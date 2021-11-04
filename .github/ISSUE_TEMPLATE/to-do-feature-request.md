@@ -2,7 +2,7 @@
 name: To Do Feature Request
 about: Add something to the to do list
 title: "[TODO]"
-labels: ''
+labels: TODO
 assignees: ''
 
 ---
