@@ -5,8 +5,52 @@ import {describeUsers, getAllUsers, getUserByID, getUserByName} from '../databas
 const router = express.Router()
 /* GET users listing. */
 router.get('/', (req, res, next) => {
-    res.render('users')
+    getAllUsers((err: Error, users: User[]) => {
+        if (err) {
+          next(err)
+        }
+        else {
+            console.log(users)
+            res.status(200).json({"users:": users})
+        }
+    })
 })
 
+/* GET user by user id listing. */
+router.get('/:userId', (req, res, next) => {
+    const userID = parseInt(req.params.userId)
+    console.log(req.params.userId) 
+    console.log(userID);
+    
+    try {
+        if (isNaN(userID)) {
+            getUserByName(req.params.userId, (err: Error, user: User) => {
+                if (err) {
+                    next(err)
+                }
+                else {
+                    console.log(user)
+                    res.status(200).json({"user:": user})
+                }
+            })
+        } else {
+            console.log("Number user id found");
+            
+            getUserByID(userID, (err: Error, user: User) => {
+                if (err) {
+                    next(err)
+                }
+                else {
+                    console.log(user)
+                    res.status(200).json({"user:": user})
+                }
+            })
+            
+        }
+    } catch (error) {
+        next(error)
+    }
+    
+})
 
 export default router
