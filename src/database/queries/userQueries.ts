@@ -1,16 +1,16 @@
 import { RowDataPacket } from "mysql2";
 import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
 import { UnexpectedSQLResultError } from "../../exceptions/UnexpectedSQLResultError";
-import { User } from "../../model/users";
-import { db } from "../database";
+import { User } from "../../model/Users";
+import { db } from "../Database";
 
 export const getAllUsers= (callback: Function) => {
-    const query = "SELECT * FROM ak_users"
+    const query = "SELECT * FROM ak_users";
 
     db.query(query, (err, result) => {
         if (err) {callback(err)}
         const rows = <RowDataPacket[]> result;
-        let resultArray: User[] = []
+        let resultArray: User[] = [];
         rows.forEach(row => {
             const user: User = {
                 id: row.ID,
@@ -19,26 +19,26 @@ export const getAllUsers= (callback: Function) => {
                 bankAccount: row.Bankaccount,
                 active: row.Active
             }
-            resultArray.push(user)
-        })
-        callback(null, resultArray)
-    })
+            resultArray.push(user);
+        });
+        callback(null, resultArray);
+    });
 
 }
 
 export const describeUsers= (callback: Function) => {
-    const query = "DESCRIBE ak_users"
+    const query = "DESCRIBE ak_users";
 
     db.query(query, (err, result) => {
         if (err) {callback(err)}
         const rows = <RowDataPacket[]> result;
         rows.forEach(row => {
-        })
-    })
+        });
+    });
 }
 
 export const getUserByID = (userID: number, callback: Function) => {
-    const query = "SELECT * FROM ak_users u WHERE u.id = ?"
+    const query = "SELECT * FROM ak_users u WHERE u.id = ?";
 
     db.query(query, userID, (err, result) => {
         try {
@@ -46,7 +46,7 @@ export const getUserByID = (userID: number, callback: Function) => {
             const rows = <RowDataPacket[]> result;
 
             if (rows == undefined) {
-                throw new EmptySQLResultError("No match found")
+                throw new EmptySQLResultError("No match found");
             } else if (rows.length == 1) {
                 rows.forEach(row => {
                     const user: User = {
@@ -56,27 +56,27 @@ export const getUserByID = (userID: number, callback: Function) => {
                         bankAccount: row.Bankaccount,
                         active: row.Active
                     }
-                    callback(null, user)
+                    callback(null, user);
                 })
             } else {
-                throw new UnexpectedSQLResultError("Could not find a user with id: " + userID + ".")
+                throw new UnexpectedSQLResultError("Could not find a user with id: " + userID + ".");
             }
         } catch (error) {
-            callback(error)
+            callback(error);
         }
                 
-    })
+    });
 }
 
 export const getUserByName = (userName: string, callback: Function) => {
     const query = "SELECT * FROM ak_users u WHERE u.name LIKE ?"
-    userName = '%' + userName + '%'
+    userName = '%' + userName + '%';
     db.query(query, userName, (err, result) => {
         try {
             if (err) {callback(err)}
             const rows = <RowDataPacket[]> result;
             if (rows == undefined) {
-                throw new EmptySQLResultError("No match found")
+                throw new EmptySQLResultError("No match found");
             } else if (rows.length == 1) {
                 rows.forEach(row => {
                     const user: User = {
@@ -86,13 +86,13 @@ export const getUserByName = (userName: string, callback: Function) => {
                         bankAccount: row.Bankaccount,
                         active: row.Active
                     }
-                    callback(null, user)
-                })
+                    callback(null, user);
+                });
             } else {
-                throw new UnexpectedSQLResultError("Could not find a user with id: " + userName + ".")
+                throw new UnexpectedSQLResultError("Could not find a user with id: " + userName + ".");
             }
     } catch (error){
-        callback(error)
+        callback(error);
     }
-    })
+    });
 }

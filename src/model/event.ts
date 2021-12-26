@@ -1,13 +1,13 @@
-import { EventType } from "./eventTypes"
+import { EventType } from "./EventTypes"
 
 export interface BasicEvent {
-    id: number
+    id: number;
 }
 
 export interface Event extends BasicEvent {
-    name: string
-    eventType?: EventType
-    startDate?: Date
-    endDate?: Date
-    saved?:boolean
+    name: string;
+    eventType?: EventType;
+    startDate?: Date;
+    endDate?: Date;
+    saved?:boolean;
 }

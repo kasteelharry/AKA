@@ -1,8 +1,8 @@
 export interface BasicProduct {
-    id: number
+    id: number;
 }
 
 export interface Product extends BasicProduct {
-    name: string
-    archived?: boolean
+    name: string;
+    archived?: boolean;
 }

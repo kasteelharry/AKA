@@ -1,7 +1,7 @@
-import { BasicEvent } from "./Event"
+import { BasicEvent } from "./event";
 
 export interface Flowstand {
-    eventID: BasicEvent
-    start?: number
-    end?: number
+    eventID: BasicEvent;
+    start?: number;
+    end?: number;
 }

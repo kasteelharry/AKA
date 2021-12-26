@@ -1,6 +1,6 @@
-import { BasicProduct, Product } from "./products";
+import { BasicProduct, Product } from "./Products";
 
 export interface ProductHotkey {
-    product: BasicProduct
-    hotkey: string
+    product: BasicProduct;
+    hotkey: string;
 }
