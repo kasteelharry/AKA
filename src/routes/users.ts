@@ -1,6 +1,6 @@
 import express from 'express'
 import { User } from '../model/Users'
-import {describeUsers, getAllUsers, getUserByID, getUserByName} from '../database/queries/UserQueries'
+import {describeUsers, getAllUsers, getUserByID} from '../database/queries/UserQueries'
 
 const router = express.Router();
 /* GET users listing. */
@@ -23,30 +23,15 @@ router.get('/:userId', (req, res, next) => {
     console.log(userID);
     
     try {
-        if (isNaN(userID)) {
-            getUserByName(req.params.userId, (err: Error, user: User) => {
-                if (err) {
-                    next(err);
-                }
-                else {
-                    console.log(user);
-                    res.status(200).json({"user:": user});
-                }
-            });
-        } else {
-            console.log("Number user id found");
-            
-            getUserByID(userID, (err: Error, user: User) => {
-                if (err) {
-                    next(err);
-                }
-                else {
-                    console.log(user);
-                    res.status(200).json({"user:": user});
-                }
-            });
-            
-        }
+        getUserByID(req.params.userId, (err: Error, user: User) => {
+            if (err) {
+                next(err);
+            }
+            else {
+                console.log(user);
+                res.status(200).json({"user:": user});
+            }
+        });
     } catch (error) {
         next(error);
     }
