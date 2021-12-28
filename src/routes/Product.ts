@@ -1,11 +1,11 @@
-import express, { NextFunction } from 'express';
+import express from 'express';
+import { OkPacket, RowDataPacket } from 'mysql2';
 import { createNewProduct, getAllProducts, getProductByID } from '../database/queries/productQueries';
-import { BasicProduct, NewProduct, Product } from "../model/Products";
 
 const router = express.Router();
 
 router.get('/', (req, res, next) => {
-    getAllProducts((err:Error,product:Product[]) => {
+    getAllProducts((err:Error,product:RowDataPacket[]) => {
         if(err) {
             next(err);
         } else {
@@ -17,7 +17,7 @@ router.get('/', (req, res, next) => {
 
 router.get('/:productID', (req, res, next) => {
     const productID = req.params.productID;
-    getProductByID(productID, (err:Error, product:Product) => {
+    getProductByID(productID, (err:Error, product:RowDataPacket) => {
         if (err) {
             next(err)
         } else {
@@ -29,7 +29,7 @@ router.get('/:productID', (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     const name = req.body
-    createNewProduct(name, (err:Error,product:any) => {
+    createNewProduct(name, (err:Error,product:OkPacket) => {
         if(err) {
             next(err)
         } else {

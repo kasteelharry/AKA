@@ -1,11 +1,11 @@
 import express from 'express'
-import { User } from '../model/Users'
-import {describeUsers, getAllUsers, getUserByID} from '../database/queries/UserQueries'
+import { RowDataPacket } from 'mysql2';
+import {getAllUsers, getUserByID} from '../database/queries/UserQueries'
 
 const router = express.Router();
 /* GET users listing. */
 router.get('/', (req, res, next) => {
-    getAllUsers((err: Error, users: User[]) => {
+    getAllUsers((err: Error, users: RowDataPacket[]) => {
         if (err) {
           next(err);
         }
@@ -23,7 +23,7 @@ router.get('/:userId', (req, res, next) => {
     console.log(userID);
     
     try {
-        getUserByID(req.params.userId, (err: Error, user: User) => {
+        getUserByID(req.params.userId, (err: Error, user: RowDataPacket) => {
             if (err) {
                 next(err);
             }
