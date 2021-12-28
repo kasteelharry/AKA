@@ -28,11 +28,12 @@ router.get('/:productID', (req, res, next) => {
 });
 
 router.post('/', async (req, res, next) => {
-    const newProduct: NewProduct = req.body;
-    createNewProduct(newProduct, (err:Error, productId: number) => {
+    const name = req.body
+    createNewProduct(name, (err:Error,product:any) => {
         if(err) {
             next(err)
         } else {
+            const productId = product.insertId;
             res.status(200).json({"productId:": productId})
         }
     });
