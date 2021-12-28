@@ -28,7 +28,7 @@ router.get('/:productID', (req, res, next) => {
 });
 
 router.post('/', async (req, res, next) => {
-    const name = req.body
+    const name = req.body.name;
     createNewProduct(name, (err:Error,product:OkPacket) => {
         if(err) {
             next(err)
