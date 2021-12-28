@@ -1,11 +1,9 @@
-import { BasicProduct, NewProduct, Product } from "../../model/Products";
-import { db, executePreparedQuery } from "../Database";
+import { NewProduct } from "../../model/Products";
+import { executePreparedQuery } from "../Database";
 
 export const createNewProduct = (product: NewProduct, callback: Function) => {
     const query = "INSERT INTO ak_products (Name) VALUES (?);";
     executePreparedQuery(query, callback, product.name);
-
-    
 }
 
 export const getAllProducts = (callback: Function) => {
