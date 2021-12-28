@@ -1,6 +1,6 @@
 import express, { NextFunction } from 'express';
-import { getAllProducts, getProductByID } from '../database/queries/productQueries';
-import { BasicProduct, Product } from "../model/Products";
+import { createNewProduct, getAllProducts, getProductByID } from '../database/queries/productQueries';
+import { BasicProduct, NewProduct, Product } from "../model/Products";
 
 const router = express.Router();
 
@@ -23,6 +23,17 @@ router.get('/:productID', (req, res, next) => {
         } else {
             console.log(product);
             res.status(200).json({"product:":product});
+        }
+    });
+});
+
+router.post('/', async (req, res, next) => {
+    const newProduct: NewProduct = req.body;
+    createNewProduct(newProduct, (err:Error, productId: number) => {
+        if(err) {
+            next(err)
+        } else {
+            res.status(200).json({"productId:": productId})
         }
     });
 });
