@@ -1,26 +1,16 @@
-import { RowDataPacket } from "mysql2";
-import { UnexpectedSQLResultError } from "../../exceptions/UnexpectedSQLResultError";
-import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
-import { BasicProduct, Product } from "../../model/Products";
-import { db } from "../Database";
+import { BasicProduct, NewProduct, Product } from "../../model/Products";
+import { db, executePreparedQuery } from "../Database";
+
+export const createNewProduct = (product: NewProduct, callback: Function) => {
+    const query = "INSERT INTO ak_products (Name) VALUES (?);";
+    executePreparedQuery(query, callback, product.name);
+
+    
+}
 
 export const getAllProducts = (callback: Function) => {
     const query = "SELECT * FROM ak_products";
-
-    db.query(query, (err, result) => {
-        if (err) {callback(err)}
-        let resultArr: BasicProduct[] = [];
-        const rows = <RowDataPacket[]> result;
-        rows.forEach(row => {
-            const product: Product = {
-                id: row.ID,
-                name: row.Name,
-                archived: row.Archived
-            }
-            resultArr.push(product);
-        });
-        callback(null, resultArr);
-    });
+    executePreparedQuery(query, callback);
 }
 
 export const getProductByID = (productID:string, callback: Function) => {
@@ -32,30 +22,7 @@ export const getProductByID = (productID:string, callback: Function) => {
         query = queryTwo;
         productID = '%' + productID + '%';
     } else {
-        query = queryOne
+        query = queryOne;
     }
-    db.query(query, productID, (err, result) => {
-        try {
-            if (err) {
-                callback(err);
-            }
-            const rows = <RowDataPacket[]> result;
-            if (rows == undefined) {
-                throw new EmptySQLResultError("No match found.");
-            } else if (rows.length == 1) {
-                rows.forEach(row => {
-                    const product: Product = {
-                        id: row.ID,
-                        name: row.Name,
-                        archived: row.Archived
-                    }
-                    callback(null, product);
-                });
-            } else {
-                throw new UnexpectedSQLResultError("Expected 1 result, received " + rows.length);
-            }
-        } catch (error) {
-            callback(error);
-        }
-    });
+    executePreparedQuery(query, callback, productID);
 }
