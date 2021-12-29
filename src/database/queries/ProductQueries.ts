@@ -52,7 +52,19 @@ export const getProductByID = (productID:string, callback: Function) => {
 // ------------------------- Update statements -------------------------
 // 
 
-
+export const updateProductNameByID = (productID:string, newName:string, callback:Function) => {
+    const queryOne = "UPDATE ak_products p SET p.name = ? WHERE p.id = ?;";
+    const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name LIKE ?";
+    let query = "";
+    const numberID = parseInt(productID);
+    if (isNaN(numberID)) {
+        query = queryTwo;
+        productID = '%' + productID + '%';
+    } else {
+        query = queryOne;
+    }
+    executePreparedQuery(query, callback, [newName, productID]);
+}
 
 // 
 // ------------------------- Delete statements -------------------------
