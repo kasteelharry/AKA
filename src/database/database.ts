@@ -65,6 +65,7 @@ export const executeTransactions = async (queries: Array<{ id: number, query: st
                         reject(new UnexpectedSQLResultError("Something went wrong with the query."));
                     }
                     resolve(results);
+                    connection.release();
                 });
             });
         
