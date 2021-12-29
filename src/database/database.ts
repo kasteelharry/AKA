@@ -24,49 +24,52 @@ export const executeTransactions = async (queries: Array<{ id: number, query: st
     return new Promise(async (resolve, reject) => {
         const results: {[id: string]: {result: any, fields: FieldPacket[] | undefined} }= {};
         db.getConnection((err, connection) => {
-            try {
-                connection.on("error", (error: Error) => {
-                    if (error.message.match('Duplicate entry')) {
-                        reject(new ItemAlreadyExistsError())
-                    } else {
+            connection.beginTransaction((err) => {
+                if (err) {
+                    connection.rollback(() => {
+                        connection.release();
                         reject(new UnexpectedSQLResultError("Something went wrong with the connection."))
-                    }
-                    return
-                })
-            } catch (error) {
-                reject(new UnexpectedSQLResultError("Something went wrong with the database."));
-                return;
-            }
-            for (const query of queries) {
-                connection.query(query.query, query.parameters, (err, queryResult, fields) => {
-                    // If the query errored, then rollback and reject
-                    if (err !== null) {
-                        // Try catch the rollback end reject if the rollback fails
-                        try {
-                            connection.rollback(() => {
-                                reject(new UnexpectedSQLResultError("Something went wrong with query " + query.id + "."));
-                            });
-                        } catch (rollbackError) {
-                            reject(new UnexpectedSQLResultError("Failed to roll back."));
-                        }
-                    }
-                    
-                    // Push the result into an array and index it with the ID passed for searching later
-                    results[query.id] = {
-                        result: queryResult,
-                        fields: fields,
-                    };
-                });
-            }
-            connection.commit((commitError) => {
-                if (commitError !== null) {
-                    reject(new UnexpectedSQLResultError("Something went wrong with the query."));
+                    });
                 }
-                console.log("results have been saved");
-                
-                resolve(results);
+                for (const query of queries) {
+                    connection.query(query.query, query.parameters, (err, queryResult, fields) => {
+                        // If the query errored, then rollback and reject
+                        if (err) {
+                            // Try catch the rollback end reject if the rollback fails
+                            try {
+                                connection.rollback(() => {
+                                    connection.release();
+                                    reject(new UnexpectedSQLResultError("Something went wrong with query " + query.id + "."));
+                                });
+                            } catch (rollbackError) {
+                                connection.release();
+                                reject(new UnexpectedSQLResultError("Failed to roll back."));
+                            }
+                        }
+                        
+                        if(queryResult == undefined) {
+                            connection.release();
+                            reject(new UnexpectedSQLResultError('No result found'))
+                        }
+                        // Push the result into an array and index it with the ID passed for searching later
+                        results[query.id] = {
+                            result: queryResult,
+                            fields: fields,
+                        };
+                    });
+                }
+            
+                connection.commit((commitError) => {
+                    if (commitError) {
+                        connection.release();
+                        reject(new UnexpectedSQLResultError("Something went wrong with the query."));
+                    }
+                    resolve(results);
+                });
             });
+        
         });
+    
     });
 }
 
