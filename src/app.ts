@@ -5,7 +5,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import indexRouter from './routes/Index';
-import usersRouter from './routes/Users';
+import customersRouter from './routes/customers';
 import loginRouter from './routes/Login';
 import productRouter from './routes/Product';
 
@@ -23,7 +23,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/customer', customersRouter);
 app.use('/login', loginRouter);
 app.use('/products', productRouter);
 
