@@ -16,7 +16,18 @@ import { executePreparedQuery, executeTransactions } from "../Database";
  */
 export const createNewProduct = (product: string, callback: Function) => {
     const query = "INSERT INTO ak_products (Name) VALUES (?);";
-    executePreparedQuery(query, callback, product);
+    executeTransactions([
+        {
+            id: 1,
+            query: query,
+            parameters: [product]
+        }
+    ]).then(
+        val => {
+            callback(null, val[1].result)
+        }).catch(
+            err => callback(err)
+        );
 }
 
 // 
