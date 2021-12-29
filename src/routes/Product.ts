@@ -80,11 +80,4 @@ router.post('/:productID', (req, res, next) => {
 
 });
 
-function update(id: string, name: string) {
-    return new Promise((resolve, reject) => {
-        let updated = false;
-
-    });
-}
-
 export default router;
