@@ -27,15 +27,7 @@ export const createNewProduct = (product: string, callback: Function) => {
  * Gets all the products from the database.
  * @param callback callback method containing the result of the query.
  */
-export const getAllProducts = async (callback: Function) => {
-    const query = "SELECT * FROM ak_products";
-    
-    // executePreparedQuery(query, callback);
-}
-
-export const getProducts = (callback: Function)  => {
-    console.log("called");
-    
+export const getAllProducts = (callback: Function)  => {    
     executeTransactions([
         {
             id: 1,
@@ -66,7 +58,19 @@ export const getProductByID = (productID:string, callback: Function) => {
     } else {
         query = queryOne;
     }
-    executePreparedQuery(query, callback, productID);
+
+    executeTransactions([
+        {
+            id: 1,
+            query: query,
+            parameters: [productID]
+        }
+    ]).then(
+        val => {
+            callback(null, val[1].result)
+        }).catch(
+            err => callback(err)
+        );
 }
 
 // 
@@ -177,5 +181,16 @@ export const deleteProductNameByID = (productId:string, callback:Function) => {
     } else {
         query = queryOne;
     }
-    executePreparedQuery(query, callback, productId);
+    executeTransactions([
+        {
+            id: 1,
+            query: query,
+            parameters: [productId]
+        }
+    ]).then(
+        val => {
+            callback(null, val[1].result)
+        }).catch(
+            err => callback(err)
+        );
 }

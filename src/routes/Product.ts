@@ -1,7 +1,7 @@
 import express from 'express';
 import { OkPacket, RowDataPacket } from 'mysql2';
 import { EmptySQLResultError } from '../exceptions/EmptySQLResultError';
-import { archiveProductByID, createNewProduct, deleteProductNameByID, getAllProducts, getProductByID, getProducts, updateProductNameByID } from '../database/queries/productQueries';
+import { archiveProductByID, createNewProduct, deleteProductNameByID, getAllProducts, getProductByID, updateProductNameByID } from '../database/queries/productQueries';
 
 const router = express.Router();
 
@@ -26,7 +26,7 @@ router.post('/', async (req, res, next) => {
 // 
 
 router.get('/', (req, res, next) => {
-    getProducts((err: Error, product: RowDataPacket[]) => {
+    getAllProducts((err: Error, product: RowDataPacket[]) => {
         if (err) {
             next(err);
         } else {
