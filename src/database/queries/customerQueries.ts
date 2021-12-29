@@ -1,11 +1,30 @@
 import { RowDataPacket } from "mysql2";
-import { db, executePreparedQuery } from "../Database";
+import { db, executeTransactions } from "../Database";
+
+// 
+// ------------------------- Create statements -------------------------
+// 
+
+
+// 
+// ------------------------- Retrieve statements -------------------------
+// 
 
 export const getAllCustomers= (callback: Function) => {
     const query = "SELECT * FROM ak_customers";
 
-    executePreparedQuery(query, callback);
-
+    executeTransactions([
+        {
+            id: 1,
+            query: query,
+            parameters: []
+        }
+    ]).then(
+        val => {
+            callback(null, val[1].result)
+        }).catch(
+            err => callback(err)
+        );
 }
 
 export const describeCustomers= (callback: Function) => {
@@ -30,5 +49,24 @@ export const getCustomerByID = (userID: string, callback: Function) => {
     } else {
         query = queryOne
     }
-    executePreparedQuery(query, callback, userID);
+    executeTransactions([
+        {
+            id: 1,
+            query: query,
+            parameters: [userID]
+        }
+    ]).then(
+        val => {
+            callback(null, val[1].result)
+        }).catch(
+            err => callback(err)
+        );
 }
+
+// 
+// ------------------------- Update statements -------------------------
+// 
+
+// 
+// ------------------------- Delete statements -------------------------
+// 

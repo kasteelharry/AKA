@@ -1,8 +1,7 @@
 
-import { FieldPacket } from "mysql2";
 import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
 import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
-import { executePreparedQuery, executeTransactions } from "../Database";
+import { executeTransactions } from "../Database";
 
 
 // 
