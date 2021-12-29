@@ -1,14 +1,14 @@
 import { RowDataPacket } from "mysql2";
 import { db, executePreparedQuery } from "../Database";
 
-export const getAllUsers= (callback: Function) => {
-    const query = "SELECT * FROM ak_users";
+export const getAllCustomers= (callback: Function) => {
+    const query = "SELECT * FROM ak_customers";
 
     executePreparedQuery(query, callback);
 
 }
 
-export const describeUsers= (callback: Function) => {
+export const describeCustomers= (callback: Function) => {
     const query = "DESCRIBE ak_users";
 
     db.query(query, (err, result) => {
@@ -19,9 +19,9 @@ export const describeUsers= (callback: Function) => {
     });
 }
 
-export const getUserByID = (userID: string, callback: Function) => {
-    const queryOne = "SELECT * FROM ak_users u WHERE u.id = ?";
-    const queryTwo = "SELECT * FROM ak_users u WHERE u.name LIKE ?";
+export const getCustomerByID = (userID: string, callback: Function) => {
+    const queryOne = "SELECT * FROM ak_customers c WHERE c.id = ?";
+    const queryTwo = "SELECT * FROM ak_customers c WHERE c.name LIKE ?";
     let query = "";
     const numberID = parseInt(userID);
     if(isNaN(numberID)){
