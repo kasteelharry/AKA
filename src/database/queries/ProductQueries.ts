@@ -23,9 +23,17 @@ export const createNewProduct = (product: string, callback: Function) => {
         }
     ]).then(
         val => {
-            callback(null, val[1].result)
+            callback(null, val[1].result.insertId)
         }).catch(
-            err => callback(err)
+            err => {
+                console.log('catching error.');
+                
+                if (err instanceof ItemAlreadyExistsError && err.message.match("Duplicate entry")) {
+                    if (err.message.match("bank")) {
+                        callback(new ItemAlreadyExistsError("Given bankaccount already exists.")) 
+                    }
+                }
+            }
         );
 }
 
