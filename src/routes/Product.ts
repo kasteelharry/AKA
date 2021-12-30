@@ -15,7 +15,8 @@ router.post('/', async (req, res, next) => {
         if (err) {
             next(err)
         } else {
-            res.status(200).json({ "productId:": product })
+            const productId = product.insertId;
+            res.status(200).json({ "productId:": productId })
         }
     });
 });
