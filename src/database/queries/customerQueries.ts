@@ -139,7 +139,6 @@ export const updateCustomer= (customerID:string, params:Map<string, string | num
     if (active != null) {
         active = (active =="true") ? 1 : 0;
     }
-    console.log(bankaccount);
     
     const numberID = parseInt(customerID);
     if (isNaN(numberID)) {
@@ -180,3 +179,34 @@ export const updateCustomer= (customerID:string, params:Map<string, string | num
 // 
 // ------------------------- Delete statements -------------------------
 // 
+
+/**
+ * Deletes a customer from the database.
+ * @param customerID the id or name of the customer that needs to be deleted.
+ * @param callback The callback function containing either the query result or the 
+ * error if one is thrown.
+ */
+export const deleteCustomer = (customerID:string, callback:Function) => {
+    const queryOne = "DELETE FROM ak_customers c WHERE c.id = ?;";
+    const queryTwo = "DELETE FROM ak_customers c WHERE c.name = ?";
+    let query = "";
+    const numberID = parseInt(customerID);
+    if (isNaN(numberID)) {
+        query = queryTwo;
+        customerID = '%' + customerID + '%';
+    } else {
+        query = queryOne;
+    }
+    executeTransactions([
+        {
+            id: 1,
+            query: query,
+            parameters: [customerID]
+        }
+    ]).then(
+        val => {
+            callback(null, val[1].result)
+        }).catch(
+            err => callback(err)
+        );
+}

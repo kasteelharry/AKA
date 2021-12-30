@@ -1,8 +1,9 @@
 import express from 'express'
 import { OkPacket, RowDataPacket } from 'mysql2';
 import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
-import {createNewCustomer, getAllCustomers, getCustomerByID, updateCustomer } from '../database/queries/customerQueries'
+import {createNewCustomer, deleteCustomer, getAllCustomers, getCustomerByID, updateCustomer } from '../database/queries/customerQueries'
 import { convertStringToSQLDate } from '../util/ConvertStringToSQLDate';
+import { EmptySQLResultError } from '../exceptions/EmptySQLResultError';
 
 const router = express.Router();
 
@@ -96,7 +97,24 @@ router.post('/:customerID', (req, res, next) =>{
     }
 });
 
+// 
+// ------------------------- Delete endpoints -------------------------
+// 
 
+/* POST to delete a customer from the database. */
+router.post('/:customerID/delete', (req, res, next) => {
+    deleteCustomer(req.params.customerID, (err: Error, customer: RowDataPacket) => {
+        if (err) {
+            next(err);
+        } else {
+            if (customer.affectedRows == 1) {
+                res.status(200).json({ "customers:": "The customer has been deleted" });
+            } else {
+                next(new EmptySQLResultError("No entry found for " + req.params.customerID));
+            }
 
+        }
+    });
+});
 
 export default router;
