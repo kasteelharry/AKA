@@ -1,7 +1,7 @@
 import express from 'express'
 import { OkPacket, RowDataPacket } from 'mysql2';
 import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
-import {createNewCustomer, getAllCustomers, getCustomerByID, updateCustomerNameByID} from '../database/queries/customerQueries'
+import {createNewCustomer, getAllCustomers, getCustomerByID, updateCustomer } from '../database/queries/customerQueries'
 import { convertStringToSQLDate } from '../util/ConvertStringToSQLDate';
 
 const router = express.Router();
@@ -74,11 +74,16 @@ router.get('/:customerID', (req, res, next) => {
 // ------------------------- Update endpoints -------------------------
 // 
 
-/* GET customer by customer id listing. */
-router.post('/:customerID', (req, res, next) => {
-    
+/* POST to update the attributes of the customer. */
+router.post('/:customerID', (req, res, next) =>{
     try {
-        updateCustomerNameByID(req.params.customerID, req.body.name, (err: Error, customer: RowDataPacket) => {
+        const birthday = convertStringToSQLDate(req.body.birthday);
+        const params = new Map<string, string | number>();
+        params.set("name", req.body.name);
+        params.set("birthday", req.body.birthday);
+        params.set("bankaccount", req.body.bankaccount);
+        params.set("active", req.body.active);
+        updateCustomer(req.params.customerID, params, (err: Error, customer: RowDataPacket) => {
             if (err) {
                 next(err);
             }
@@ -87,8 +92,11 @@ router.post('/:customerID', (req, res, next) => {
             }
         });
     } catch (error) {
-        next(error);
+        next(error)
     }
 });
+
+
+
 
 export default router;

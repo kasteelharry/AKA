@@ -20,7 +20,7 @@ export const db = mysql.createPool({
 });
 
 
-export const executeTransactions = async (queries: Array<{ id: number, query: string, parameters: Array<string | number | boolean | JSON | Date | null> }>): Promise<{ [id: string]: any }> => {
+export const executeTransactions = async (queries: Array<{ id: number, query: string, parameters: Array<string | number | boolean | JSON | Date | null | undefined> }>): Promise<{ [id: string]: any }> => {
     return new Promise(async (resolve, reject) => {
         const results: {[id: string]: {result: any, fields: FieldPacket[] | undefined} }= {};
         db.getConnection((err, connection) => {

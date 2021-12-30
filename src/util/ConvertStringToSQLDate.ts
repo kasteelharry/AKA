@@ -5,9 +5,11 @@
  * @returns the string formatted for MySQL support.
  */
 export function convertStringToSQLDate(date:string) {
-    console.log(date);
-    
-    const dateOfBirth = new Date(date).toISOString();
-    const isoDate = new Date(dateOfBirth);
-    return isoDate.toJSON().slice(0, 19).replace('T', ' ');
+    try {
+        const dateOfBirth = new Date(date).toISOString();
+        const isoDate = new Date(dateOfBirth);
+        return isoDate.toJSON().slice(0, 19).replace('T', ' ');
+    } catch {
+        return undefined;
+    }
 }

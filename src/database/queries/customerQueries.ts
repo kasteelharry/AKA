@@ -16,7 +16,7 @@ import { db, executeTransactions } from "../database";
  *             in the database.
  * @param callback the callback function either containing the error or the query result.
  */
-export const createNewCustomer = (name:string, birthDate:string, bank:string, callback: Function) => {
+export const createNewCustomer = (name:string, birthDate:string | undefined, bank:string, callback: Function) => {
     const query = 'INSERT INTO ak_customers (Name, BirthDate, Bankaccount) ' +
     'VALUES (?, ?, ?);';
 
@@ -54,7 +54,7 @@ export const getAllCustomers= (callback: Function) => {
         }
     ]).then(
         val => {
-            callback(null, val[1].result)
+            callback(null, val[1].result);
         }).catch(
             err => callback(err)
         );
@@ -92,7 +92,7 @@ export const getCustomerByID = (customerID: string, callback: Function) => {
         query = queryTwo;
         customerID = '%' + customerID + '%';
     } else {
-        query = queryOne
+        query = queryOne;
     }
     executeTransactions([
         {
@@ -102,7 +102,7 @@ export const getCustomerByID = (customerID: string, callback: Function) => {
         }
     ]).then(
         val => {
-            callback(null, val[1].result)
+            callback(null, val[1].result);
         }).catch(
             err => callback(err)
         );
@@ -113,19 +113,34 @@ export const getCustomerByID = (customerID: string, callback: Function) => {
 // 
 
 /**
- * Updates the name of the customer when called.
+ * Updates the customer in the database based on the params input.
  * @param customerID the id or name of the customer that needs to be updated
- * @param newName the new name of the customer.
+ * @param params a map containing the values and keys that need to be updated.
  * @param callback The callback function containing either the query result or the 
  * error if one is thrown.
  */
-export const updateCustomerNameByID = (customerID:string, newName:string, callback: Function) => {
-    const queryA = "UPDATE ak_customers c SET c.name = ? WHERE c.id = ?;";
-    const queryB = "UPDATE ak_customers c SET c.name = ? WHERE c.name = ?;";
+export const updateCustomer= (customerID:string, params:Map<string, string | number>, callback:Function) => {
+    const queryA = "UPDATE ak_customers c SET " + 
+    "c.name = COALESCE(?,c.name), " + 
+    "c.birthdate = COALESCE(?,c.birthdate), " + 
+    "c.bankaccount = COALESCE(?,c.bankaccount), " + 
+    "c.active = COALESCE(?,c.active) " + 
+    "WHERE c.id = ?;";
+    const queryB = "UPDATE ak_customers c SET c.bankaccount = ? WHERE c.name = ?;";
     const queryC = "SELECT * FROM ak_customers c WHERE c.id = ?;";
     const queryD = "SELECT * FROM ak_customers c WHERE c.name = ?;";
     let queryOne = "";
     let queryTwo = "";
+    const name = params.get("name") == undefined ? null : params.get("name");
+    const finalID = name != null ? name : customerID;
+    const birthday = params.get("birthday") == undefined ? null : params.get("birthday") ;
+    const bankaccount = params.get("bankaccount") == undefined ? null : params.get("bankaccount");
+    let active = params.get("active") == undefined ? null : params.get("active");
+    if (active != null) {
+        active = (active =="true") ? 1 : 0;
+    }
+    console.log(bankaccount);
+    
     const numberID = parseInt(customerID);
     if (isNaN(numberID)) {
         queryOne = queryB;
@@ -139,12 +154,12 @@ export const updateCustomerNameByID = (customerID:string, newName:string, callba
         {
             id: 1,
             query: queryOne,
-            parameters: [newName, customerID]
+            parameters: [name, birthday, bankaccount, active, customerID]
         },
         {
             id: 2,
             query: queryTwo,
-            parameters: [newName]
+            parameters: [finalID]
         }
     ]).then(
         val => {
@@ -154,14 +169,13 @@ export const updateCustomerNameByID = (customerID:string, newName:string, callba
             } else if (queryResults.affectedRows == 1) {
                 callback(new ItemAlreadyExistsError());
             } else {
-                callback(new EmptySQLResultError('Was unable to find a match for the id.'))
+                callback(new EmptySQLResultError('Was unable to find a match for the id.'));
             }
             
         }).catch(
             err => callback(err)
         );
 }
-
 
 // 
 // ------------------------- Delete statements -------------------------
