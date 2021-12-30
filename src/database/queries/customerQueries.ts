@@ -1,5 +1,7 @@
 import { RowDataPacket } from "mysql2";
-import { db, executeTransactions } from "../Database";
+import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
+import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
+import { db, executeTransactions } from "../database";
 
 // 
 // ------------------------- Create statements -------------------------
@@ -109,6 +111,56 @@ export const getCustomerByID = (customerID: string, callback: Function) => {
 // 
 // ------------------------- Update statements -------------------------
 // 
+
+/**
+ * Updates the name of the customer when called.
+ * @param customerID the id or name of the customer that needs to be updated
+ * @param newName the new name of the customer.
+ * @param callback The callback function containing either the query result or the 
+ * error if one is thrown.
+ */
+export const updateCustomerNameByID = (customerID:string, newName:string, callback: Function) => {
+    const queryA = "UPDATE ak_customers c SET c.name = ? WHERE c.id = ?;";
+    const queryB = "UPDATE ak_customers c SET c.name = ? WHERE c.name = ?;";
+    const queryC = "SELECT * FROM ak_customers c WHERE c.id = ?;";
+    const queryD = "SELECT * FROM ak_customers c WHERE c.name = ?;";
+    let queryOne = "";
+    let queryTwo = "";
+    const numberID = parseInt(customerID);
+    if (isNaN(numberID)) {
+        queryOne = queryB;
+        queryTwo = queryD;
+    } else {
+        queryOne = queryA;
+        queryTwo = queryC;
+    }
+
+    executeTransactions([
+        {
+            id: 1,
+            query: queryOne,
+            parameters: [newName, customerID]
+        },
+        {
+            id: 2,
+            query: queryTwo,
+            parameters: [newName]
+        }
+    ]).then(
+        val => {
+            const queryResults = val[1].result
+            if (queryResults.changedRows == 1) {
+                callback(null, val[2].result);
+            } else if (queryResults.affectedRows == 1) {
+                callback(new ItemAlreadyExistsError());
+            } else {
+                callback(new EmptySQLResultError('Was unable to find a match for the id.'))
+            }
+            
+        }).catch(
+            err => callback(err)
+        );
+}
 
 
 // 

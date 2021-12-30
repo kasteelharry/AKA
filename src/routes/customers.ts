@@ -1,7 +1,7 @@
 import express from 'express'
 import { OkPacket, RowDataPacket } from 'mysql2';
 import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
-import {createNewCustomer, getAllCustomers, getCustomerByID} from '../database/queries/customerQueries'
+import {createNewCustomer, getAllCustomers, getCustomerByID, updateCustomerNameByID} from '../database/queries/customerQueries'
 import { convertStringToSQLDate } from '../util/ConvertStringToSQLDate';
 
 const router = express.Router();
@@ -33,6 +33,9 @@ router.post('/', async (req, res, next) => {
     });
 });
 
+// 
+// ------------------------- Retrieve endpoints -------------------------
+// 
 
 /* GET customer listing. */
 router.get('/', (req, res, next) => {
@@ -49,17 +52,14 @@ router.get('/', (req, res, next) => {
 
 /* GET customer by customer id listing. */
 router.get('/:customerID', (req, res, next) => {
-    const customerID = parseInt(req.params.customerID);
     console.log(req.params.customerID);
-    console.log(customerID);
-    
     try {
         getCustomerByID(req.params.customerID, (err: Error, customer: RowDataPacket) => {
             if (err) {
                 next(err);
             }
             else {
-                console.log(customer);
+
                 res.status(200).json({"customer:": customer});
             }
         });
@@ -67,6 +67,27 @@ router.get('/:customerID', (req, res, next) => {
         next(error);
     }
     
+});
+
+// 
+// ------------------------- Update endpoints -------------------------
+// 
+
+/* GET customer by customer id listing. */
+router.post('/:customerID', (req, res, next) => {
+    
+    try {
+        updateCustomerNameByID(req.params.customerID, req.body.name, (err: Error, customer: RowDataPacket) => {
+            if (err) {
+                next(err);
+            }
+            else {
+                res.status(200).json({"customer:": customer});
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
 });
 
 export default router;
