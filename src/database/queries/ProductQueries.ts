@@ -97,16 +97,15 @@ export const getProductByID = (productID:string, callback: Function) => {
 
 export const updateProductNameByID = (productID:string, newName:string, callback:Function) => {
     const queryOne = "UPDATE ak_products p SET p.name = ? WHERE p.id = ?;";
-    const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name LIKE ?";
+    const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name = ?";
     const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
-    const queryFour = "SELECT * FROM ak_products p WHERE p.name LIKE ?";
+    const queryFour = "SELECT * FROM ak_products p WHERE p.name = ?";
     let queryToPerform = "";
     let secondQuery = "";
     const numberID = parseInt(productID);
     if (isNaN(numberID)) {
         queryToPerform = queryTwo;
         secondQuery = queryFour;
-        productID = '%' + productID + '%';
     } else {
         queryToPerform = queryOne;
         secondQuery = queryThree;
@@ -121,7 +120,7 @@ export const updateProductNameByID = (productID:string, newName:string, callback
         {
             id: 2,
             query: secondQuery,
-            parameters: [productID]
+            parameters: [newName]
         }
     ]).then(
         val => {
