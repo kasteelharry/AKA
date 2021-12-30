@@ -1,5 +1,5 @@
 import { RowDataPacket } from "mysql2";
-import { db, executeTransactions } from "../database";
+import { db, executeTransactions } from "../Database";
 
 // 
 // ------------------------- Create statements -------------------------
