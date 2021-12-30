@@ -1,4 +1,4 @@
-import mysql, { FieldPacket, PoolConnection } from 'mysql2';
+import mysql, { FieldPacket } from 'mysql2';
 import dotenv from 'dotenv';
 import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
 import { UnexpectedSQLResultError } from '../exceptions/UnexpectedSQLResultError';
