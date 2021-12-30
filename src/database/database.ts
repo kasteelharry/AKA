@@ -20,7 +20,7 @@ export const db = mysql.createPool({
 });
 
 
-export const executeTransactions = async (queries: Array<{ id: number, query: string, parameters: Array<string | number | boolean | JSON> }>): Promise<{ [id: string]: any }> => {
+export const executeTransactions = async (queries: Array<{ id: number, query: string, parameters: Array<string | number | boolean | JSON | Date | null> }>): Promise<{ [id: string]: any }> => {
     return new Promise(async (resolve, reject) => {
         const results: {[id: string]: {result: any, fields: FieldPacket[] | undefined} }= {};
         db.getConnection((err, connection) => {
@@ -48,8 +48,19 @@ export const executeTransactions = async (queries: Array<{ id: number, query: st
                         }
                         
                         if(queryResult == undefined) {
+                            connection.rollback(() => {
                             connection.release();
-                            reject(new UnexpectedSQLResultError('No result found'))
+                            
+                            });
+                            // If the server has thrown a SQL error, catch it here otherwise nothing was found.
+                            if (err) {
+                                console.log('error found.');
+                                
+                                reject(new ItemAlreadyExistsError(err.message))
+                            } else {
+                                reject(new UnexpectedSQLResultError("No match found.")) 
+                            }
+                            
                         }
                         // Push the result into an array and index it with the ID passed for searching later
                         results[query.id] = {
@@ -61,8 +72,10 @@ export const executeTransactions = async (queries: Array<{ id: number, query: st
             
                 connection.commit((commitError) => {
                     if (commitError) {
+                        connection.rollback(() => {
                         connection.release();
                         reject(new UnexpectedSQLResultError("Something went wrong with the query."));
+                        });
                     }
                     resolve(results);
                     connection.release();
