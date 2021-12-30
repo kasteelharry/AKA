@@ -4,9 +4,9 @@ import createError from 'http-errors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-import indexRouter from './routes/Index';
+import indexRouter from './routes/index';
 import customersRouter from './routes/customers';
-import loginRouter from './routes/Login';
+import loginRouter from './routes/login';
 import productRouter from './routes/Product';
 
 const app = express();

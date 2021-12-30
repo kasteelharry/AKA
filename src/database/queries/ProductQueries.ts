@@ -1,7 +1,7 @@
 
 import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
 import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
-import { executeTransactions } from "../Database";
+import { executeTransactions } from "../database";
 
 
 // 
@@ -29,10 +29,11 @@ export const createNewProduct = (product: string, callback: Function) => {
                 console.log('catching error.');
                 
                 if (err instanceof ItemAlreadyExistsError && err.message.match("Duplicate entry")) {
-                    if (err.message.match("bank")) {
-                        callback(new ItemAlreadyExistsError("Given bankaccount already exists.")) 
+                    if (err.message.match(product)) {
+                        callback(new ItemAlreadyExistsError("Given product name already exists.")) 
                     }
                 }
+                callback(err);
             }
         );
 }
