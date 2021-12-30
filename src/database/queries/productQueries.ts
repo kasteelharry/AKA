@@ -1,7 +1,7 @@
 
 import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
 import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
-import { executeTransactions } from "../Database";
+import { executeTransactions } from "../database";
 
 
 // 
@@ -33,6 +33,7 @@ export const createNewProduct = (product: string, callback: Function) => {
                         callback(new ItemAlreadyExistsError("Given bankaccount already exists.")) 
                     }
                 }
+                callback(err)
             }
         );
 }

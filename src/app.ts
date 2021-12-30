@@ -4,9 +4,9 @@ import createError from 'http-errors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-import indexRouter from './routes/Index';
+import indexRouter from './routes/index';
 import customersRouter from './routes/customers';
-import loginRouter from './routes/Login';
+import loginRouter from './routes/login';
 import productRouter from './routes/Product';
 
 const app = express();
@@ -28,12 +28,12 @@ app.use('/login', loginRouter);
 app.use('/products', productRouter);
 
 // catch 404 and forward to error handler
-app.use( (req: Request, res: Response, next) => {
+app.use((req: Request, res: Response, next) => {
   next(createError(404));
 });
 
 // error handler
-app.use( (err: any, req: Request, res: Response, next:NextFunction) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
   // render the error page
   res.status(err.status || 500);
@@ -44,7 +44,7 @@ app.use( (err: any, req: Request, res: Response, next:NextFunction) => {
 });
 
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
-  });
+  console.log(`Example app listening at http://localhost:${port}`);
+});
 
 module.exports = app;
