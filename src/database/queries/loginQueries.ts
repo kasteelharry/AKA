@@ -11,26 +11,27 @@ import { executeTransactions } from "../database";
  * @param email the email of the user.
  * @param hash the hashed password.
  * @param salt the salt used when hashing.
- * @param callback The callback function containing either the query result or the 
+ * @param callback The callback function containing either the query result or the
  * error if one is thrown.
  */
-export const registerLogin = (email:string, hash:string, salt:string, callback:Function) => {
-    const query = "INSERT INTO ak_login (email, password, salt) " + 
+export const registerLogin = (email:string, hash:string, salt:string, callback:
+    (error:Error | null, result?:any) => void) => {
+    const qry = "INSERT INTO ak_login (email, password, salt) " +
     "VALUES (?,?,?);";
 
     executeTransactions([
         {
             id: 1,
-            query: query,
+            query: qry,
             parameters: [email, hash, salt]
         }
     ]).then(
         val => {
-            callback(null, val[1].result.insertId)
+            callback(null, val[1].result.insertId);
         }).catch(
             err => callback(err)
         );
-}
+};
 
 //
 // ------------------------- Retrieve statements -------------------------
@@ -42,52 +43,44 @@ export const registerLogin = (email:string, hash:string, salt:string, callback:F
  */
 export const retrieveUserID = (email:string): Promise<number> => {
     return new Promise((resolve, reject) => {
-        const query = "SELECT l.loginID FROM ak_login l WHERE l.email = ?;";
+        const qry = "SELECT l.loginID FROM ak_login l WHERE l.email = ?;";
 
         executeTransactions([
             {
                 id: 1,
-                query: query,
+                query: qry,
                 parameters: [email]
             }
         ]).then(
             val => {
-                resolve(val[1].result[0].loginID)
+                resolve(val[1].result[0].loginID);
             }).catch(
                 err => reject(err)
             );
 
-    })
-}
+    });
+};
 
 /**
  * Retrieves the salt of the user from the database.
  * @param email the email of the user.
- * @param callback The callback function containing either the query result or the 
- * error if one is thrown. 
+ * @param callback The callback function containing either the query result or the
+ * error if one is thrown.
  */
-export const retrieveSalt = (email:string, callback:Function) => {
-    const query = "SELECT l.salt FROM ak_login l WHERE l.email = ?";
-    console.log(email);
-    
+export const retrieveSalt = (email:string, callback:
+    (error:Error | null, result?:any) => void) => {
+    const qry = "SELECT l.salt FROM ak_login l WHERE l.email = ?";
     executeTransactions([
         {
             id: 1,
-            query: query,
+            query: qry,
             parameters: [email]
         }
     ]).then (
         val => {
-            console.log(val);
-            
-            console.log("value is " + val[1][1]);
-            console.log("value " + val[1].result.length);
-            
-            if (val[1].result.length == 0) {
+            if (val[1].result.length === 0) {
                 bcrypt.genSalt((err, salt) => {
-                    // console.log(salt);
-                    
-                    callback(null, salt)
+                    callback(null, salt);
                 });
             } else {
                 callback(null, val[1].result[0].salt);
@@ -96,20 +89,21 @@ export const retrieveSalt = (email:string, callback:Function) => {
     ).catch(err => {
         genSalt().then(salt => callback(null, salt));
     });
-}
+};
 
 /**
  * Retrieves the user hash from the database.
  * @param email the email of the user
  * @param callback The callback function containing the result or the error
  */
-export const retrieveHash = (email: string, callback: Function) => {
-    const query = "SELECT l.password FROM ak_login l WHERE l.email = ?";
+export const retrieveHash = (email: string, callback:
+    (error:Error | null, result?:any) => void) => {
+    const qry = "SELECT l.password FROM ak_login l WHERE l.email = ?";
 
     executeTransactions([
         {
             id: 1,
-            query: query,
+            query: qry,
             parameters: [email]
         }
     ]).then (
@@ -117,4 +111,4 @@ export const retrieveHash = (email: string, callback: Function) => {
             callback(null, val[1].result[0].password);
         }
     ).catch(err => callback(err));
-}
+};

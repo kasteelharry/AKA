@@ -7,6 +7,6 @@ export class EmailNotRegisteredError extends Error {
         // Set the prototype explicitly.
         Object.setPrototypeOf(this, EmailNotRegisteredError.prototype);
     }
-    
+
 
 }

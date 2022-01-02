@@ -1,8 +1,8 @@
 export class ItemAlreadyExistsError extends Error {
     public status: number;
     constructor(msg?:string) {
-        if(msg == undefined) {
-            msg = 'Item already exists in the database or no value was changed.'
+        if(msg === undefined) {
+            msg = 'Item already exists in the database or no value was changed.';
         }
         super(msg);
         this.status = 403;

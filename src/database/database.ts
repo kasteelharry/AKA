@@ -24,7 +24,7 @@ export const dbOptions = {
           data: 'data'
         }
       }
-}
+};
 
 export const db = mysql.createPool({
     connectionLimit: 10,

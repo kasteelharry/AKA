@@ -32,7 +32,7 @@ export const createNewCustomer = (name:string, birthDate:string | undefined, ban
         }).catch(
             err => callback(err)
         );
-}
+};
 
 
 //

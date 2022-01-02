@@ -13,34 +13,30 @@ router.get('/', (req, res, next) => {
 router.post('/', (req, res, next) => {
     const email = req.body.email;
     const session = req.sessionID;
-    let password: string = req.body.password;
-    if (password == undefined || email == undefined) {
+    const password: string = req.body.password;
+    if (password === undefined || email === undefined) {
         return res.status(401).redirect("../");
     }
     let salt: string = '';
     try {
-        retrieveSalt(email, (err: Error, result: string) => {
-            // console.log(result);
-
+        retrieveSalt(email, (err: Error | null, result: string) => {
             salt = result;
-            console.log(salt);
             let hash = '';
-            retrieveHash(email, (err: Error, result: string) => {
-                hash = result;
-                console.log(hash);
-
-                if (err) {
+            retrieveHash(email, (error: Error | null, result1: string) => {
+                hash = result1;
+                if (error) {
                     next(err);
-                } else if (hash == undefined) {
-                    next(new EmailNotRegisteredError("email " + email + " is not registered."))
+                } else if (hash === undefined) {
+                    next(new EmailNotRegisteredError("email " + email + " is not registered."));
                 } else {
-                    bcrypt.compare(password, hash, (err, result) => {
-                        if (result) {
+                    bcrypt.compare(password, hash, (error2, result2) => {
+                        if (result2) {
                             registerSession(session, email).then(val => {
-                                res.status(200).json({ "login:": result });
+                                // TODO change this to redirect to the dashboard.
+                                res.status(200).json({ "login:": result2 });
                             });
                         } else {
-                            res.status(401).json({ "login:": result })
+                            res.status(401).json({ "login:": result2 });
                         }
                     });
                 }
@@ -51,8 +47,6 @@ router.post('/', (req, res, next) => {
     } catch (error) {
         next(error);
     }
-
-
 });
 
 /* POST register an user*/
@@ -60,24 +54,22 @@ router.post('/register', (req, res, next) => {
     authenticateUser(req.sessionID).then(val => {
         if (val) {
             const email = req.body.email;
-            let password = req.body.password;
-            retrieveSalt(email, (err: Error, result: string) => {
+            const password = req.body.password;
+            retrieveSalt(email, (err: Error | null, result: string) => {
                 if (err) {
                     next(err);
                 }
                 const salt = result;
-                bcrypt.hash(password, salt, (err, result) => {
-                    const hash = result;
-                    console.log(hash);
-
-                    registerLogin(email, result, salt, (err: Error, result: string) => {
+                bcrypt.hash(password, salt, (error, result1) => {
+                    const hash = result1;
+                    registerLogin(email, result, salt, (error2: Error | null, result2: string) => {
                         if (err) {
                             next(err);
                         } else {
-                            res.status(200).json({ "registered:": result })
+                            res.status(200).json({ "registered:": result2});
                         }
                     });
-                })
+                });
             });
         } else {
             return res.render("login");

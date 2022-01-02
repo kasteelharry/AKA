@@ -1,5 +1,5 @@
 /**
- * This method converts the string it receives into a format that 
+ * This method converts the string it receives into a format that
  * can be inserted into the MySQL database.
  * @param date string containing the date format.
  * @returns the string formatted for MySQL support.

@@ -12,20 +12,18 @@ export async function authenticateUser(session:string): Promise<boolean> {
         if (error) {
             resolve(false);
         } else {
-            if (loginID == undefined || expires == undefined) {
-                console.log("undefined variable found.");
-                
-                return
+            if (loginID === undefined || expires === undefined) {
+                return;
             } else {
                 const expiresMilliseconds = expires * 1000;
                 if (expiresMilliseconds > new Date().getTime()) {
                     resolve(true);
                 } else {
-                    logOutSession(session, (error, result) => {
-                        if (error) {
+                    logOutSession(session, (err, result) => {
+                        if (err) {
                             resolve(false);
                         }
-                    })
+                    });
                 }
             }
             resolve(false);
@@ -38,7 +36,7 @@ export async function authenticateUser(session:string): Promise<boolean> {
  * Authenticates an user with a valid session such that the other endpoints can be queried.
  * @param session the session to register
  * @param email the email of the user that needs to be registered.
- * @returns true if the authentication process has been completed, false if not. 
+ * @returns true if the authentication process has been completed, false if not.
  */
 export function registerSession(session:string, email:string): Promise<boolean> {
     return new Promise((resolve) => {
@@ -47,14 +45,14 @@ export function registerSession(session:string, email:string): Promise<boolean> 
                 if (err) {
                     resolve(false);
                 }
-                if (res != undefined && res > 0) {
+                if (res !== undefined && res > 0) {
                     resolve(true);
                 } else {
                     resolve(false);
                 }
-            })
+            });
         }).catch((err) => {
             resolve(false);
         });
-    })
+    });
 }

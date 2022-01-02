@@ -7,6 +7,6 @@ export class EmptySQLResultError extends Error {
         // Set the prototype explicitly.
         Object.setPrototypeOf(this, EmptySQLResultError.prototype);
     }
-    
+
 
 }

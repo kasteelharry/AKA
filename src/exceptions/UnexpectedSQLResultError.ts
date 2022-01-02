@@ -7,6 +7,4 @@ export class UnexpectedSQLResultError extends Error {
         // Set the prototype explicitly.
         Object.setPrototypeOf(this, UnexpectedSQLResultError.prototype);
     }
-    
-
 }
