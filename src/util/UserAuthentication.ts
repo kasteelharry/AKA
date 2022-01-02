@@ -39,11 +39,11 @@ export async function authenticateUser(session:string): Promise<boolean> {
  * @returns true if the authentication process has been completed, false if not.
  */
 export function registerSession(session:string, email:string): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise((resolve,reject) => {
         retrieveUserID(email).then((result) => {
             authenticateUserInDB(result, session, (err, res) => {
                 if (err) {
-                    resolve(false);
+                    reject(err);
                 }
                 if (res !== undefined && res > 0) {
                     resolve(true);
@@ -52,7 +52,7 @@ export function registerSession(session:string, email:string): Promise<boolean> 
                 }
             });
         }).catch((err) => {
-            resolve(false);
+            resolve(err);
         });
     });
 }

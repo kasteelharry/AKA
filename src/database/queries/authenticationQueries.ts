@@ -26,7 +26,14 @@ export const authenticateUserInDB = (loginID:number, session:string, callback:
         val => {
             callback(null, val[1].result.insertId);
         }).catch(
-            err => callback(err)
+            err => {
+                const msg:string = err.message;
+                if (msg.match("Duplicate")) {
+                    callback(null, 0);
+                } else {
+                    callback(err);
+                }
+            }
         );
 };
 

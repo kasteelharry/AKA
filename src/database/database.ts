@@ -74,9 +74,7 @@ export const executeTransactions = async (queries: Array<{ id: number, query: st
                             
                             });
                             // If the server has thrown a SQL error, catch it here otherwise nothing was found.
-                            if (err) {
-                                console.log('error found.');
-                                
+                            if (err) {                              
                                 reject(new ItemAlreadyExistsError(err.message))
                             } else {
                                 reject(new UnexpectedSQLResultError("No match found.")) 
