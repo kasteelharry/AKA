@@ -4,6 +4,7 @@ import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
 import {createNewCustomer, deleteCustomer, getAllCustomers, getCustomerByID, updateCustomer } from '../database/queries/customerQueries'
 import { convertStringToSQLDate } from '../util/ConvertStringToSQLDate';
 import { EmptySQLResultError } from '../exceptions/EmptySQLResultError';
+import { authenticateUser } from '../util/UserAuthentication';
 
 const router = express.Router();
 
@@ -18,21 +19,28 @@ router.post('/', async (req, res, next) => {
     const bank = req.body.bank;
     const birthDate = req.body.birthday;
     const mySQLDateString = convertStringToSQLDate(birthDate);
-    createNewCustomer(name, mySQLDateString, bank, (err: Error, product: OkPacket) => {
-        if (err) {
-            if (err.message.match("Duplicate entry")) {
-                if (err.message.match("Bank")) {
-                    next(new ItemAlreadyExistsError("Given bankaccount already exists.")) 
+    authenticateUser(req.sessionID).then(val => {
+        if (val) {
+            createNewCustomer(name, mySQLDateString, bank, (err: Error, product: OkPacket) => {
+                if (err) {
+                    if (err.message.match("Duplicate entry")) {
+                        if (err.message.match("Bank")) {
+                            next(new ItemAlreadyExistsError("Given bankaccount already exists.")) 
+                        } else {
+                            next(err);
+                        }
+                    } else {
+                        next(err);
+                    }
                 } else {
-                    next(err);
+                    res.status(200).json({ "productId:": product })
                 }
-            } else {
-                next(err);
-            }
+            });
         } else {
-            res.status(200).json({ "productId:": product })
+            return res.redirect("../");
         }
     });
+    
 });
 
 // 
@@ -41,30 +49,44 @@ router.post('/', async (req, res, next) => {
 
 /* GET customer listing. */
 router.get('/', (req, res, next) => {
-    getAllCustomers((err: Error, customers: RowDataPacket[]) => {
-        if (err) {
-          next(err);
-        }
-        else {
-            console.log(customers);
-            res.status(200).json({"users:": customers});
+    authenticateUser(req.sessionID).then(val => {
+        if (val) {
+            getAllCustomers((err: Error, customers: RowDataPacket[]) => {
+                if (err) {
+                  next(err);
+                }
+                else {
+                    console.log(customers);
+                    res.status(200).json({"users:": customers});
+                }
+            });
+        } else {
+            return res.redirect("../");
         }
     });
+    
 });
 
 /* GET customer by customer id listing. */
 router.get('/:customerID', (req, res, next) => {
     console.log(req.params.customerID);
     try {
-        getCustomerByID(req.params.customerID, (err: Error, customer: RowDataPacket) => {
-            if (err) {
-                next(err);
-            }
-            else {
-
-                res.status(200).json({"customer:": customer});
+        authenticateUser(req.sessionID).then(val => {
+            if (val) {
+                getCustomerByID(req.params.customerID, (err: Error, customer: RowDataPacket) => {
+                    if (err) {
+                        next(err);
+                    }
+                    else {
+        
+                        res.status(200).json({"customer:": customer});
+                    }
+                });
+            } else {
+                return res.redirect("../");
             }
         });
+        
     } catch (error) {
         next(error);
     }
@@ -78,10 +100,12 @@ router.get('/:customerID', (req, res, next) => {
 /* POST to update the attributes of the customer. */
 router.post('/:customerID', (req, res, next) =>{
     try {
-        const birthday = convertStringToSQLDate(req.body.birthday);
-        const params = new Map<string, string | number>();
+        authenticateUser(req.sessionID).then(val => {
+            if (val) {
+                const birthday = convertStringToSQLDate(req.body.birthday);
+        const params = new Map<string, string | number | undefined>();
         params.set("name", req.body.name);
-        params.set("birthday", req.body.birthday);
+        params.set("birthday", birthday);
         params.set("bankaccount", req.body.bankaccount);
         params.set("active", req.body.active);
         updateCustomer(req.params.customerID, params, (err: Error, customer: RowDataPacket) => {
@@ -92,6 +116,11 @@ router.post('/:customerID', (req, res, next) =>{
                 res.status(200).json({"customer:": customer});
             }
         });
+            } else {
+                return res.redirect("../");
+            }
+        });
+        
     } catch (error) {
         next(error)
     }
@@ -103,18 +132,25 @@ router.post('/:customerID', (req, res, next) =>{
 
 /* POST to delete a customer from the database. */
 router.post('/:customerID/delete', (req, res, next) => {
-    deleteCustomer(req.params.customerID, (err: Error, customer: RowDataPacket) => {
-        if (err) {
-            next(err);
+    authenticateUser(req.sessionID).then(val => {
+        if (val) {
+            deleteCustomer(req.params.customerID, (err: Error, customer: RowDataPacket) => {
+                if (err) {
+                    next(err);
+                } else {
+                    if (customer.affectedRows == 1) {
+                        res.status(200).json({ "customers:": "The customer has been deleted" });
+                    } else {
+                        next(new EmptySQLResultError("No entry found for " + req.params.customerID));
+                    }
+        
+                }
+            });
         } else {
-            if (customer.affectedRows == 1) {
-                res.status(200).json({ "customers:": "The customer has been deleted" });
-            } else {
-                next(new EmptySQLResultError("No entry found for " + req.params.customerID));
-            }
-
+            return res.redirect("../");
         }
     });
+    
 });
 
 export default router;

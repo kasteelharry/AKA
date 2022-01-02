@@ -9,6 +9,23 @@ const hostname = process.env.DATABASE_HOST;
 const database = process.env.DATABASE_SCHEMA;
 const password = process.env.DATABASE_PASSWORD;
 const username = process.env.DATABASE_USER;
+
+export const dbOptions = {
+    host: hostname,
+    user: username,
+    password: password,
+    database: database,
+    port: 3306,
+    schema: {
+        tableName: 'ak_session',
+        columnNames: {
+          session_id: 'session_id',
+          expires: 'expires',
+          data: 'data'
+        }
+      }
+}
+
 export const db = mysql.createPool({
     connectionLimit: 10,
     host: hostname,
@@ -19,7 +36,11 @@ export const db = mysql.createPool({
     timezone: 'Europe/Amsterdam'
 });
 
-
+/**
+ * Performs a transactions of all the queries passed in the database.
+ * @param queries the queries to perform with their attributes.
+ * @returns an overview of the results or the error.
+ */
 export const executeTransactions = async (queries: Array<{ id: number, query: string, parameters: Array<string | number | boolean | JSON | Date | null | undefined> }>): Promise<{ [id: string]: any }> => {
     return new Promise(async (resolve, reject) => {
         const results: {[id: string]: {result: any, fields: FieldPacket[] | undefined} }= {};

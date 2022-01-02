@@ -3,9 +3,9 @@ import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
 import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
 import { db, executeTransactions } from "../database";
 
-// 
+//
 // ------------------------- Create statements -------------------------
-// 
+//
 
 /**
  * Creates a new customer in the database. By default this customer is active and assumes that a SEPA 
@@ -34,9 +34,10 @@ export const createNewCustomer = (name:string, birthDate:string | undefined, ban
         );
 }
 
-// 
+
+//
 // ------------------------- Retrieve statements -------------------------
-// 
+//
 
 /**
  * Queries all the customers in the database, regardless if they are active or not.
@@ -108,9 +109,9 @@ export const getCustomerByID = (customerID: string, callback: Function) => {
         );
 }
 
-// 
+//
 // ------------------------- Update statements -------------------------
-// 
+//
 
 /**
  * Updates the customer in the database based on the params input.
@@ -119,7 +120,7 @@ export const getCustomerByID = (customerID: string, callback: Function) => {
  * @param callback The callback function containing either the query result or the 
  * error if one is thrown.
  */
-export const updateCustomer= (customerID:string, params:Map<string, string | number>, callback:Function) => {
+export const updateCustomer= (customerID:string, params:Map<string, string | number | undefined>, callback:Function) => {
     const queryA = "UPDATE ak_customers c SET " + 
     "c.name = COALESCE(?,c.name), " + 
     "c.birthdate = COALESCE(?,c.birthdate), " + 
@@ -176,9 +177,9 @@ export const updateCustomer= (customerID:string, params:Map<string, string | num
         );
 }
 
-// 
+//
 // ------------------------- Delete statements -------------------------
-// 
+//
 
 /**
  * Deletes a customer from the database.
