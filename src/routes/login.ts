@@ -17,32 +17,27 @@ router.post('/', (req, res, next) => {
     if (password === undefined || email === undefined) {
         return res.status(401).redirect("../");
     }
-    let salt: string = '';
     try {
-        retrieveSalt(email, (err: Error | null, result: string) => {
-            salt = result;
-            let hash = '';
-            retrieveHash(email, (error: Error | null, result1: string) => {
-                hash = result1;
-                if (error) {
-                    next(err);
-                } else if (hash === undefined) {
-                    next(new EmailNotRegisteredError("email " + email + " is not registered."));
-                } else {
-                    bcrypt.compare(password, hash, (error2, result2) => {
-                        if (result2) {
-                            registerSession(session, email).then(val => {
-                                // TODO change this to redirect to the dashboard.
-                                res.status(200).json({ "login:": result2 });
-                            });
-                        } else {
-                            res.status(401).json({ "login:": result2 });
-                        }
-                    });
-                }
-
-            });
-
+        retrieveHash(email, (error: Error | null, result1: string) => {
+            const hash = result1;
+            if (error) {
+                next(error);
+            } else if (hash === undefined) {
+                next(new EmailNotRegisteredError("email " + email + " is not registered."));
+            } else {
+                bcrypt.compare(password, hash, (error2, result2) => {
+                    if (result2) {
+                        registerSession(session, email).then(val => {
+                            // TODO change this to redirect to the dashboard.
+                            res.status(200).json({ "login:": result2 });
+                        }).catch(failure => {
+                            next(failure);
+                        });
+                    } else {
+                        res.status(401).json({ "login:": result2 });
+                    }
+                });
+            }
         });
     } catch (error) {
         next(error);
@@ -62,7 +57,7 @@ router.post('/register', (req, res, next) => {
                 const salt = result;
                 bcrypt.hash(password, salt, (error, result1) => {
                     const hash = result1;
-                    registerLogin(email, result, salt, (error2: Error | null, result2: string) => {
+                    registerLogin(email, hash, salt, (error2: Error | null, result2: string) => {
                         if (err) {
                             next(err);
                         } else {
