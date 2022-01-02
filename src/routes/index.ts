@@ -3,6 +3,7 @@ import { retrieveSalt, retrieveHash } from '../database/queries/loginQueries';
 import { EmailNotRegisteredError } from '../exceptions/EmailNotRegisteredError';
 import { authenticateUser, registerSession } from '../util/UserAuthentication';
 import bcrypt from "bcryptjs";
+import { logOutSession } from '../database/queries/authenticationQueries';
 const app = express();
 const router = express.Router();
 // define a route handler for the default home page
@@ -16,6 +17,22 @@ app.get('/',(req, res, next) => {
     });
   });
 
+/* POST logout an user*/
+app.get('/logout',(req, res, next) => {
+    authenticateUser(req.sessionID).then(val => {
+        if (val) {
+            logOutSession(req.sessionID, (err:Error | null, result?:string) => {
+                if (err) {
+                    next(err);
+                } else {
+                    res.redirect("../");
+                }
+            });
+        } else {
+            return res.render("login");
+        }
+    });
+  });
 
 /* POST login an user*/
 // TODO combine this with the function using the same name in the login route.
