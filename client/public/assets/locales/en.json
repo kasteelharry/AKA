@@ -1,0 +1,16 @@
+{
+  "login": {
+    "email": {
+      "title": "Email address",
+      "placeholder": "Enter email"
+    },
+    "password": {
+      "title": "Password",
+      "placeholder": "Enter password"
+    },
+    "submit": "Submit",
+    "title": "Welcome to the $t(app_title)",
+    "forgot_password": "Forgot password?"
+  },
+  "app_title": "AKA V3.0"
+}

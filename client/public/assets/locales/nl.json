@@ -1,1 +1,9 @@
-{}
+{
+  "login": {
+    "email": {
+      "title": "Emailadres"
+    },
+    "submit": "Inloggen"
+  },
+  "app_title": "AKA V3.0"
+}
