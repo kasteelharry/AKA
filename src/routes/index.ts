@@ -8,13 +8,7 @@ const app = express();
 const router = express.Router();
 // define a route handler for the default home page
 app.get('/',(req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            return res.redirect("customers");
-        } else {
-            return res.render("login");
-        }
-    });
+    return res.render("login");
   });
 
 /* POST logout an user*/

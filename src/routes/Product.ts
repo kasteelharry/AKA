@@ -11,18 +11,12 @@ const router = express.Router();
 //
 
 router.post('/', async (req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            const name = req.body.name;
-            createNewProduct(name, (err: Error | null, product?: OkPacket) => {
-                if (err) {
-                    next(err);
-                } else {
-                    res.status(200).json({ "productId:": product });
-                }
-            });
+    const name = req.body.name;
+    createNewProduct(name, (err: Error | null, product?: OkPacket) => {
+        if (err) {
+            next(err);
         } else {
-            return res.redirect("../");
+            res.status(200).json({ "productId:": product });
         }
     });
 
@@ -33,35 +27,23 @@ router.post('/', async (req, res, next) => {
 //
 
 router.get('/', (req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            getAllProducts((err: Error | null, product: RowDataPacket[]) => {
-                if (err) {
-                    next(err);
-                } else {
-                    res.status(200).json({ "products:": product });
-                }
-            });
+    getAllProducts((err: Error | null, product: RowDataPacket[]) => {
+        if (err) {
+            next(err);
         } else {
-            return res.redirect("../");
+            res.status(200).json({ "products:": product });
         }
     });
 
 });
 
 router.get('/:productID', (req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            const productID = req.params.productID;
-            getProductByID(productID, (err: Error | null, product: RowDataPacket) => {
-                if (err) {
-                    next(err);
-                } else {
-                    res.status(200).json({ "product:": product });
-                }
-            });
+    const productID = req.params.productID;
+    getProductByID(productID, (err: Error | null, product: RowDataPacket) => {
+        if (err) {
+            next(err);
         } else {
-            return res.redirect("../");
+            res.status(200).json({ "product:": product });
         }
     });
 
@@ -72,20 +54,14 @@ router.get('/:productID', (req, res, next) => {
 //
 
 router.post('/:productID', (req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            const id = req.params.productID;
-            const name = req.body.name;
+    const id = req.params.productID;
+    const name = req.body.name;
 
-            updateProductNameByID(id, name, (err: Error | null, product: OkPacket) => {
-                if (err) {
-                    next(err);
-                } else {
-                    res.status(200).json({ "product:": product });
-                }
-            });
+    updateProductNameByID(id, name, (err: Error | null, product: OkPacket) => {
+        if (err) {
+            next(err);
         } else {
-            return res.redirect("../");
+            res.status(200).json({ "product:": product });
         }
     });
 
@@ -94,13 +70,6 @@ router.post('/:productID', (req, res, next) => {
 
 
 router.post('/:productID/archive', (req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            return res.redirect("customers");
-        } else {
-            return res.redirect("../");
-        }
-    });
     const id = req.params.productID;
     const archive = req.body.archive;
     archiveProductByID(id, archive, (err: Error | null, product: RowDataPacket) => {
@@ -119,23 +88,17 @@ router.post('/:productID/archive', (req, res, next) => {
 //
 
 router.post('/:productID/delete', (req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            const id = req.params.productID;
-            deleteProductNameByID(id, (err: Error | null, product: RowDataPacket) => {
-                if (err) {
-                    next(err);
-                } else {
-                    if (product.affectedRows === 1) {
-                        res.status(200).json({ "product:": "The product has been deleted" });
-                    } else {
-                        next(new EmptySQLResultError("No entry found for " + id));
-                    }
-
-                }
-            });
+    const id = req.params.productID;
+    deleteProductNameByID(id, (err: Error | null, product: RowDataPacket) => {
+        if (err) {
+            next(err);
         } else {
-            return res.redirect("../");
+            if (product.affectedRows === 1) {
+                res.status(200).json({ "product:": "The product has been deleted" });
+            } else {
+                next(new EmptySQLResultError("No entry found for " + id));
+            }
+
         }
     });
 
