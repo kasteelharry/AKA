@@ -1,5 +1,4 @@
 
-import { OkPacket } from "mysql2";
 import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
 import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
 import { executeTransactions } from "../database";
@@ -30,7 +29,7 @@ export const createNewProduct = (product: string, callback:
             err => {
                 if (err instanceof ItemAlreadyExistsError && err.message.match("Duplicate entry")) {
                     if (err.message.match("name")) {
-                        callback(new ItemAlreadyExistsError("Given product already exists."));
+                        callback(new ItemAlreadyExistsError("Given product " + product + " already exists."));
                     }
                 } else {
                     callback(err);
