@@ -1,4 +1,4 @@
-import express, { NextFunction } from 'express';
+import express, { application, NextFunction } from 'express';
 import { Request, Response } from 'express';
 import session, { Session } from 'express-session';
 import createError from 'http-errors';
@@ -11,15 +11,22 @@ import loginRouter from './routes/login';
 import productRouter from './routes/Product';
 const MySQLStore = require('express-mysql-session')(session);
 import {  dbOptions } from './database/database';
-
+import https from 'https';
+import http from 'http';
+import fs from 'fs';
 import dotenv from 'dotenv';
 
+const options = {
+    key: fs.readFileSync(path.join(__dirname, "../.keys/privkey.pem"), "utf-8"),
+    cert: fs.readFileSync(path.join(__dirname, "../.keys/fullchain.pem"), "utf-8")
+};
+const portHttps:number = 8433;
 const app = express();
-const port = 8080;
+// const port = 8080;
+
 process.env.TZ = 'Europe/Amsterdam';
 const sessionStore = new MySQLStore(dbOptions);
 dotenv.config();
-
 
 // view engine setups
 app.set('views', path.join(__dirname, '../views'));
@@ -38,9 +45,9 @@ app.use(session({
   store: sessionStore,
   // TODO set this to secure
   cookie: {
-    secure: false,
+    secure: true,
     maxAge: 1000 * 12 * 60 * 60,// 12 hours expiration rate
-    sameSite: "strict"
+    sameSite: true
     }
 }));
 app.use('/', indexRouter);
@@ -64,9 +71,5 @@ app.use( (err: any, req: Request, res: Response, next:NextFunction) => {
   });
 });
 
-app.listen(port, () => {
-    // eslint-disable-next-line
-    console.log(`Example app listening at http://localhost:${port}`);
-  });
-
+https.createServer(options, app).listen(process.env.PORT_HTTPS);
 module.exports = app;
