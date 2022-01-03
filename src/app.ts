@@ -6,15 +6,17 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import indexRouter from './routes/index';
-import customersRouter from './routes/customers';
+
 import loginRouter from './routes/login';
-import productRouter from './routes/Product';
+
+import apiRouter from './routes/apiRoutes';
 const MySQLStore = require('express-mysql-session')(session);
 import {  dbOptions } from './database/database';
 import https from 'https';
 import http from 'http';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import { authenticateUser } from './util/UserAuthentication';
 
 const options = {
     key: fs.readFileSync(path.join(__dirname, "../.keys/privkey.pem"), "utf-8"),
@@ -27,6 +29,7 @@ const app = express();
 process.env.TZ = 'Europe/Amsterdam';
 const sessionStore = new MySQLStore(dbOptions);
 dotenv.config();
+
 
 // view engine setups
 app.set('views', path.join(__dirname, '../views'));
@@ -50,10 +53,21 @@ app.use(session({
     sameSite: true
     }
 }));
+
+
+app.all("/api/*", (req, res, next) => {
+    authenticateUser(req.sessionID).then(val => {
+        if (val) {
+            next();
+        } else {
+            return res.redirect("/");
+        }
+    });
+});
+
 app.use('/', indexRouter);
-app.use('/customers', customersRouter);
 app.use('/login', loginRouter);
-app.use('/products', productRouter);
+app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
 app.use( (req: Request, res: Response, next) => {
@@ -73,3 +87,4 @@ app.use( (err: any, req: Request, res: Response, next:NextFunction) => {
 
 https.createServer(options, app).listen(process.env.PORT_HTTPS);
 module.exports = app;
+export default app;

@@ -1,7 +1,7 @@
 import express from 'express';
 import { OkPacket, RowDataPacket } from 'mysql2';
 import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
-import {createNewCustomer, deleteCustomer, getAllCustomers, getCustomerByID, updateCustomer } from '../database/queries/customerQueries';
+import { createNewCustomer, deleteCustomer, getAllCustomers, getCustomerByID, updateCustomer } from '../database/queries/customerQueries';
 import { convertStringToSQLDate } from '../util/ConvertStringToSQLDate';
 import { EmptySQLResultError } from '../exceptions/EmptySQLResultError';
 import { authenticateUser } from '../util/UserAuthentication';
@@ -19,25 +19,19 @@ router.post('/', async (req, res, next) => {
     const bank = req.body.bank;
     const birthDate = req.body.birthday;
     const mySQLDateString = convertStringToSQLDate(birthDate);
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            createNewCustomer(name, mySQLDateString, bank, (err: Error, product: OkPacket) => {
-                if (err) {
-                    if (err.message.match("Duplicate entry")) {
-                        if (err.message.match("Bank")) {
-                            next(new ItemAlreadyExistsError("Given bankaccount already exists."));
-                        } else {
-                            next(err);
-                        }
-                    } else {
-                        next(err);
-                    }
+    createNewCustomer(name, mySQLDateString, bank, (err: Error, product: OkPacket) => {
+        if (err) {
+            if (err.message.match("Duplicate entry")) {
+                if (err.message.match("Bank")) {
+                    next(new ItemAlreadyExistsError("Given bankaccount already exists."));
                 } else {
-                    res.status(200).json({ "productId:": product });
+                    next(err);
                 }
-            });
+            } else {
+                next(err);
+            }
         } else {
-            return res.redirect("../");
+            res.status(200).json({ "productId:": product });
         }
     });
 });
@@ -48,18 +42,14 @@ router.post('/', async (req, res, next) => {
 
 /* GET customer listing. */
 router.get('/', (req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            getAllCustomers((err: Error, customers: RowDataPacket[]) => {
-                if (err) {
-                  next(err);
-                }
-                else {
-                    res.status(200).json({"users:": customers});
-                }
-            });
-        } else {
-            return res.redirect("../");
+    console.log(req.sessionID);
+
+    getAllCustomers((err: Error, customers: RowDataPacket[]) => {
+        if (err) {
+            next(err);
+        }
+        else {
+            res.status(200).json({ "users:": customers });
         }
     });
 });
@@ -67,18 +57,12 @@ router.get('/', (req, res, next) => {
 /* GET customer by customer id listing. */
 router.get('/:customerID', (req, res, next) => {
     try {
-        authenticateUser(req.sessionID).then(val => {
-            if (val) {
-                getCustomerByID(req.params.customerID, (err: Error, customer: RowDataPacket) => {
-                    if (err) {
-                        next(err);
-                    }
-                    else {
-                        res.status(200).json({"customer:": customer});
-                    }
-                });
-            } else {
-                return res.redirect("../");
+        getCustomerByID(req.params.customerID, (err: Error, customer: RowDataPacket) => {
+            if (err) {
+                next(err);
+            }
+            else {
+                res.status(200).json({ "customer:": customer });
             }
         });
     } catch (error) {
@@ -91,11 +75,9 @@ router.get('/:customerID', (req, res, next) => {
 //
 
 /* POST to update the attributes of the customer. */
-router.post('/:customerID', (req, res, next) =>{
+router.post('/:customerID', (req, res, next) => {
     try {
-        authenticateUser(req.sessionID).then(val => {
-            if (val) {
-                const birthday = convertStringToSQLDate(req.body.birthday);
+        const birthday = convertStringToSQLDate(req.body.birthday);
         const params = new Map<string, string | number | undefined>();
         params.set("name", req.body.name);
         params.set("birthday", birthday);
@@ -106,11 +88,7 @@ router.post('/:customerID', (req, res, next) =>{
                 next(err);
             }
             else {
-                res.status(200).json({"customer:": customer});
-            }
-        });
-            } else {
-                return res.redirect("../");
+                res.status(200).json({ "customer:": customer });
             }
         });
     } catch (error) {
@@ -124,21 +102,15 @@ router.post('/:customerID', (req, res, next) =>{
 
 /* POST to delete a customer from the database. */
 router.post('/:customerID/delete', (req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            deleteCustomer(req.params.customerID, (err: Error, customer: RowDataPacket) => {
-                if (err) {
-                    next(err);
-                } else {
-                    if (customer.affectedRows === 1) {
-                        res.status(200).json({ "customers:": "The customer has been deleted" });
-                    } else {
-                        next(new EmptySQLResultError("No entry found for " + req.params.customerID));
-                    }
-                }
-            });
+    deleteCustomer(req.params.customerID, (err: Error, customer: RowDataPacket) => {
+        if (err) {
+            next(err);
         } else {
-            return res.redirect("../");
+            if (customer.affectedRows === 1) {
+                res.status(200).json({ "customers:": "The customer has been deleted" });
+            } else {
+                next(new EmptySQLResultError("No entry found for " + req.params.customerID));
+            }
         }
     });
 });
