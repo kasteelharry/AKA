@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 
 
-function Login() {
+function LoginForm() {
     const { t } = useTranslation();
 
     return (
@@ -12,12 +12,12 @@ function Login() {
             <Form>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>{t('login.email.title')}</Form.Label>
-                    <Form.Control type="email" placeholder={t('login.email.placeholder')}/>
+                    <Form.Control type="email" placeholder={t('login.email.placeholder')} />
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="formBasicPassword">
                     <Form.Label>{t('login.password.title')}</Form.Label>
-                    <Form.Control type="password" placeholder={t('login.password.placeholder')}/>
+                    <Form.Control type="password" placeholder={t('login.password.placeholder')} />
                 </Form.Group>
                 <Button variant="primary" type="submit">
                     {t('login.submit')}
@@ -27,4 +27,4 @@ function Login() {
     )
 }
 
-export default Login;
+export default LoginForm;
