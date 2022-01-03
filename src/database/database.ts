@@ -1,4 +1,4 @@
-import mysql, { FieldPacket, PoolConnection } from 'mysql2';
+import mysql, { FieldPacket } from 'mysql2';
 import dotenv from 'dotenv';
 import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
 import { UnexpectedSQLResultError } from '../exceptions/UnexpectedSQLResultError';
@@ -9,6 +9,25 @@ const hostname = process.env.DATABASE_HOST;
 const database = process.env.DATABASE_SCHEMA;
 const password = process.env.DATABASE_PASSWORD;
 const username = process.env.DATABASE_USER;
+
+export const dbOptions = {
+    host: hostname,
+    user: username,
+    password: password,
+    database: database,
+    port: 3306,
+    schema: {
+        tableName: 'ak_session',
+        columnNames: {
+          session_id: 'session_id',
+          expires: 'expires',
+          data: 'data'
+        }
+      },
+      clearExpired: true,
+      checkExpirationInterval: 60000, //1 minute
+};
+
 export const db = mysql.createPool({
     connectionLimit: 10,
     host: hostname,
@@ -19,8 +38,12 @@ export const db = mysql.createPool({
     timezone: 'Europe/Amsterdam'
 });
 
-
-export const executeTransactions = async (queries: Array<{ id: number, query: string, parameters: Array<string | number | boolean | JSON | Date | null> }>): Promise<{ [id: string]: any }> => {
+/**
+ * Performs a transactions of all the queries passed in the database.
+ * @param queries the queries to perform with their attributes.
+ * @returns an overview of the results or the error.
+ */
+export const executeTransactions = async (queries: Array<{ id: number, query: string, parameters: Array<string | number | boolean | JSON | Date | null | undefined> }>): Promise<{ [id: string]: any }> => {
     return new Promise(async (resolve, reject) => {
         const results: {[id: string]: {result: any, fields: FieldPacket[] | undefined} }= {};
         db.getConnection((err, connection) => {
@@ -53,9 +76,7 @@ export const executeTransactions = async (queries: Array<{ id: number, query: st
                             
                             });
                             // If the server has thrown a SQL error, catch it here otherwise nothing was found.
-                            if (err) {
-                                console.log('error found.');
-                                
+                            if (err) {                              
                                 reject(new ItemAlreadyExistsError(err.message))
                             } else {
                                 reject(new UnexpectedSQLResultError("No match found.")) 
