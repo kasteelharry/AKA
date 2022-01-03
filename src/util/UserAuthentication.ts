@@ -1,5 +1,5 @@
 import { retrieveUserID } from "../database/queries/loginQueries";
-import { authenticateUserInDB, logOutSession, verifyUserInDB } from "../database/queries/authenticationQueries";
+import { authenticateGUserInDB, authenticateUserInDB, logOutSession, verifyUserInDB } from "../database/queries/authenticationQueries";
 
 /**
  * Authenticates a session.
@@ -53,6 +53,28 @@ export function registerSession(session:string, email:string): Promise<boolean> 
             });
         }).catch((err) => {
             resolve(err);
+        });
+    });
+}
+
+
+/**
+ * Authenticates an user with a valid session such that the other endpoints can be queried.
+ * @param session the session to register
+ * @param email the email of the user that needs to be registered.
+ * @returns true if the authentication process has been completed, false if not.
+ */
+ export function registerGoogleSession(session:string, googleID:string): Promise<boolean> {
+    return new Promise((resolve,reject) => {
+        authenticateGUserInDB(googleID, session, (err, res) => {
+            if (err) {
+                reject(err);
+            }
+            if (res !== undefined && res > 0) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
         });
     });
 }

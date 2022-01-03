@@ -23,7 +23,9 @@ export const dbOptions = {
           expires: 'expires',
           data: 'data'
         }
-      }
+      },
+      clearExpired: true,
+      checkExpirationInterval: 60000, //1 minute
 };
 
 export const db = mysql.createPool({

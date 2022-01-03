@@ -10,8 +10,8 @@ import customersRouter from './routes/customers';
 import loginRouter from './routes/login';
 import productRouter from './routes/Product';
 const MySQLStore = require('express-mysql-session')(session);
-import { db, dbOptions } from './database/database';
-import mysql from 'mysql2';
+import {  dbOptions } from './database/database';
+
 import dotenv from 'dotenv';
 
 const app = express();
@@ -40,7 +40,7 @@ app.use(session({
   cookie: {
     secure: false,
     maxAge: 1000 * 12 * 60 * 60,// 12 hours expiration rate
-    sameSite: true
+    sameSite: "strict"
     }
 }));
 app.use('/', indexRouter);
@@ -65,7 +65,7 @@ app.use( (err: any, req: Request, res: Response, next:NextFunction) => {
 });
 
 app.listen(port, () => {
-    // eslint-disable-line
+    // eslint-disable-next-line
     console.log(`Example app listening at http://localhost:${port}`);
   });
 

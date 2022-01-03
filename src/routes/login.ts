@@ -2,7 +2,11 @@ import express from 'express';
 import bcrypt from "bcryptjs";
 import { registerLogin, retrieveHash, retrieveSalt } from '../database/queries/loginQueries';
 import { EmailNotRegisteredError } from '../exceptions/EmailNotRegisteredError';
-import { authenticateUser, registerSession } from '../util/UserAuthentication';
+import { authenticateUser, registerGoogleSession, registerSession } from '../util/UserAuthentication';
+import { google } from 'googleapis';
+import { OAuth2Client } from 'google-auth-library';
+import { authenticateGUserInDB } from '../database/queries/authenticationQueries';
+import { GeneralServerError } from '../exceptions/GeneralServerError';
 
 const router = express.Router();
 // define a route handler for the default home page
@@ -71,6 +75,32 @@ router.post('/register', (req, res, next) => {
         }
     });
 
+});
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT);
+router.post('/google', async (req, res, next) => {
+    const token = req.body.idtoken;
+    const session = req.sessionID;
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    if (payload !== undefined) {
+        const uniqueId = payload.sub;
+        registerGoogleSession(session, uniqueId)
+        .then(val => {
+            res.redirect("../products");
+        }).catch(err => {
+            if (err === null) {
+                res.redirect("../products");
+            }
+            next(err);
+        });
+    } else {
+        res.render("login");
+    }
 });
 
 export default router;

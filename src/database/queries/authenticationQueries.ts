@@ -37,6 +37,38 @@ export const authenticateUserInDB = (loginID:number, session:string, callback:
         );
 };
 
+/**
+ * Adds the session and the google id of the user to the active google sessions table.
+ * @param googleSession the id of the user
+ * @param session the session of the user
+ * @param callback the callback method with either the error or the result
+ */
+ export const authenticateGUserInDB = (googleSession:string, session:string, callback:
+    (error:Error | null, result?:number) => void) => {
+    const qry = "INSERT INTO ak_googleSessions (googleSession, sessionId) " +
+    "VALUES (?,?);";
+
+    executeTransactions([
+        {
+            id: 1,
+            query: qry,
+            parameters: [googleSession,session]
+        }
+    ]).then(
+        val => {
+            callback(null, val[1].result.insertId);
+        }).catch(
+            err => {
+                const msg:string = err.message;
+                if (msg.match("Duplicate")) {
+                    callback(null, 0);
+                } else {
+                    callback(err);
+                }
+            }
+        );
+};
+
 //
 // ------------------------- Retrieve statements -------------------------
 //
@@ -44,24 +76,31 @@ export const authenticateUserInDB = (loginID:number, session:string, callback:
 /**
  * Retrieves the active session information from the database based on the session.
  * @param session the session that needs to be verified.
- * @param callback the callback method containing the error or the id and expire date of the session
+ * @param callback the callback method containing the error or the (google) id and expire date of the session
  */
 export const verifyUserInDB = (session:string, callback:
-    (error:Error | null, loginID?:number, expires?:number) => void) => {
-    const queryToPerform = "SELECT a.loginID, s.expires FROM ak_activesessions a "+
-	"INNER JOIN ak_session s " +
-    "ON a.sessionId = s.session_id " +
-    "WHERE a.sessionId = ?";
+    (error:Error | null, loginID?:number, expires?:number, googleId?:number) => void) => {
+    // const queryToPerform = "SELECT a.loginID, s.expires FROM ak_activesessions a "+
+	// "INNER JOIN ak_session s " +
+    // "ON a.sessionId = s.session_id " +
+    // "WHERE a.sessionId = ?";
+    const queryToPerform = "SELECT * FROM ak_activesessions a "
+    + "RIGHT JOIN ak_session s "
+    + "ON a.sessionId = s.session_id "
+    + "LEFT JOIN ak_googleSessions g "
+    + "ON s.session_id = g.sessionId "
+    + "WHERE g.sessionId = ? OR a.sessionId = ?";
 
     executeTransactions([
         {
             id: 1,
             query: queryToPerform,
-            parameters: [session]
+            parameters: [session, session]
         }
     ]).then(
         val => {
-            callback(null, val[1].result[0].loginID, val[1].result[0].expires);
+            const table = val[1].result[0];
+            callback(null, table.loginID, table.expires, table.googleId);
         }).catch(
             err => callback(err)
         );
@@ -102,11 +141,17 @@ export const logOutUser = (loginID:string, callback:
 export const logOutSession = (session:string, callback:
     (error:Error | null, result?:string) => void) => {
     const qry = "DELETE FROM ak_activesessions a WHERE a.sessionId = ?;";
+    const qry2 = "DELETE FROM ak_googlesessions g WHERE g.sessionID = ?;";
 
     executeTransactions([
         {
             id: 1,
             query: qry,
+            parameters: [session]
+        },
+        {
+            id:2,
+            query: qry2,
             parameters: [session]
         }
     ]).then(

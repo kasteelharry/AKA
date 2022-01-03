@@ -10,6 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@googleapis/docs": "^0.2.0",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "concurrency": "^0.1.4",
@@ -20,7 +21,10 @@
     "express": "~4.16.1",
     "express-mysql-session": "^2.1.7",
     "express-session": "^1.17.2",
+    "google-auth-library": "^7.11.0",
+    "googleapis": "^92.0.0",
     "http-errors": "~1.6.3",
+    "https": "^1.0.0",
     "jade": "^0.29.0",
     "mariadb": "^2.5.5",
     "morgan": "~1.9.1",

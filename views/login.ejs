@@ -4,6 +4,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+        <meta name="google-signin-client_id" content="307249424434-gt08hvl10rounintb7pd30fapi3jq9fu.apps.googleusercontent.com">
         <title>Login - Brand</title>
         <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet"
@@ -36,6 +37,7 @@
                                         </div><button class="btn btn-primary d-block btn-user w-100" type="submit">Login</button>
                                         <hr><a class="btn btn-primary d-block btn-google btn-user w-100 mb-2" role="button"><i class="fab fa-google"></i>&nbsp; Login with Google</a>
                                         <hr>
+                                        <div class="g-signin2" data-onsuccess="onSignIn"></div>
                                     </form>
                                     <div class="text-center"><a class="small" href="/login/forgotten">Forgot Password?</a></div>
                                     
@@ -50,6 +52,20 @@
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/bs-init.js"></script>
     <script src="assets/js/theme.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+        function onSignIn(googleUser) {
+        var id_token = googleUser.getAuthResponse().id_token;
+  console.log(id_token)
+  var xhr = new XMLHttpRequest();
+xhr.open('POST', './login/google');
+xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+xhr.onload = function() {
+  console.log('Signed in as: ' + xhr.responseText);
+};
+xhr.send('idtoken=' + id_token);
+}
+    </script>
 </body>
 
 </html>
