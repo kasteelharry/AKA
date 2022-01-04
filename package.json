@@ -7,7 +7,7 @@
         "start:build": "tsc -w",
         "start": "concurrently npm:start:*",
         "start:run": "nodemon dist/app.js",
-        "test": "jest"
+        "test": "jest --coverage"
     },
     "dependencies": {
         "@googleapis/docs": "^0.2.0",
