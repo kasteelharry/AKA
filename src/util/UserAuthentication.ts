@@ -4,7 +4,7 @@ import AuthenticateQueries from '../database/queries/authenticationQueries';
 import getDatabase, { queryType } from '../app';
 import LoginQueries from '../database/queries/loginQueries';
 
-class UserAuthentication {
+export class UserAuthentication {
 
     private auth : AuthenticateQueries;
     private login: LoginQueries;

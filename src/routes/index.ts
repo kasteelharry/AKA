@@ -1,30 +1,26 @@
 import express from 'express';
 // import { retrieveHash } from '../database/queries/loginQueries';
 import { EmailNotRegisteredError } from '../exceptions/EmailNotRegisteredError';
-import { authenticateUser, registerSession } from '../util/UserAuthentication';
 import bcrypt from "bcryptjs";
 // import { logOutSession } from '../database/queries/authenticationQueries';
 import AuthenticateQueries from '../database/queries/authenticationQueries';
 import getDatabase from '../app';
 import LoginQueries from '../database/queries/loginQueries';
+import { UserAuthentication } from '../util/UserAuthentication';
 
 
 const app = express();
 const router = express.Router();
 // define a route handler for the default home page
 app.get('/',(req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
-        if (val) {
-            return res.redirect("customers");
-        } else {
-            return res.render("login");
-        }
-    });
+    return res.render("login");
   });
 
 /* POST logout an user*/
 app.get('/logout',(req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
+
+    const authUser = new UserAuthentication(getDatabase());
+    authUser.authenticateUser(req.sessionID).then(val => {
         if (val) {
             const auth = new AuthenticateQueries(getDatabase());
             auth.logOutSession(req.sessionID, (err:Error | null, result?:string) => {
@@ -44,6 +40,7 @@ app.get('/logout',(req, res, next) => {
 // TODO combine this with the function using the same name in the login route.
 app.post('/', (req, res, next) => {
     const login = new LoginQueries(getDatabase());
+    const authUser = new UserAuthentication(getDatabase());
     const email = req.body.email;
     const session = req.sessionID;
     const password: string = req.body.password;
@@ -60,7 +57,7 @@ app.post('/', (req, res, next) => {
             } else {
                 bcrypt.compare(password, hash, (error2, result2) => {
                     if (result2) {
-                        registerSession(session, email).then(val => {
+                        authUser.registerSession(session, email).then(val => {
                             // TODO change this to redirect to the dashboard.
                             res.status(200).json({ "login:": result2 });
                         }).catch(failure => {
