@@ -6,7 +6,23 @@ The front end of this application is written in React. Please familiarize yourse
 
 This front-end utilizes the i18next library for React, which allows easy internationalization. Although React makes use of near-like HTML elements (JSX), we don't want to write plain text in these elements ourselves. We actually want to add 'keys' where we want text, then we can put translations for these keys in public/assets/locales.
 
-### Writing content on a page
+### Writing text inside a Component
+
+Before we start, we should add the `t()` function to the Component. You can do this like so:
+
+```JSX
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+//...
+
+function LoginPage() {
+    const { t } = useTranslation();
+
+    //...
+}
+```
+
+Now we are able to use the `t()` function inside of our Component.
 
 When we want to add text to a page, we use a 'key'. We wrap a key name in a `t()` function inside JSX, so that i18next can replace the key with the translation. Let's look at an example:
 

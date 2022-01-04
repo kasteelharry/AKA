@@ -14,7 +14,6 @@ function LoginPage() {
             <LoginForm />
 
             {/* TODO replace a with Link */}
-            <a className="small" href="/login/forgotten">{t('login.forgot_password')}</a>
         </Container>
                 )
 }
