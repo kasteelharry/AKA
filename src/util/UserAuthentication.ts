@@ -1,8 +1,9 @@
 // import { retrieveUserID } from "../database/queries/loginQueries";
 
-import AuthenticateQueries from '../database/queries/authenticationQueries';
+import AuthenticateQueries from '../queries/AuthenticationQueries';
 import getDatabase, { queryType } from '../app';
-import LoginQueries from '../database/queries/loginQueries';
+import LoginQueries from '../queries/LoginQueries';
+import { nextTick } from 'process';
 
 export class UserAuthentication {
 
@@ -21,26 +22,22 @@ export class UserAuthentication {
      */
     authenticateUser(session: string): Promise<boolean> {
         return new Promise(async (resolve) => {
-            this.auth.verifyUserInDB(session, (error, loginID, expires) => {
-                if (error) {
-                    resolve(false);
-                } else {
-                    if (loginID === undefined || expires === undefined) {
-                        return;
-                    } else {
-                        const expiresMilliseconds = expires * 1000;
-                        if (expiresMilliseconds > new Date().getTime()) {
-                            resolve(true);
-                        } else {
-                            this.auth.logOutSession(session, (err, result) => {
-                                if (err) {
-                                    resolve(false);
+            this.auth.verifyUserInDB(session).then(result =>{
+                const loginID = result[0];
+                const expires = result[1];
+                const googleID = result[2];
+                if (loginID === undefined || expires === undefined) {
+                                return;
+                            } else {
+                                const expiresMilliseconds = expires * 1000;
+                                if (expiresMilliseconds > new Date().getTime()) {
+                                    resolve(true);
+                                } else {
+                                    this.auth.logOutSession(session).catch(err => resolve(false));
                                 }
-                            });
-                        }
-                    }
-                    resolve(false);
-                }
+                            }
+            }).catch(error => {
+                resolve(false);
             });
         });
     }
@@ -53,19 +50,16 @@ export class UserAuthentication {
      */
     registerSession(session: string, email: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
-            this.login.retrieveUserID(email).then((result) => {
-                this.auth.authenticateUserInDB(result, session, (err, res) => {
-                    if (err) {
-                        reject(err);
-                    }
+            this.login.retrieveUserID(email).then(result => {
+                this.auth.authenticateUserInDB(result, session).then(res => {
                     if (res !== undefined && res > 0) {
                         resolve(true);
                     } else {
                         resolve(false);
                     }
-                });
-            }).catch((err) => {
-                resolve(err);
+                }).catch(err => reject(err));
+            }).catch(err => {
+                reject(err);
             });
         });
     }
@@ -80,16 +74,13 @@ export class UserAuthentication {
     registerGoogleSession(session: string, googleID: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             const auth = new AuthenticateQueries(await getDatabase());
-            auth.authenticateGUserInDB(googleID, session, (err, res) => {
-                if (err) {
-                    reject(err);
-                }
+            auth.authenticateGUserInDB(googleID, session).then(res => {
                 if (res !== undefined && res > 0) {
                     resolve(true);
                 } else {
                     resolve(false);
                 }
-            });
+            }).catch(err => reject(err));
         });
     }
 }

@@ -5,4 +5,5 @@ interface Database<T> {
     update(id: string, object: T): Promise<void>;
     delete(id: string): Promise<void>;
     executeTransactions(queries:{}):Promise<any>;
+    setDBState(state:boolean): void;
   }

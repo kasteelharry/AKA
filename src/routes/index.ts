@@ -3,9 +3,9 @@ import express from 'express';
 import { EmailNotRegisteredError } from '../exceptions/EmailNotRegisteredError';
 import bcrypt from "bcryptjs";
 // import { logOutSession } from '../database/queries/authenticationQueries';
-import AuthenticateQueries from '../database/queries/authenticationQueries';
+import AuthenticateQueries from '../queries/AuthenticationQueries';
 import getDatabase from '../app';
-import LoginQueries from '../database/queries/loginQueries';
+import LoginQueries from '../queries/LoginQueries';
 import { UserAuthentication } from '../util/UserAuthentication';
 
 
@@ -23,13 +23,7 @@ app.get('/logout',(req, res, next) => {
     authUser.authenticateUser(req.sessionID).then(val => {
         if (val) {
             const auth = new AuthenticateQueries(getDatabase());
-            auth.logOutSession(req.sessionID, (err:Error | null, result?:string) => {
-                if (err) {
-                    next(err);
-                } else {
-                    res.redirect("../");
-                }
-            });
+            auth.logOutSession(req.sessionID).then(value => res.redirect("../")).catch(err => next(err));
         } else {
             return res.render("login");
         }
@@ -48,11 +42,8 @@ app.post('/', (req, res, next) => {
         return res.status(401).redirect("../");
     }
     try {
-        login.retrieveHash(email, (error: Error | null, result1: string) => {
-            const hash = result1;
-            if (error) {
-                next(error);
-            } else if (hash === undefined) {
+        login.retrieveHash(email).then(hash => {
+            if (hash === undefined) {
                 next(new EmailNotRegisteredError("email " + email + " is not registered."));
             } else {
                 bcrypt.compare(password, hash, (error2, result2) => {
@@ -68,8 +59,7 @@ app.post('/', (req, res, next) => {
                     }
                 });
             }
-
-        });
+        }).catch(error =>  next(error));
     } catch (error) {
         next(error);
     }

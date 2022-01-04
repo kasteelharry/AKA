@@ -8,6 +8,7 @@ import logger from 'morgan';
 import indexRouter from './routes/index';
 import loginRouter from './routes/login';
 import apiRouter from './routes/apiRoutes';
+// tslint:disable-next-line: no-var-requires
 const MySQLStore = require('express-mysql-session')(session);
 import https from 'https';
 import fs from 'fs';
