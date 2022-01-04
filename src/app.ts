@@ -1,6 +1,6 @@
-import express, { application, NextFunction } from 'express';
+import express, { NextFunction } from 'express';
 import { Request, Response } from 'express';
-import session, { Session } from 'express-session';
+import session from 'express-session';
 import createError from 'http-errors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
@@ -9,14 +9,18 @@ import indexRouter from './routes/index';
 import loginRouter from './routes/login';
 import apiRouter from './routes/apiRoutes';
 const MySQLStore = require('express-mysql-session')(session);
-import {  dbSessionOptions } from './database/database';
 import https from 'https';
-import http from 'http';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import MySQLDatabase from './model/MySQLDatabase';
 import { UserAuthentication } from './util/UserAuthentication';
 
+dotenv.config();
+
+const hostname = process.env.DATABASE_HOST;
+const dbSchema = process.env.DATABASE_SCHEMA;
+const password = process.env.DATABASE_PASSWORD;
+const username = process.env.DATABASE_USER;
 export type queryType = { id: number, query: string, parameters: (string | number | boolean | JSON | Date | null | undefined)[]}[];
 const database: Database<queryType> = new MySQLDatabase();
 
@@ -28,6 +32,26 @@ const options = {
     key: fs.readFileSync(path.join(__dirname, "../.keys/privkey.pem"), "utf-8"),
     cert: fs.readFileSync(path.join(__dirname, "../.keys/fullchain.pem"), "utf-8")
 };
+
+
+const dbSessionOptions = {
+    host: hostname,
+    user: username,
+    password,
+    database: dbSchema,
+    port: 3306,
+    schema: {
+        tableName: 'ak_session',
+        columnNames: {
+          session_id: 'session_id',
+          expires: 'expires',
+          data: 'data'
+        }
+      },
+      clearExpired: true,
+      checkExpirationInterval: 60000, // 1 minute
+};
+
 const portHttps:number = 8433;
 const app = express();
 // const port = 8080;
