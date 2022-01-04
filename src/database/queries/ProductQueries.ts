@@ -2,7 +2,14 @@
 import { OkPacket } from "mysql2";
 import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
 import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
-import { executeTransactions } from "../database";
+import { queryType } from "../../app";
+
+export default class ProductQueries {
+
+    constructor(private database: Database<queryType>) {
+        this.database =database;
+     }
+
 
 
 //
@@ -14,10 +21,10 @@ import { executeTransactions } from "../database";
  * @param product the name of the product.
  * @param callback callback method containing the result of the queryToPerform.
  */
-export const createNewProduct = (product: string, callback:
+createNewProduct = (product: string, callback:
     (error:Error | null, result?:any) => void) => {
     const queryToPerform = "INSERT INTO ak_products (Name) VALUES (?);";
-    executeTransactions([
+    this.database.executeTransactions([
         {
             id: 1,
             query: queryToPerform,
@@ -37,7 +44,7 @@ export const createNewProduct = (product: string, callback:
                 }
             }
         );
-};
+}
 
 //
 // ------------------------- Retrieve statements -------------------------
@@ -47,9 +54,9 @@ export const createNewProduct = (product: string, callback:
  * Gets all the products from the database.
  * @param callback callback method containing the result of the queryToPerform.
  */
-export const getAllProducts = (callback:
+getAllProducts = (callback:
     (error:Error | null, result?:any) => void) => {
-    executeTransactions([
+        this.database.executeTransactions([
         {
             id: 1,
             query: "SELECT * FROM ak_products",
@@ -61,14 +68,14 @@ export const getAllProducts = (callback:
         }).catch(
             err => callback(err)
         );
-};
+}
 
 /**
  * Gets a single product from the database.
  * @param productID the product ID, can be the name or the id.
  * @param callback callback method containing the result of the queryToPerform.
  */
-export const getProductByID = (productID:string, callback:
+getProductByID = (productID:string, callback:
     (error:Error | null, result?:any) => void) => {
     const queryOne = "SELECT * FROM ak_products p WHERE p.id = ?;";
     const queryTwo = "SELECT * FROM ak_products p WHERE p.name LIKE ?";
@@ -81,7 +88,7 @@ export const getProductByID = (productID:string, callback:
         queryToPerform = queryOne;
     }
 
-    executeTransactions([
+    this.database.executeTransactions([
         {
             id: 1,
             query: queryToPerform,
@@ -93,13 +100,13 @@ export const getProductByID = (productID:string, callback:
         }).catch(
             err => callback(err)
         );
-};
+}
 
 //
 // ------------------------- Update statements -------------------------
 //
 
-export const updateProductNameByID = (productID:string, newName:string, callback:
+updateProductNameByID = (productID:string, newName:string, callback:
     (error:Error | null, result?:any) => void) => {
     const queryOne = "UPDATE ak_products p SET p.name = ? WHERE p.id = ?;";
     const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name LIKE ?";
@@ -117,7 +124,7 @@ export const updateProductNameByID = (productID:string, newName:string, callback
         secondQuery = queryThree;
     }
     // executePreparedQuery(queryToPerform, callback, [newName, productID]);
-    executeTransactions([
+    this.database.executeTransactions([
         {
             id: 1,
             query: queryToPerform,
@@ -141,9 +148,8 @@ export const updateProductNameByID = (productID:string, newName:string, callback
         }).catch(
             err => callback(err)
         );
-};
-
-export const archiveProductByID = (productID:string, archive:string, callback:
+}
+archiveProductByID = (productID:string, archive:string, callback:
     (error:Error | null, result?:any) => void) => {
     const queryOne = "UPDATE ak_products p SET p.archived = ? WHERE p.id = ?;";
     const queryTwo = "UPDATE ak_products p SET p.archived = ? WHERE p.name LIKE ?;";
@@ -161,7 +167,7 @@ export const archiveProductByID = (productID:string, archive:string, callback:
         queryToPerform = queryOne;
         secondQuery = queryThree;
     }
-    executeTransactions([
+    this.database.executeTransactions([
         {
             id: 1,
             query: queryToPerform,
@@ -185,13 +191,13 @@ export const archiveProductByID = (productID:string, archive:string, callback:
         }).catch(
             err => callback(err)
         );
-};
+}
 
 //
 // ------------------------- Delete statements -------------------------
 //
 
-export const deleteProductNameByID = (productId:string, callback:
+deleteProductNameByID = (productId:string, callback:
     (error:Error | null, result?:any) => void) => {
     const queryOne = "DELETE FROM ak_products p WHERE p.id = ?;";
     const queryTwo = "DELETE FROM ak_products p WHERE p.name LIKE ?";
@@ -203,7 +209,7 @@ export const deleteProductNameByID = (productId:string, callback:
     } else {
         queryToPerform = queryOne;
     }
-    executeTransactions([
+    this.database.executeTransactions([
         {
             id: 1,
             query: queryToPerform,
@@ -215,4 +221,5 @@ export const deleteProductNameByID = (productId:string, callback:
         }).catch(
             err => callback(err)
         );
-};
+}
+}

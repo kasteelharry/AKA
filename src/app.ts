@@ -10,11 +10,19 @@ import customersRouter from './routes/customers';
 import loginRouter from './routes/login';
 import productRouter from './routes/Product';
 const MySQLStore = require('express-mysql-session')(session);
-import {  dbOptions } from './database/database';
+import {  dbSessionOptions } from './database/database';
 import https from 'https';
 import http from 'http';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import MySQLDatabase from './model/MySQLDatabase';
+
+export type queryType = { id: number, query: string, parameters: (string | number | boolean | JSON | Date | null | undefined)[]}[];
+const database: Database<queryType> = new MySQLDatabase();
+
+export default function getDatabase() {
+    return database;
+}
 
 const options = {
     key: fs.readFileSync(path.join(__dirname, "../.keys/privkey.pem"), "utf-8"),
@@ -25,7 +33,7 @@ const app = express();
 // const port = 8080;
 
 process.env.TZ = 'Europe/Amsterdam';
-const sessionStore = new MySQLStore(dbOptions);
+const sessionStore = new MySQLStore(dbSessionOptions);
 dotenv.config();
 
 // view engine setups
@@ -72,4 +80,3 @@ app.use( (err: any, req: Request, res: Response, next:NextFunction) => {
 });
 
 https.createServer(options, app).listen(process.env.PORT_HTTPS);
-module.exports = app;

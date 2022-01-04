@@ -1,9 +1,14 @@
 import express from 'express';
-import { retrieveSalt, retrieveHash } from '../database/queries/loginQueries';
+// import { retrieveHash } from '../database/queries/loginQueries';
 import { EmailNotRegisteredError } from '../exceptions/EmailNotRegisteredError';
 import { authenticateUser, registerSession } from '../util/UserAuthentication';
 import bcrypt from "bcryptjs";
-import { logOutSession } from '../database/queries/authenticationQueries';
+// import { logOutSession } from '../database/queries/authenticationQueries';
+import AuthenticateQueries from '../database/queries/authenticationQueries';
+import getDatabase from '../app';
+import LoginQueries from '../database/queries/loginQueries';
+
+
 const app = express();
 const router = express.Router();
 // define a route handler for the default home page
@@ -21,7 +26,8 @@ app.get('/',(req, res, next) => {
 app.get('/logout',(req, res, next) => {
     authenticateUser(req.sessionID).then(val => {
         if (val) {
-            logOutSession(req.sessionID, (err:Error | null, result?:string) => {
+            const auth = new AuthenticateQueries(getDatabase());
+            auth.logOutSession(req.sessionID, (err:Error | null, result?:string) => {
                 if (err) {
                     next(err);
                 } else {
@@ -37,6 +43,7 @@ app.get('/logout',(req, res, next) => {
 /* POST login an user*/
 // TODO combine this with the function using the same name in the login route.
 app.post('/', (req, res, next) => {
+    const login = new LoginQueries(getDatabase());
     const email = req.body.email;
     const session = req.sessionID;
     const password: string = req.body.password;
@@ -44,7 +51,7 @@ app.post('/', (req, res, next) => {
         return res.status(401).redirect("../");
     }
     try {
-        retrieveHash(email, (error: Error | null, result1: string) => {
+        login.retrieveHash(email, (error: Error | null, result1: string) => {
             const hash = result1;
             if (error) {
                 next(error);

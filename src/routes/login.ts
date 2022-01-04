@@ -2,11 +2,11 @@ import express from 'express';
 import bcrypt from "bcryptjs";
 import { registerLogin, retrieveHash, retrieveSalt } from '../database/queries/loginQueries';
 import { EmailNotRegisteredError } from '../exceptions/EmailNotRegisteredError';
-import { authenticateUser, registerGoogleSession, registerSession } from '../util/UserAuthentication';
-import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
-import { authenticateGUserInDB } from '../database/queries/authenticationQueries';
-import { GeneralServerError } from '../exceptions/GeneralServerError';
+
+import { authenticateUser, registerGoogleSession, registerSession } from '../util/UserAuthentication';
+
+
 
 const router = express.Router();
 // define a route handler for the default home page
