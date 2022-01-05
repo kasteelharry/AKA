@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import AuthenticateQueries from '../queries/AuthenticationQueries';
 import getDatabase from '../app';
 import LoginQueries from '../queries/LoginQueries';
-import { UserAuthentication } from '../util/UserAuthentication';
+import UserAuthentication from '../util/UserAuthentication';
 
 
 const app = express();

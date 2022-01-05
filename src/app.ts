@@ -14,7 +14,7 @@ import https from 'https';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import MySQLDatabase from './model/MySQLDatabase';
-import { UserAuthentication } from './util/UserAuthentication';
+import UserAuthentication  from './util/UserAuthentication';
 
 dotenv.config();
 

@@ -1,5 +1,4 @@
 import express from 'express';
-import { OkPacket, RowDataPacket } from 'mysql2';
 import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
 import { convertStringToSQLDate } from '../util/ConvertStringToSQLDate';
 import { EmptySQLResultError } from '../exceptions/EmptySQLResultError';

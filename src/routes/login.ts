@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { EmailNotRegisteredError } from '../exceptions/EmailNotRegisteredError';
 import { OAuth2Client } from 'google-auth-library';
 
-import { UserAuthentication } from '../util/UserAuthentication';
+import UserAuthentication from '../util/UserAuthentication';
 import getDatabase from '../app';
 import LoginQueries from '../queries/LoginQueries';
 

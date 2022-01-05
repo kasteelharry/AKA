@@ -5,7 +5,7 @@ import getDatabase, { queryType } from '../app';
 import LoginQueries from '../queries/LoginQueries';
 import { nextTick } from 'process';
 
-export class UserAuthentication {
+export default class UserAuthentication {
 
     private auth : AuthenticateQueries;
     private login: LoginQueries;

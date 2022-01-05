@@ -1,5 +1,4 @@
 import express from 'express';
-import { OkPacket, RowDataPacket } from 'mysql2';
 import getDatabase from '../app';
 import ProductQueries from '../queries/ProductQueries';
 import { EmptySQLResultError } from '../exceptions/EmptySQLResultError';

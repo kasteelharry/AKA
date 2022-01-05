@@ -1,10 +1,8 @@
 import { GeneralServerError } from "../../exceptions/GeneralServerError";
 import { queryType } from "../../app";
 import CustomerQueries from "../../queries/CustomerQueries";
-import { exampleResult, MockDatabase } from "../../model/MockDatabase";
+import { MockDatabase } from "../../model/MockDatabase";
 import { convertStringToSQLDate } from "../../util/ConvertStringToSQLDate";
-import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
-import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
 
 describe('CustomerQueriesTest', () => {
 
