@@ -35,10 +35,8 @@ createNewProduct = (product: string): Promise<any> => {
             resolve(val[1].result.insertId);
         }).catch(
             err => {
-                if (err instanceof ItemAlreadyExistsError && err.message.match("Duplicate entry")) {
-                    if (err.message.match("name")) {
-                        reject(new ItemAlreadyExistsError("Given product already exists."));
-                    }
+                if (err.message.match("Duplicate entry")) {
+                    reject(new ItemAlreadyExistsError("Given product already exists."));
                 } else {
                     reject(err);
                 }
