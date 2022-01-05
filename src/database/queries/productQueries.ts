@@ -4,49 +4,50 @@ import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError"
 import { executeTransactions } from "../database";
 
 
-// 
+//
 // ------------------------- Create statements -------------------------
-// 
+//
 
 /**
  * Creates a new product with just the name.
  * @param product the name of the product.
- * @param callback callback method containing the result of the query.
+ * @param callback callback method containing the result of the queryToPerform.
  */
-export const createNewProduct = (product: string, callback: Function) => {
-    const query = "INSERT INTO ak_products (Name) VALUES (?);";
+export const createNewProduct = (product: string, callback:
+    (error:Error | null, result?:any) => void) => {
+    const queryToPerform = "INSERT INTO ak_products (Name) VALUES (?);";
     executeTransactions([
         {
             id: 1,
-            query: query,
+            query: queryToPerform,
             parameters: [product]
         }
     ]).then(
         val => {
-            callback(null, val[1].result.insertId)
+            callback(null, val[1].result.insertId);
         }).catch(
             err => {
-                console.log('catching error.');
-                
                 if (err instanceof ItemAlreadyExistsError && err.message.match("Duplicate entry")) {
-                    if (err.message.match(product)) {
-                        callback(new ItemAlreadyExistsError("Given product name already exists.")) 
+                    if (err.message.match("name")) {
+                        callback(new ItemAlreadyExistsError("Given product " + product + " already exists."));
                     }
+                } else {
+                    callback(err);
                 }
-                callback(err);
             }
         );
-}
+};
 
-// 
+//
 // ------------------------- Retrieve statements -------------------------
-// 
+//
 
 /**
  * Gets all the products from the database.
- * @param callback callback method containing the result of the query.
+ * @param callback callback method containing the result of the queryToPerform.
  */
-export const getAllProducts = (callback: Function)  => {    
+export const getAllProducts = (callback:
+    (error:Error | null, result?:any) => void) => {
     executeTransactions([
         {
             id: 1,
@@ -55,63 +56,66 @@ export const getAllProducts = (callback: Function)  => {
         }
     ]).then(
         val => {
-            callback(null, val[1].result)
+            callback(null, val[1].result);
         }).catch(
             err => callback(err)
         );
-}
+};
 
 /**
  * Gets a single product from the database.
  * @param productID the product ID, can be the name or the id.
- * @param callback callback method containing the result of the query.
+ * @param callback callback method containing the result of the queryToPerform.
  */
-export const getProductByID = (productID:string, callback: Function) => {
+export const getProductByID = (productID:string, callback:
+    (error:Error | null, result?:any) => void) => {
     const queryOne = "SELECT * FROM ak_products p WHERE p.id = ?;";
     const queryTwo = "SELECT * FROM ak_products p WHERE p.name LIKE ?";
-    let query = "";
-    const numberID = parseInt(productID);
+    let queryToPerform = "";
+    const numberID = parseInt(productID, 10);
     if (isNaN(numberID)) {
-        query = queryTwo;
+        queryToPerform = queryTwo;
         productID = '%' + productID + '%';
     } else {
-        query = queryOne;
+        queryToPerform = queryOne;
     }
 
     executeTransactions([
         {
             id: 1,
-            query: query,
+            query: queryToPerform,
             parameters: [productID]
         }
     ]).then(
         val => {
-            callback(null, val[1].result)
+            callback(null, val[1].result);
         }).catch(
             err => callback(err)
         );
-}
+};
 
-// 
+//
 // ------------------------- Update statements -------------------------
-// 
+//
 
-export const updateProductNameByID = (productID:string, newName:string, callback:Function) => {
+export const updateProductNameByID = (productID:string, newName:string, callback:
+    (error:Error | null, result?:any) => void) => {
     const queryOne = "UPDATE ak_products p SET p.name = ? WHERE p.id = ?;";
-    const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name = ?";
+    const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name LIKE ?";
     const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
-    const queryFour = "SELECT * FROM ak_products p WHERE p.name = ?";
+    const queryFour = "SELECT * FROM ak_products p WHERE p.name LIKE ?";
     let queryToPerform = "";
     let secondQuery = "";
-    const numberID = parseInt(productID);
+    const numberID = parseInt(productID,10);
     if (isNaN(numberID)) {
         queryToPerform = queryTwo;
         secondQuery = queryFour;
+        productID = '%' + productID + '%';
     } else {
         queryToPerform = queryOne;
         secondQuery = queryThree;
     }
-    // executePreparedQuery(query, callback, [newName, productID]);
+    // executePreparedQuery(queryToPerform, callback, [newName, productID]);
     executeTransactions([
         {
             id: 1,
@@ -121,33 +125,33 @@ export const updateProductNameByID = (productID:string, newName:string, callback
         {
             id: 2,
             query: secondQuery,
-            parameters: [newName]
+            parameters: [productID]
         }
     ]).then(
         val => {
-            const queryResults = val[1].result
-            if (queryResults.changedRows == 1) {
+            const queryResults = val[1].result;
+            if (queryResults.changedRows === 1) {
                 callback(null, val[2].result);
-            } else if (queryResults.affectedRows == 1) {
+            } else if (queryResults.affectedRows === 1) {
                 callback(new ItemAlreadyExistsError());
             } else {
-                callback(new EmptySQLResultError('Was unable to find a match for the id.'))
+                callback(new EmptySQLResultError('Was unable to find a match for the id.'));
             }
-            
         }).catch(
             err => callback(err)
         );
-}
+};
 
-export const archiveProductByID = (productID:string, archive:string, callback:Function) => {
+export const archiveProductByID = (productID:string, archive:string, callback:
+    (error:Error | null, result?:any) => void) => {
     const queryOne = "UPDATE ak_products p SET p.archived = ? WHERE p.id = ?;";
     const queryTwo = "UPDATE ak_products p SET p.archived = ? WHERE p.name LIKE ?;";
     const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
     const queryFour = "SELECT * FROM ak_products p WHERE p.name LIKE ?";
     let queryToPerform = "";
     let secondQuery = "";
-    const archiveNum = (archive =="true") ? 1 : 0;
-    const numberID = parseInt(productID);
+    const archiveNum = (archive ==="true") ? 1 : 0;
+    const numberID = parseInt(productID, 10);
     if (isNaN(numberID)) {
         queryToPerform = queryTwo;
         secondQuery = queryFour;
@@ -170,45 +174,44 @@ export const archiveProductByID = (productID:string, archive:string, callback:Fu
     ]).then(
         val => {
             const queryResults = val[1].result;
-            
-            if (queryResults.changedRows == 1) {
+            if (queryResults.changedRows === 1) {
                 callback(null, val[2].result);
-            } else if (queryResults.affectedRows == 1) {
+            } else if (queryResults.affectedRows === 1) {
                 callback(new ItemAlreadyExistsError());
             } else {
                 callback(new EmptySQLResultError('Was unable to find a match for the id.'));
             }
-            
         }).catch(
             err => callback(err)
         );
-}
+};
 
-// 
+//
 // ------------------------- Delete statements -------------------------
-// 
+//
 
-export const deleteProductNameByID = (productId:string, callback:Function) => {
+export const deleteProductNameByID = (productId:string, callback:
+    (error:Error | null, result?:any) => void) => {
     const queryOne = "DELETE FROM ak_products p WHERE p.id = ?;";
     const queryTwo = "DELETE FROM ak_products p WHERE p.name LIKE ?";
-    let query = "";
-    const numberID = parseInt(productId);
+    let queryToPerform = "";
+    const numberID = parseInt(productId, 10);
     if (isNaN(numberID)) {
-        query = queryTwo;
+        queryToPerform = queryTwo;
         productId = '%' + productId + '%';
     } else {
-        query = queryOne;
+        queryToPerform = queryOne;
     }
     executeTransactions([
         {
             id: 1,
-            query: query,
+            query: queryToPerform,
             parameters: [productId]
         }
     ]).then(
         val => {
-            callback(null, val[1].result)
+            callback(null, val[1].result);
         }).catch(
             err => callback(err)
         );
-}
+};
