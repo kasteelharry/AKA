@@ -14,6 +14,8 @@ describe('UserAuthenticationTests', () => {
     beforeEach(() => {
         db.setDBState(true);
         db.setIndexToUse(0);
+        db.setFailInsert(false);
+        db.setDuplicateInsert(false);
     });
 
 
@@ -36,6 +38,13 @@ describe('UserAuthenticationTests', () => {
         await expect(promise).resolves.toBeFalsy();
     });
 
+    test("Authenticate an expired non-existent \"session\".", async () => {
+        db.setIndexToUse(3);
+        const promise = auth.authenticateUser("existentSession");
+        await expect(promise).resolves.toBeFalsy();
+    });
+
+
     test("Authenticate a \"session\" on a closed database.", async () => {
         db.setDBState(false);
         const promise = auth.authenticateUser("1");
@@ -47,25 +56,34 @@ describe('UserAuthenticationTests', () => {
         await expect(promise).resolves.toBeTruthy();
     });
 
+    test("Failing to register a valid \"session\".", async () => {
+        db.setFailInsert(true);
+        const promise = auth.registerSession("1", 'joriskuiper2@gmail.com');
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
+    test("Failing to register a duplicate \"session\".", async () => {
+        db.setDuplicateInsert(true);
+        const promise = auth.registerSession("1", 'joriskuiper2@gmail.com');
+        await expect(promise).resolves.toBeFalsy();
+    });
+
+    test("Registering a valid \"session\" with non-existent user", async () => {
+        const promise = auth.registerSession("1", 'amy@gmail.com');
+        await expect(promise).resolves.toBeFalsy();
+    });
+
     test("Registering a \"session\" on a closed database.", async () => {
         db.setDBState(false);
         const promise = auth.registerSession("1", 'joriskuiper2@gmail.com');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
-
-    test("Registering an invalid \"session\".", async () => {
-        db.setIndexToUse(1);
-        const promise = auth.registerSession("2", 'joriskuiper2@gmail.com');
-        await expect(promise).resolves.toBeFalsy();
-    });
-
     test("Registering a valid Google \"session\".", async () => {
         const promise = auth.registerGoogleSession("1", 'joriskuiper2@gmail.com');
         await expect(promise).resolves.toBeTruthy();
     });
 
     test("Registering an invalid Google \"session\".", async () => {
-        db.setIndexToUse(1);
         const promise = auth.registerGoogleSession("2", 'joriskuiper2@gmail.com');
         await expect(promise).resolves.toBeTruthy();
     });
@@ -74,6 +92,18 @@ describe('UserAuthenticationTests', () => {
         db.setDBState(false);
         const promise = auth.registerGoogleSession("1", 'joriskuiper2@gmail.com');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
+    test("Failing to register a valid Google \"session\" with non-existent user", async () => {
+        db.setFailInsert(true);
+        const promise = auth.registerGoogleSession("1", 'bobby@gmail.com');
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
+    test("Failing to register a duplicate Google \"session\" with non-existent user", async () => {
+        db.setDuplicateInsert(true);
+        const promise = auth.registerGoogleSession("1", 'bobby@gmail.com');
+        await expect(promise).resolves.toBeFalsy();
     });
 
     //

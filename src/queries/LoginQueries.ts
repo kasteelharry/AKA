@@ -2,6 +2,7 @@ import { genSalt } from "bcryptjs";
 import bcrypt from "bcryptjs";
 
 import { queryType } from "../app";
+import { EmptySQLResultError } from "../exceptions/EmptySQLResultError";
 export default class LoginQueries {
 
     constructor(private database: Database<queryType>) {
@@ -59,7 +60,11 @@ export default class LoginQueries {
                 }
             ]).then(
                 val => {
-                    resolve(val[1].result[0].loginID);
+                    const res =val[1].result[0];
+                    if (res === undefined || res.length === 0) {
+                        reject(new EmptySQLResultError("Could not find: " + email));
+                    }
+                    resolve(res.loginID);
                 }).catch(
                     err => reject(err)
                 );
