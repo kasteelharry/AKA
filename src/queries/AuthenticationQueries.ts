@@ -102,6 +102,8 @@ export default class AuthenticateQueries {
                 }
             ]).then(
                 val => {
+                    console.log(val[1]);
+                    
                     const table = val[1].result[0];
                     resolve([table.loginID, table.expires, table.googleId]);
                 }).catch(

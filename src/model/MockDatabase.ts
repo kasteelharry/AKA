@@ -4,28 +4,7 @@ import { EmptySQLResultError } from "../exceptions/EmptySQLResultError";
 import { isDeepStrictEqual } from "util";
 import { query } from "express";
 
-export const exampleResult = {
-    '1': {
-        result: [
-            {
-                ID: 1,
-                Name: 'Joris',
-                BirthDate: new Date("2001-01-26T00:00:00.000Z"),
-                PicturePath: null,
-                Bankaccount: 'NL22INGB0123456789',
-                Active: 1
-            },
-            {
-                ID: 2,
-                Name: 'Bobby',
-                BirthDate: new Date("2001-01-26T00:00:00.000Z"),
-                PicturePath: null,
-                Bankaccount: 'NL22INGB0123456789',
-                Active: 1
-            }
-        ]
-    }
-};
+
 
 const insertResult = {
     fieldCount: 0,
@@ -47,14 +26,20 @@ const updateResult = {
 };
 
 export class MockDatabase<T> implements Database<T> {
-
+// This is faked data from the database. The real database does not
+// generate this data. The data below is data from all tables that
+// are being tested, hacked together.
     itemList = [{
         ID: 1,
         Name: 'Joris',
+        Email: 'joriskuiper2@gmail.com',
         BirthDate: new Date("2001-01-26T00:00:00.000Z"),
         PicturePath: null,
         Bankaccount: 'NL22INGB0123456789',
-        Active: 1
+        Active: 1,
+        expires: 1672441200,
+        loginID: 112233445566778899,
+        googleId: 112233445566778899
     },
     {
         ID: 2,
@@ -64,13 +49,30 @@ export class MockDatabase<T> implements Database<T> {
         Bankaccount: 'NL22INGB0123456789',
         Active: 1
     },
+    {
+        ID: 3,
+        Name: 'Charlie',
+        BirthDate: new Date("2001-01-26T00:00:00.000Z"),
+        PicturePath: null,
+        Bankaccount: 'NL22INGB0123456789',
+        Active: 1,
+        Email: 'charlie@gmail.com',
+        expires: 1670441,
+        loginID: 112233445566778899,
+        googleId: 112233445566778899,
+    },
     ];
 
     private dbState: boolean = true;
 
+    private indexToUse:number = 0;
 
     setDBState(state: boolean): void {
         this.dbState = state;
+    }
+
+    setIndexToUse(index:number): void {
+        this.indexToUse = index;
     }
 
     executeTransactions(queries: any[]): Promise<{ [id: string]: any }> {
@@ -78,36 +80,37 @@ export class MockDatabase<T> implements Database<T> {
             if (!this.dbState) {
                 reject(new GeneralServerError("SQL Server is not able to be reached"));
             }
-            let res: { [id: string]: { result: any } } = {};
+            const res: { [id: string]: { result: any } } = {};
             for (const qry of queries) {
+                const param = qry.parameters;
                 try {
                     switch (qry.query.split(" ")[0]) {
                         case "SELECT":
-                            if (qry.parameters[0] === undefined) {
+                            if (param[0] === undefined) {
                                 res[qry.id] = this.getAllElements();
                                 break;
                             }
-                            const num = parseInt(qry.parameters[0], 10);
+                            const num = parseInt(param[0], 10);
                             if (num === undefined) {
-                                reject(new GeneralServerError("Bad parameter given"));
+                                res[qry.id] = this.getElements(param[0]);
                             } else {
                                 res[qry.id] = this.getElements(num);
                             }
                             break;
                         case "INSERT":
-                            res[qry.id] = this.createElements(qry.parameters);
+                            res[qry.id] = this.createElements(param);
                             break;
                         case "UPDATE":
-                            const updateNum = parseInt(qry.parameters[0], 10);
-                            const map:Map<string, string | number | undefined> = qry.parameters[1];
-                            if (updateNum === undefined || qry.parameters[1] === undefined) {
+                            const updateNum = parseInt(param[0], 10);
+                            const map: Map<string, string | number | undefined> = param[1];
+                            if (updateNum === undefined || param[1] === undefined) {
                                 reject(new GeneralServerError("Bad parameter given"));
                             } else {
                                 res[qry.id] = this.updateElements(updateNum, map);
                             }
                             break;
                         case "DELETE":
-                            const deleteNum = parseInt(qry.parameters[0], 10);
+                            const deleteNum = parseInt(param[0], 10);
                             if (deleteNum === undefined) {
                                 reject(new GeneralServerError("Bad parameter given"));
                             } else {
@@ -118,7 +121,7 @@ export class MockDatabase<T> implements Database<T> {
                             reject(new GeneralServerError("SQL Server is not able to be reached"));
                             break;
                     }
-                    if (qry.id === queries.length){
+                    if (qry.id === queries.length) {
                         resolve(res);
                         return;
                     }
@@ -137,7 +140,7 @@ export class MockDatabase<T> implements Database<T> {
     }
 
 
-    updateElements(id:number, param: Map<string, string | number | undefined>):any {
+    updateElements(id: number, param: Map<string, string | number | undefined>): any {
 
         return {
             result: updateResult,
@@ -156,12 +159,18 @@ export class MockDatabase<T> implements Database<T> {
         };
     }
 
-    getElements(index: number): any {
+    getElements(index: number | string): any {
+        if (typeof index === 'string' ) {
+            const values = this.itemList.filter(e =>e.Name === index || e.Email === index || e.Bankaccount === index);
+            return {
+                result:values,
+            };
+        }
         if (this.itemList.length <= index) {
             throw new EmptySQLResultError("No results found.");
         }
         return {
-            result: this.itemList,
+            result: [this.itemList[this.indexToUse]],
         };
     }
 
