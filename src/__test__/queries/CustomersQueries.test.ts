@@ -3,6 +3,8 @@ import { queryType } from "../../app";
 import CustomerQueries from "../../queries/CustomerQueries";
 import { MockDatabase } from "../../model/MockDatabase";
 import { convertStringToSQLDate } from "../../util/ConvertStringToSQLDate";
+import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
+import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
 
 describe('CustomerQueriesTest', () => {
 
@@ -26,6 +28,12 @@ describe('CustomerQueriesTest', () => {
         await expect(promise).resolves.toBeGreaterThanOrEqual(1);
     });
 
+    test("Create a customer on a closed database", async () => {
+        db.setDBState(false);
+        const promise = customer.createNewCustomer("testName", convertStringToSQLDate("2000-01-01"), "NL22INGB00000000");
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
 
     //
     // ------------------------- Retrieve statements test -------------------------
@@ -38,6 +46,11 @@ describe('CustomerQueriesTest', () => {
 
     test("Get one customer", async () => {
         const promise = customer.getCustomerByID("1");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Get one customer by name", async () => {
+        const promise = customer.getCustomerByID("Joris");
         await expect(promise).resolves.toBeDefined();
     });
 
@@ -67,6 +80,57 @@ describe('CustomerQueriesTest', () => {
         await expect(promise).resolves.toBeDefined();
     });
 
+    test("Update existing customer by name", async () => {
+        const params = new Map<string, string | number | undefined>();
+        params.set("name", "Anna");
+        params.set("birthday", convertStringToSQLDate("1999-02-22"));
+        params.set("bankaccount", "NL11RABO1234567890");
+        params.set("active", 1);
+        const promise = customer.updateCustomer("Joris", params);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Update existing customer by name with no parameters", async () => {
+        const params = new Map<string, string | number | undefined>();
+        const promise = customer.updateCustomer("Joris", params);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+
+    test("Update existing customer on a closed database", async () => {
+        db.setDBState(false);
+        const params = new Map<string, string | number | undefined>();
+        params.set("name", "Anna");
+        params.set("birthday", convertStringToSQLDate("1999-02-22"));
+        params.set("bankaccount", "NL11RABO1234567890");
+        params.set("active", "true");
+        const promise = customer.updateCustomer("1", params);
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
+    test("Update existing customer with no data change", async () => {
+        db.setIndexToUse(1);
+        const params = new Map<string, string | number | undefined>();
+        params.set("name", "Anna");
+        params.set("birthday", convertStringToSQLDate("1999-02-22"));
+        params.set("bankaccount", "NL11RABO1234567890");
+        params.set("active", 1);
+        const promise = customer.updateCustomer("1", params);
+        await expect(promise).rejects.toBeInstanceOf(ItemAlreadyExistsError);
+    });
+
+    test("Update non-existing customer", async () => {
+        db.setIndexToUse(2);
+        const params = new Map<string, string | number | undefined>();
+        params.set("name", "Anna");
+        params.set("birthday", convertStringToSQLDate("1999-02-22"));
+        params.set("bankaccount", "NL11RABO1234567890");
+        params.set("active", 1);
+        const promise = customer.updateCustomer("1", params);
+        await expect(promise).rejects.toBeInstanceOf(EmptySQLResultError);
+    });
+
+
 
     //
     // ------------------------- Delete statements test -------------------------
@@ -75,6 +139,18 @@ describe('CustomerQueriesTest', () => {
     test("Delete customer", async () => {
         const promise = customer.deleteCustomer("1");
         await expect(promise).resolves.toBeDefined();
+    });
+
+
+    test("Delete customer by name", async () => {
+        const promise = customer.deleteCustomer("Joris");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Delete customer on closed database", async () => {
+        db.setDBState(false);
+        const promise = customer.deleteCustomer("1");
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
 });

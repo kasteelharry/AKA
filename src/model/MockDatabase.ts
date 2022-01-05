@@ -25,6 +25,26 @@ const updateResult = {
     warningStatus: 0
 };
 
+const updateFailedResult = {
+    fieldCount: 0,
+    affectedRows: 1,
+    changedRows: 0,
+    insertId: 3,
+    info: '',
+    serverStatus: 3,
+    warningStatus: 0
+};
+
+const updateNotFound = {
+    fieldCount: 0,
+    affectedRows: 0,
+    changedRows: 0,
+    insertId: 3,
+    info: '',
+    serverStatus: 3,
+    warningStatus: 0
+};
+
 export class MockDatabase<T> implements Database<T> {
 // This is faked data from the database. The real database does not
 // generate this data. The data below is data from all tables that
@@ -141,10 +161,20 @@ export class MockDatabase<T> implements Database<T> {
 
 
     updateElements(id: number, param: Map<string, string | number | undefined>): any {
-
-        return {
+        if (this.indexToUse === 1) {
+            return {
+                result: updateFailedResult,
+            };
+        } else if (this.indexToUse === 2) {
+            return {
+                result: updateNotFound,
+            };
+        } else {
+            return {
             result: updateResult,
         };
+        }
+
     }
 
     createElements(param: string[]): any {
