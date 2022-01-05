@@ -91,9 +91,6 @@ export default class LoginQueries {
             val => {
                 if (val[1].result.length === 0) {
                     bcrypt.genSalt((err, salt) => {
-                        if (err) {
-                            reject(err);
-                        }
                         resolve(salt);
                     });
                 } else {
