@@ -1,5 +1,8 @@
 import { ItemAlreadyExistsError } from "../exceptions/ItemAlreadyExistsError";
 import { GeneralServerError } from "../exceptions/GeneralServerError";
+import { EmptySQLResultError } from "../exceptions/EmptySQLResultError";
+import { isDeepStrictEqual } from "util";
+import { query } from "express";
 
 export const exampleResult = {
     '1': {
@@ -24,21 +27,6 @@ export const exampleResult = {
     }
 };
 
-export const singleResult = {
-    '1': {
-        result: [
-            {
-                ID: 1,
-                Name: 'Joris',
-                BirthDate: new Date("2001-01-26T00:00:00.000Z"),
-                PicturePath: null,
-                Bankaccount: 'NL22INGB0123456789',
-                Active: 1
-            }
-        ]
-    }
-};
-
 const insertResult = {
     fieldCount: 0,
     affectedRows: 1,
@@ -48,10 +36,35 @@ const insertResult = {
     warningStatus: 0
 };
 
+const updateResult = {
+    fieldCount: 0,
+    affectedRows: 1,
+    changedRows: 1,
+    insertId: 3,
+    info: '',
+    serverStatus: 3,
+    warningStatus: 0
+};
 
 export class MockDatabase<T> implements Database<T> {
 
-    table: string[][] = [];
+    itemList = [{
+        ID: 1,
+        Name: 'Joris',
+        BirthDate: new Date("2001-01-26T00:00:00.000Z"),
+        PicturePath: null,
+        Bankaccount: 'NL22INGB0123456789',
+        Active: 1
+    },
+    {
+        ID: 2,
+        Name: 'Bobby',
+        BirthDate: new Date("2001-01-26T00:00:00.000Z"),
+        PicturePath: null,
+        Bankaccount: 'NL22INGB0123456789',
+        Active: 1
+    },
+    ];
 
     private dbState: boolean = true;
 
@@ -65,59 +78,91 @@ export class MockDatabase<T> implements Database<T> {
             if (!this.dbState) {
                 reject(new GeneralServerError("SQL Server is not able to be reached"));
             }
-            const queryList: [{ query: string, param: string[] }] = [{ query: "", param: [] }];
-            queryList.pop();
+            let res: { [id: string]: { result: any } } = {};
             for (const qry of queries) {
-                queryList.push({
-                    query: qry.query,
-                    param: qry.parameters
-                });
-            }
-
-            const firstQ = queryList[0].query;
-            const firstP = queryList[0].param;
-            try {
-                let res;
-                switch (firstQ.split(" ")[0]) {
-                    case "SELECT":
-                        if (firstP[0] === undefined) {
-                            resolve(this.getAllElements());
-                        } else {
-                            resolve(this.getElements(firstP[0]));
-                        }
-                        break;
-                    case "INSERT":
-                        res = this.createElements(firstP);
+                try {
+                    switch (qry.query.split(" ")[0]) {
+                        case "SELECT":
+                            if (qry.parameters[0] === undefined) {
+                                res[qry.id] = this.getAllElements();
+                                break;
+                            }
+                            const num = parseInt(qry.parameters[0], 10);
+                            if (num === undefined) {
+                                reject(new GeneralServerError("Bad parameter given"));
+                            } else {
+                                res[qry.id] = this.getElements(num);
+                            }
+                            break;
+                        case "INSERT":
+                            res[qry.id] = this.createElements(qry.parameters);
+                            break;
+                        case "UPDATE":
+                            const updateNum = parseInt(qry.parameters[0], 10);
+                            const map:Map<string, string | number | undefined> = qry.parameters[1];
+                            if (updateNum === undefined || qry.parameters[1] === undefined) {
+                                reject(new GeneralServerError("Bad parameter given"));
+                            } else {
+                                res[qry.id] = this.updateElements(updateNum, map);
+                            }
+                            break;
+                        case "DELETE":
+                            const deleteNum = parseInt(qry.parameters[0], 10);
+                            if (deleteNum === undefined) {
+                                reject(new GeneralServerError("Bad parameter given"));
+                            } else {
+                                res[qry.id] = this.deleteElements();
+                            }
+                            break;
+                        default:
+                            reject(new GeneralServerError("SQL Server is not able to be reached"));
+                            break;
+                    }
+                    if (qry.id === queries.length){
                         resolve(res);
-                        break;
-                    default:
-                        reject(new GeneralServerError("SQL Server is not able to be reached"));
-                        break;
+                        return;
+                    }
+                } catch (error) {
+                    reject(error);
                 }
-            } catch (error) {
-                reject(error);
-            }
 
+            }
         });
     }
-    createElements(firstP: string[]): any {
-        if (this.table.includes(firstP)) {
-            throw new ItemAlreadyExistsError();
-        }
-        const results: { [id: string]: { result: any } } = {};
-        results[1] = {
+
+    deleteElements() {
+        return {
+            result: updateResult
+        };
+    }
+
+
+    updateElements(id:number, param: Map<string, string | number | undefined>):any {
+
+        return {
+            result: updateResult,
+        };
+    }
+
+    createElements(param: string[]): any {
+        return {
             result: insertResult,
         };
-        this.table.push(firstP);
-        return results;
     }
 
     getAllElements(): any {
-        return exampleResult;
+        return {
+            result: this.itemList
+        };
     }
 
-    getElements(index: string | number): any {
-        return singleResult;
+    getElements(index: number): any {
+        if (this.itemList.length <= index) {
+            throw new EmptySQLResultError("No results found.");
+        }
+        return {
+            result: this.itemList,
+        };
     }
 
     private objects: any[] = [];
