@@ -35,7 +35,7 @@ export default class ProductQueries {
                 }).catch(
                     err => {
                         if (err.message.match("Duplicate entry")) {
-                            reject(new ItemAlreadyExistsError("Given product already exists."));
+                            reject(new ItemAlreadyExistsError("Given product " + product + " already exists."));
                         } else {
                             reject(err);
                         }
