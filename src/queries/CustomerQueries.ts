@@ -124,7 +124,12 @@ export default class CustomerQueries {
                 "c.bankaccount = COALESCE(?,c.bankaccount), " +
                 "c.active = COALESCE(?,c.active) " +
                 "WHERE c.id = ?;";
-            const queryB = "UPDATE ak_customers c SET c.bankaccount = ? WHERE c.name = ?;";
+            const queryB = "UPDATE ak_customers c SET " +
+            "c.name = COALESCE(?,c.name), " +
+            "c.birthdate = COALESCE(?,c.birthdate), " +
+            "c.bankaccount = COALESCE(?,c.bankaccount), " +
+            "c.active = COALESCE(?,c.active) " +
+            "WHERE c.name = ?;";
             const queryC = "SELECT * FROM ak_customers c WHERE c.id = ?;";
             const queryD = "SELECT * FROM ak_customers c WHERE c.name = ?;";
             let queryOne = "";
