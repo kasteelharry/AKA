@@ -3,9 +3,9 @@ import bcrypt from "bcryptjs";
 import { EmailNotRegisteredError } from '../exceptions/EmailNotRegisteredError';
 import { OAuth2Client } from 'google-auth-library';
 
-import { UserAuthentication } from '../util/UserAuthentication';
+import UserAuthentication from '../util/UserAuthentication';
 import getDatabase from '../app';
-import LoginQueries from '../database/queries/loginQueries';
+import LoginQueries from '../queries/LoginQueries';
 
 const router = express.Router();
 // define a route handler for the default home page
@@ -14,6 +14,8 @@ router.get('/', (req, res, next) => {
 });
 /* POST login an user*/
 router.post('/', (req, res, next) => {
+    const login = new LoginQueries(getDatabase());
+    const authUser = new UserAuthentication(getDatabase());
     const email = req.body.email;
     const session = req.sessionID;
     const password: string = req.body.password;
@@ -21,17 +23,12 @@ router.post('/', (req, res, next) => {
         return res.status(401).redirect("../");
     }
     try {
-        const login = new LoginQueries(getDatabase());
-        login.retrieveHash(email, (error: Error | null, result1: string) => {
-            const hash = result1;
-            if (error) {
-                next(error);
-            } else if (hash === undefined) {
+        login.retrieveHash(email).then(hash => {
+            if (hash === undefined) {
                 next(new EmailNotRegisteredError("email " + email + " is not registered."));
             } else {
                 bcrypt.compare(password, hash, (error2, result2) => {
                     if (result2) {
-                        const authUser = new UserAuthentication(getDatabase());
                         authUser.registerSession(session, email).then(val => {
                             // TODO change this to redirect to the dashboard.
                             res.status(200).json({ "login:": result2 });
@@ -43,7 +40,7 @@ router.post('/', (req, res, next) => {
                     }
                 });
             }
-        });
+        }).catch(error => next(error));
     } catch (error) {
         next(error);
     }
@@ -57,26 +54,18 @@ router.post('/register', (req, res, next) => {
             const email = req.body.email;
             const password = req.body.password;
             const login = new LoginQueries(getDatabase());
-            login.retrieveSalt(email, (err: Error | null, result: string) => {
-                if (err) {
-                    next(err);
-                }
-                const salt = result;
-                bcrypt.hash(password, salt, (error, result1) => {
+            login.retrieveSalt(email).then(salt => {
+                bcrypt.hash(password, salt, (hashError, result1) => {
                     const hash = result1;
-                    login.registerLogin(email, hash, salt, (error2: Error | null, result2: string) => {
-                        if (err) {
-                            next(err);
-                        } else {
-                            res.status(200).json({ "registered:": result2 });
-                        }
-                    });
+                    login.registerLogin(email, hash, salt).then(result => {
+                        res.status(200).json({ "registered:": result });
+                    }).catch(error => next(error));
                 });
-            });
+            }).catch(err => next(err));
         } else {
             return res.render("login");
         }
-    });
+    }).catch(errors => next(errors));
 
 });
 

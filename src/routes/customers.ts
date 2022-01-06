@@ -1,9 +1,8 @@
 import express from 'express';
-import { OkPacket, RowDataPacket } from 'mysql2';
 import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
 import { convertStringToSQLDate } from '../util/ConvertStringToSQLDate';
 import { EmptySQLResultError } from '../exceptions/EmptySQLResultError';
-import CustomerQueries from '../database/queries/customerQueries';
+import CustomerQueries from '../queries/CustomerQueries';
 import getDatabase from '../app';
 
 const router = express.Router();
@@ -18,8 +17,9 @@ router.post('/', async (req, res, next) => {
     const birthDate = req.body.birthday;
     const mySQLDateString = convertStringToSQLDate(birthDate);
     const customer = new CustomerQueries(getDatabase());
-        customer.createNewCustomer(name, mySQLDateString, bank, (err: Error | null, customers: OkPacket) => {
-        if (err) {
+        customer.createNewCustomer(name, mySQLDateString, bank).then(customers => {
+            res.status(200).json({ "customer:": customers });
+        }).catch(err =>{
             if (err.message.match("Duplicate entry")) {
                 if (err.message.match("Bank")) {
                     next(new ItemAlreadyExistsError("Given bankaccount already exists."));
@@ -29,10 +29,7 @@ router.post('/', async (req, res, next) => {
             } else {
                 next(err);
             }
-        } else {
-            res.status(200).json({ "customerId:": customers });
-        }
-    });
+        });
 });
 
 //
@@ -42,28 +39,18 @@ router.post('/', async (req, res, next) => {
 /* GET customer listing. */
 router.get('/', (req, res, next) => {
     const customer = new CustomerQueries(getDatabase());
-        customer.getAllCustomers((err: Error | null, customers: RowDataPacket[]) => {
-        if (err) {
-            next(err);
-        }
-        else {
-            res.status(200).json({ "users:": customers });
-        }
-    });
+        customer.getAllCustomers().then(customers => {
+            res.status(200).json({ "customer:": customers });
+        }).catch(err => next(err));
 });
 
 /* GET customer by customer id listing. */
 router.get('/:customerID', (req, res, next) => {
     try {
         const customer = new CustomerQueries(getDatabase());
-        customer.getCustomerByID(req.params.customerID, (err: Error | null, customers: RowDataPacket) => {
-            if (err) {
-                next(err);
-            }
-            else {
-                res.status(200).json({ "customer:": customers });
-            }
-        });
+        customer.getCustomerByID(req.params.customerID).then(customers => {
+            res.status(200).json({ "customer:": customers });
+        }).catch(err => next(err));
     } catch (error) {
         next(error);
     }
@@ -83,14 +70,9 @@ router.post('/:customerID', (req, res, next) => {
         params.set("bankaccount", req.body.bankaccount);
         params.set("active", req.body.active);
         const customer = new CustomerQueries(getDatabase());
-        customer.updateCustomer(req.params.customerID, params, (err: Error | null, customers: RowDataPacket) => {
-            if (err) {
-                next(err);
-            }
-            else {
-                res.status(200).json({ "customer:": customer });
-            }
-        });
+        customer.updateCustomer(req.params.customerID, params).then(customers => {
+            res.status(200).json({ "customer:": customers });
+        }).catch(err => next(err));
     } catch (error) {
         next(error);
     }
@@ -103,17 +85,13 @@ router.post('/:customerID', (req, res, next) => {
 /* POST to delete a customer from the database. */
 router.post('/:customerID/delete', (req, res, next) => {
     const customer = new CustomerQueries(getDatabase());
-        customer.deleteCustomer(req.params.customerID, (err: Error | null, customers: RowDataPacket) => {
-        if (err) {
-            next(err);
-        } else {
+        customer.deleteCustomer(req.params.customerID).then(customers => {
             if (customers.affectedRows === 1) {
                 res.status(200).json({ "customers:": "The customer has been deleted" });
             } else {
                 next(new EmptySQLResultError("No entry found for " + req.params.customerID));
             }
-        }
-    });
+        }).catch(err => next(err));
 });
 
 export default router;

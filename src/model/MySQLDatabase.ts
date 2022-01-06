@@ -9,6 +9,13 @@ const password = process.env.DATABASE_PASSWORD;
 const username = process.env.DATABASE_USER;
 
 export default class MySqlDatabase<T> implements Database<T> {
+
+    setDBState(state:boolean): void {
+        throw new Error("Method not implemented.");
+    }
+
+    private dbState: boolean = true;
+
     options = {
         connectionLimit: 10,
         host: hostname,
@@ -48,10 +55,10 @@ export default class MySqlDatabase<T> implements Database<T> {
                                 query: string,
                                 parameters: (string | number | boolean | JSON | Date | null | undefined)[]}[]): Promise<{ [id: string]: any }> {
         return new Promise(async (resolve, reject) => {
-            const results: {[id: string]: {result: any, fields: FieldPacket[] | undefined} }= {};
+            const results: {[id: string]: {result: any} }= {};
             this.db.getConnection((err, connection) => {
                 connection.beginTransaction((error) => {
-                    if (err) {
+                    if (error) {
                         connection.rollback(() => {
                             connection.release();
                             reject(new UnexpectedSQLResultError("Something went wrong with the connection."));
@@ -86,7 +93,6 @@ export default class MySqlDatabase<T> implements Database<T> {
                             // Push the result into an array and index it with the ID passed for searching later
                             results[query.id] = {
                                 result: queryResult,
-                                fields,
                             };
                         });
                     }

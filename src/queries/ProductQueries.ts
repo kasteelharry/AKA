@@ -1,8 +1,8 @@
 
 import { OkPacket } from "mysql2";
-import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
-import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
-import { queryType } from "../../app";
+import { EmptySQLResultError } from "../exceptions/EmptySQLResultError";
+import { ItemAlreadyExistsError } from "../exceptions/ItemAlreadyExistsError";
+import { queryType } from "../app";
 
 export default class ProductQueries {
 
@@ -20,8 +20,8 @@ export default class ProductQueries {
  * @param product the name of the product.
  * @param callback callback method containing the result of the queryToPerform.
  */
-createNewProduct = (product: string, callback:
-    (error:Error | null, result?:any) => void) => {
+createNewProduct = (product: string): Promise<any> => {
+    return new Promise((resolve, reject) => {
     const queryToPerform = "INSERT INTO ak_products (Name) VALUES (?);";
     this.database.executeTransactions([
         {
@@ -31,18 +31,17 @@ createNewProduct = (product: string, callback:
         }
     ]).then(
         val => {
-            callback(null, val[1].result.insertId);
+            resolve(val[1].result.insertId);
         }).catch(
             err => {
-                if (err instanceof ItemAlreadyExistsError && err.message.match("Duplicate entry")) {
-                    if (err.message.match("name")) {
-                        callback(new ItemAlreadyExistsError("Given product " + product + " already exists."));
-                    }
+                if (err.message.match("Duplicate entry")) {
+                    reject(new ItemAlreadyExistsError("Given product already exists."));
                 } else {
-                    callback(err);
+                    reject(err);
                 }
             }
         );
+    });
 }
 
 //
@@ -53,8 +52,8 @@ createNewProduct = (product: string, callback:
  * Gets all the products from the database.
  * @param callback callback method containing the result of the queryToPerform.
  */
-getAllProducts = (callback:
-    (error:Error | null, result?:any) => void) => {
+getAllProducts = (): Promise<any> => {
+    return new Promise((resolve, reject) => {
         this.database.executeTransactions([
         {
             id: 1,
@@ -63,10 +62,11 @@ getAllProducts = (callback:
         }
     ]).then(
         val => {
-            callback(null, val[1].result);
+            resolve(val[1].result);
         }).catch(
-            err => callback(err)
+            err => reject(err)
         );
+    });
 }
 
 /**
@@ -74,8 +74,8 @@ getAllProducts = (callback:
  * @param productID the product ID, can be the name or the id.
  * @param callback callback method containing the result of the queryToPerform.
  */
-getProductByID = (productID:string, callback:
-    (error:Error | null, result?:any) => void) => {
+getProductByID = (productID:string): Promise<any> => {
+    return new Promise((resolve, reject) => {
     const queryOne = "SELECT * FROM ak_products p WHERE p.id = ?;";
     const queryTwo = "SELECT * FROM ak_products p WHERE p.name LIKE ?";
     let queryToPerform = "";
@@ -96,10 +96,11 @@ getProductByID = (productID:string, callback:
         }
     ]).then(
         val => {
-            callback(null, val[1].result);
+            resolve(val[1].result);
         }).catch(
-            err => callback(err)
+            err => reject(err)
         );
+    });
 }
 
 
@@ -107,8 +108,8 @@ getProductByID = (productID:string, callback:
 // ------------------------- Update statements -------------------------
 //
 
-updateProductNameByID = (productID:string, newName:string, callback:
-    (error:Error | null, result?:any) => void) => {
+updateProductNameByID = (productID:string, newName:string): Promise<any> => {
+    return new Promise((resolve, reject) => {
     const queryOne = "UPDATE ak_products p SET p.name = ? WHERE p.id = ?;";
     const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name LIKE ?";
     const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
@@ -140,18 +141,19 @@ updateProductNameByID = (productID:string, newName:string, callback:
         val => {
             const queryResults = val[1].result;
             if (queryResults.changedRows === 1) {
-                callback(null, val[2].result);
+                resolve(val[2].result);
             } else if (queryResults.affectedRows === 1) {
-                callback(new ItemAlreadyExistsError());
+                reject(new ItemAlreadyExistsError());
             } else {
-                callback(new EmptySQLResultError('Was unable to find a match for the id.'));
+                reject(new EmptySQLResultError('Was unable to find a match for the id.'));
             }
         }).catch(
-            err => callback(err)
+            err => reject(err)
         );
+    });
 }
-archiveProductByID = (productID:string, archive:string, callback:
-    (error:Error | null, result?:any) => void) => {
+archiveProductByID = (productID:string, archive:string): Promise<any> => {
+    return new Promise((resolve, reject) => {
     const queryOne = "UPDATE ak_products p SET p.archived = ? WHERE p.id = ?;";
     const queryTwo = "UPDATE ak_products p SET p.archived = ? WHERE p.name LIKE ?;";
     const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
@@ -183,23 +185,24 @@ archiveProductByID = (productID:string, archive:string, callback:
         val => {
             const queryResults = val[1].result;
             if (queryResults.changedRows === 1) {
-                callback(null, val[2].result);
+                resolve(val[2].result);
             } else if (queryResults.affectedRows === 1) {
-                callback(new ItemAlreadyExistsError());
+                reject(new ItemAlreadyExistsError());
             } else {
-                callback(new EmptySQLResultError('Was unable to find a match for the id.'));
+                reject(new EmptySQLResultError('Was unable to find a match for the id.'));
             }
         }).catch(
-            err => callback(err)
+            err => reject(err)
         );
+    });
 }
 
 //
 // ------------------------- Delete statements -------------------------
 //
 
-deleteProductNameByID = (productId:string, callback:
-    (error:Error | null, result?:any) => void) => {
+deleteProductNameByID = (productId:string): Promise<any> => {
+    return new Promise((resolve, reject) => {
     const queryOne = "DELETE FROM ak_products p WHERE p.id = ?;";
     const queryTwo = "DELETE FROM ak_products p WHERE p.name LIKE ?";
     let queryToPerform = "";
@@ -218,9 +221,11 @@ deleteProductNameByID = (productId:string, callback:
         }
     ]).then(
         val => {
-            callback(null, val[1].result);
+            resolve(val[1].result);
         }).catch(
-            err => callback(err)
+            err => reject(err)
         );
+
+    });
 }
 }

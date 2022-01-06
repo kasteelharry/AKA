@@ -1,6 +1,8 @@
 import { genSalt } from "bcryptjs";
 import bcrypt from "bcryptjs";
-import { queryType } from "../../app";
+
+import { queryType } from "../app";
+import { EmptySQLResultError } from "../exceptions/EmptySQLResultError";
 export default class LoginQueries {
 
     constructor(private database: Database<queryType>) {
@@ -18,8 +20,8 @@ export default class LoginQueries {
      * @param callback The callback function containing either the query result or the
      * error if one is thrown.
      */
-    registerLogin = (email: string, hash: string, salt: string, callback:
-        (error: Error | null, result?: any) => void) => {
+    registerLogin = (email: string, hash: string, salt: string): Promise<number> => {
+        return new Promise((resolve, reject) => {
         const qry = "INSERT INTO ak_login (email, password, salt) " +
             "VALUES (?,?,?);";
 
@@ -31,10 +33,11 @@ export default class LoginQueries {
             }
         ]).then(
             val => {
-                callback(null, val[1].result.insertId);
+                resolve(val[1].result.insertId);
             }).catch(
-                err => callback(err)
+                err => reject(err)
             );
+        });
     }
 
     //
@@ -57,7 +60,11 @@ export default class LoginQueries {
                 }
             ]).then(
                 val => {
-                    resolve(val[1].result[0].loginID);
+                    const res =val[1].result[0];
+                    if (res === undefined || res.length === 0) {
+                        reject(new EmptySQLResultError("Could not find: " + email));
+                    }
+                    resolve(res.loginID);
                 }).catch(
                     err => reject(err)
                 );
@@ -71,8 +78,8 @@ export default class LoginQueries {
      * @param callback The callback function containing either the query result or the
      * error if one is thrown.
      */
-    retrieveSalt = (email: string, callback:
-        (error: Error | null, result?: any) => void) => {
+    retrieveSalt = (email: string): Promise<any> => {
+        return new Promise((resolve, reject) => {
         const qry = "SELECT l.salt FROM ak_login l WHERE l.email = ?";
         this.database.executeTransactions([
             {
@@ -84,24 +91,25 @@ export default class LoginQueries {
             val => {
                 if (val[1].result.length === 0) {
                     bcrypt.genSalt((err, salt) => {
-                        callback(null, salt);
+                        resolve(salt);
                     });
                 } else {
-                    callback(null, val[1].result[0].salt);
+                    resolve(val[1].result[0].salt);
                 }
             }
         ).catch(err => {
-            genSalt().then(salt => callback(null, salt));
+            genSalt().then(salt => resolve(salt));
         });
-    }
+    });
+}
 
     /**
      * Retrieves the user hash from the database.
      * @param email the email of the user
      * @param callback The callback function containing the result or the error
      */
-    retrieveHash = (email: string, callback:
-        (error: Error | null, result?: any) => void) => {
+    retrieveHash = (email: string): Promise<any> => {
+        return new Promise((resolve, reject) => {
         const qry = "SELECT l.password FROM ak_login l WHERE l.email = ?";
 
         this.database.executeTransactions([
@@ -112,8 +120,9 @@ export default class LoginQueries {
             }
         ]).then(
             val => {
-                callback(null, val[1].result[0].password);
+                resolve(val[1].result[0].password);
             }
-        ).catch(err => callback(err));
-    }
+        ).catch(err => reject(err));
+    });
+}
 }
