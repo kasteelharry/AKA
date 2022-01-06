@@ -38,7 +38,6 @@ router.get('/:productID', (req, res, next) => {
 router.post('/:productID', (req, res, next) => {
     const id = req.params.productID;
     const name = req.body.name;
-
     const prod = new ProductQueries(getDatabase());
     prod.updateProductNameByID(id, name).then(product =>  res.status(200).json({ "products:": product })).catch(err => next(err));
 

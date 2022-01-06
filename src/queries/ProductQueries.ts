@@ -11,7 +11,6 @@ export default class ProductQueries {
      }
 
 
-
 //
 // ------------------------- Create statements -------------------------
 //
@@ -89,6 +88,7 @@ getProductByID = (productID:string): Promise<any> => {
     }
 
     this.database.executeTransactions([
+
         {
             id: 1,
             query: queryToPerform,
@@ -102,6 +102,7 @@ getProductByID = (productID:string): Promise<any> => {
         );
     });
 }
+
 
 //
 // ------------------------- Update statements -------------------------
