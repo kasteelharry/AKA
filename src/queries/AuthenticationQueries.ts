@@ -30,7 +30,7 @@ export default class AuthenticateQueries {
                     resolve(val[1].result.insertId);
                 }).catch(
                     err => {
-                        const msg: string = err.message; 
+                        const msg: string = err.message;
                         if (msg.match("Duplicate")) {
                             resolve(0);
                         } else {
