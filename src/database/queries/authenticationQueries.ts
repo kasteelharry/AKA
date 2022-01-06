@@ -1,163 +1,163 @@
-import { executeTransactions } from "../database";
+import { queryType } from "../../app";
+export default class AuthenticateQueries {
 
+    constructor(private database: Database<queryType>) {
+        this.database =database;
+     }
 
-//
-// ------------------------- Create statements -------------------------
-//
+    //
+    // ------------------------- Create statements -------------------------
+    //
 
-/**
- * Adds the session and the login id of the user to the active sessions table.
- * @param loginID the id of the user
- * @param session the session of the user
- * @param callback the callback method with either the error or the result
- */
-export const authenticateUserInDB = (loginID:number, session:string, callback:
-    (error:Error | null, result?:number) => void) => {
-    const qry = "INSERT INTO ak_activesessions (loginID, sessionId) " +
-    "VALUES (?,?);";
-
-    executeTransactions([
-        {
-            id: 1,
-            query: qry,
-            parameters: [loginID,session]
-        }
-    ]).then(
-        val => {
-            callback(null, val[1].result.insertId);
-        }).catch(
-            err => {
-                const msg:string = err.message;
-                if (msg.match("Duplicate")) {
-                    callback(null, 0);
-                } else {
-                    callback(err);
-                }
+    /**
+     * Adds the session and the login id of the user to the active sessions table.
+     * @param loginID the id of the user
+     * @param session the session of the user
+     * @param callback the callback method with either the error or the result
+     */
+    authenticateUserInDB = (loginID: number, session: string, callback:
+        (error: Error | null, result?: number) => void) => {
+        const qry = "INSERT INTO ak_activesessions (loginID, sessionId) " +
+            "VALUES (?,?);";
+        this.database.executeTransactions([
+            {
+                id: 1,
+                query: qry,
+                parameters: [loginID, session]
             }
-        );
-};
-
-/**
- * Adds the session and the google id of the user to the active google sessions table.
- * @param googleSession the id of the user
- * @param session the session of the user
- * @param callback the callback method with either the error or the result
- */
- export const authenticateGUserInDB = (googleSession:string, session:string, callback:
-    (error:Error | null, result?:number) => void) => {
-    const qry = "INSERT INTO ak_googleSessions (googleSession, sessionId) " +
-    "VALUES (?,?);";
-
-    executeTransactions([
-        {
-            id: 1,
-            query: qry,
-            parameters: [googleSession,session]
-        }
-    ]).then(
-        val => {
-            callback(null, val[1].result.insertId);
-        }).catch(
-            err => {
-                const msg:string = err.message;
-                if (msg.match("Duplicate")) {
-                    callback(null, 0);
-                } else {
-                    callback(err);
+        ]).then(
+            val => {
+                callback(null, val[1].result.insertId);
+            }).catch(
+                err => {
+                    const msg: string = err.message;
+                    if (msg.match("Duplicate")) {
+                        callback(null, 0);
+                    } else {
+                        callback(err);
+                    }
                 }
+            );
+    }
+
+    /**
+     * Adds the session and the google id of the user to the active google sessions table.
+     * @param googleSession the id of the user
+     * @param session the session of the user
+     * @param callback the callback method with either the error or the result
+     */
+    authenticateGUserInDB = (googleSession: string, session: string, callback:
+        (error: Error | null, result?: number) => void) => {
+        const qry = "INSERT INTO ak_googleSessions (googleSession, sessionId) " +
+            "VALUES (?,?);";
+            this.database.executeTransactions([
+            {
+                id: 1,
+                query: qry,
+                parameters: [googleSession, session]
             }
-        );
-};
+        ]).then(
+            val => {
+                callback(null, val[1].result.insertId);
+            }).catch(
+                err => {
+                    const msg: string = err.message;
+                    if (msg.match("Duplicate")) {
+                        callback(null, 0);
+                    } else {
+                        callback(err);
+                    }
+                }
+            );
+    }
 
-//
-// ------------------------- Retrieve statements -------------------------
-//
+    //
+    // ------------------------- Retrieve statements -------------------------
+    //
 
-/**
- * Retrieves the active session information from the database based on the session.
- * @param session the session that needs to be verified.
- * @param callback the callback method containing the error or the (google) id and expire date of the session
- */
-export const verifyUserInDB = (session:string, callback:
-    (error:Error | null, loginID?:number, expires?:number, googleId?:number) => void) => {
-    // const queryToPerform = "SELECT a.loginID, s.expires FROM ak_activesessions a "+
-	// "INNER JOIN ak_session s " +
-    // "ON a.sessionId = s.session_id " +
-    // "WHERE a.sessionId = ?";
-    const queryToPerform = "SELECT * FROM ak_activesessions a "
-    + "RIGHT JOIN ak_session s "
-    + "ON a.sessionId = s.session_id "
-    + "LEFT JOIN ak_googleSessions g "
-    + "ON s.session_id = g.sessionId "
-    + "WHERE g.sessionId = ? OR a.sessionId = ?";
+    /**
+     * Retrieves the active session information from the database based on the session.
+     * @param session the session that needs to be verified.
+     * @param callback the callback method containing the error or the (google) id and expire date of the session
+     */
+    verifyUserInDB = (session: string, callback:
+        (error: Error | null, loginID?: number, expires?: number, googleId?: number) => void) => {
+        // const queryToPerform = "SELECT a.loginID, s.expires FROM ak_activesessions a "+
+        // "INNER JOIN ak_session s " +
+        // "ON a.sessionId = s.session_id " +
+        // "WHERE a.sessionId = ?";
+        const queryToPerform = "SELECT * FROM ak_activesessions a "
+            + "RIGHT JOIN ak_session s "
+            + "ON a.sessionId = s.session_id "
+            + "LEFT JOIN ak_googleSessions g "
+            + "ON s.session_id = g.sessionId "
+            + "WHERE g.sessionId = ? OR a.sessionId = ?";
+            this.database.executeTransactions([
+            {
+                id: 1,
+                query: queryToPerform,
+                parameters: [session, session]
+            }
+        ]).then(
+            val => {
+                const table = val[1].result[0];
+                callback(null, table.loginID, table.expires, table.googleId);
+            }).catch(
+                err => callback(err)
+            );
+    }
 
-    executeTransactions([
-        {
-            id: 1,
-            query: queryToPerform,
-            parameters: [session, session]
-        }
-    ]).then(
-        val => {
-            const table = val[1].result[0];
-            callback(null, table.loginID, table.expires, table.googleId);
-        }).catch(
-            err => callback(err)
-        );
-};
+    //
+    // ------------------------- Delete statements -------------------------
+    //
 
-//
-// ------------------------- Delete statements -------------------------
-//
+    /**
+     * Logs an user out of the database.
+     * @param loginID The id of the user.
+     * @param callback the callback method with either the error or the result
+     */
+    logOutUser = (loginID: string, callback:
+        (error: Error | null, result?: string) => void) => {
+        const qry = "DELETE FROM ak_activesessions a WHERE a.loginID = ?;";
+        this.database.executeTransactions([
+            {
+                id: 1,
+                query: qry,
+                parameters: [loginID]
+            }
+        ]).then(
+            val => {
+                callback(null, val[1].result);
+            }).catch(
+                err => callback(err)
+            );
+    }
 
-/**
- * Logs an user out of the database.
- * @param loginID The id of the user.
- * @param callback the callback method with either the error or the result
- */
-export const logOutUser = (loginID:string, callback:
-    (error:Error | null, result?:string) => void) => {
-    const qry = "DELETE FROM ak_activesessions a WHERE a.loginID = ?;";
-
-    executeTransactions([
-        {
-            id: 1,
-            query: qry,
-            parameters: [loginID]
-        }
-    ]).then(
-        val => {
-            callback(null, val[1].result);
-        }).catch(
-            err => callback(err)
-        );
-};
-
-/**
- * Logs a session out of the database.
- * @param session the session to log out.
- * @param callback the callback method with either the error or the result
- */
-export const logOutSession = (session:string, callback:
-    (error:Error | null, result?:string) => void) => {
-    const qry = "DELETE FROM ak_activesessions a WHERE a.sessionId = ?;";
-    const qry2 = "DELETE FROM ak_googlesessions g WHERE g.sessionID = ?;";
-
-    executeTransactions([
-        {
-            id: 1,
-            query: qry,
-            parameters: [session]
-        },
-        {
-            id:2,
-            query: qry2,
-            parameters: [session]
-        }
-    ]).then(
-        val => {
-            callback(null, val[1].result);
-        }).catch(
-            err => callback(err)
-        );
-};
+    /**
+     * Logs a session out of the database.
+     * @param session the session to log out.
+     * @param callback the callback method with either the error or the result
+     */
+    logOutSession = (session: string, callback:
+        (error: Error | null, result?: string) => void) => {
+        const qry = "DELETE FROM ak_activesessions a WHERE a.sessionId = ?;";
+        const qry2 = "DELETE FROM ak_googlesessions g WHERE g.sessionID = ?;";
+        this.database.executeTransactions([
+            {
+                id: 1,
+                query: qry,
+                parameters: [session]
+            },
+            {
+                id: 2,
+                query: qry2,
+                parameters: [session]
+            }
+        ]).then(
+            val => {
+                callback(null, val[1].result);
+            }).catch(
+                err => callback(err)
+            );
+    }
+}

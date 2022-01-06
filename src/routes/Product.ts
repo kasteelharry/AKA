@@ -1,8 +1,8 @@
 import express from 'express';
 import { OkPacket, RowDataPacket } from 'mysql2';
+import getDatabase from '../app';
+import ProductQueries from '../database/queries/ProductQueries';
 import { EmptySQLResultError } from '../exceptions/EmptySQLResultError';
-import { archiveProductByID, createNewProduct, deleteProductNameByID, getAllProducts, getProductByID, updateProductNameByID } from '../database/queries/productQueries';
-import { authenticateUser } from '../util/UserAuthentication';
 
 const router = express.Router();
 
@@ -12,7 +12,8 @@ const router = express.Router();
 
 router.post('/', async (req, res, next) => {
     const name = req.body.name;
-    createNewProduct(name, (err: Error | null, product?: OkPacket) => {
+    const prod = new ProductQueries(getDatabase());
+    prod.createNewProduct(name, (err: Error | null, product?: OkPacket) => {
         if (err) {
             next(err);
         } else {
@@ -27,7 +28,8 @@ router.post('/', async (req, res, next) => {
 //
 
 router.get('/', (req, res, next) => {
-    getAllProducts((err: Error | null, product: RowDataPacket[]) => {
+    const prod = new ProductQueries(getDatabase());
+    prod.getAllProducts((err: Error | null, product: RowDataPacket[]) => {
         if (err) {
             next(err);
         } else {
@@ -39,7 +41,8 @@ router.get('/', (req, res, next) => {
 
 router.get('/:productID', (req, res, next) => {
     const productID = req.params.productID;
-    getProductByID(productID, (err: Error | null, product: RowDataPacket) => {
+    const prod = new ProductQueries(getDatabase());
+    prod.getProductByID(productID, (err: Error | null, product: RowDataPacket) => {
         if (err) {
             next(err);
         } else {
@@ -56,8 +59,8 @@ router.get('/:productID', (req, res, next) => {
 router.post('/:productID', (req, res, next) => {
     const id = req.params.productID;
     const name = req.body.name;
-
-    updateProductNameByID(id, name, (err: Error | null, product: OkPacket) => {
+    const prod = new ProductQueries(getDatabase());
+    prod.updateProductNameByID(id, name, (err: Error | null, product: OkPacket) => {
         if (err) {
             next(err);
         } else {
@@ -72,7 +75,8 @@ router.post('/:productID', (req, res, next) => {
 router.post('/:productID/archive', (req, res, next) => {
     const id = req.params.productID;
     const archive = req.body.archive;
-    archiveProductByID(id, archive, (err: Error | null, product: RowDataPacket) => {
+    const prod = new ProductQueries(getDatabase());
+    prod.archiveProductByID(id, archive, (err: Error | null, product: RowDataPacket) => {
         if (err) {
             next(err);
         } else {
@@ -89,7 +93,8 @@ router.post('/:productID/archive', (req, res, next) => {
 
 router.post('/:productID/delete', (req, res, next) => {
     const id = req.params.productID;
-    deleteProductNameByID(id, (err: Error | null, product: RowDataPacket) => {
+    const prod = new ProductQueries(getDatabase());
+    prod.deleteProductNameByID(id, (err: Error | null, product: RowDataPacket) => {
         if (err) {
             next(err);
         } else {

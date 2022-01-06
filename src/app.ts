@@ -1,32 +1,59 @@
-import express, { application, NextFunction } from 'express';
+import express, { NextFunction } from 'express';
 import { Request, Response } from 'express';
-import session, { Session } from 'express-session';
+import session from 'express-session';
 import createError from 'http-errors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import indexRouter from './routes/index';
-
 import loginRouter from './routes/login';
-
 import apiRouter from './routes/apiRoutes';
 const MySQLStore = require('express-mysql-session')(session);
-import {  dbOptions } from './database/database';
 import https from 'https';
-import http from 'http';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import { authenticateUser } from './util/UserAuthentication';
+import MySQLDatabase from './model/MySQLDatabase';
+import { UserAuthentication } from './util/UserAuthentication';
 
+dotenv.config();
+
+const hostname = process.env.DATABASE_HOST;
+const dbSchema = process.env.DATABASE_SCHEMA;
+const password = process.env.DATABASE_PASSWORD;
+const username = process.env.DATABASE_USER;
+export type queryType = { id: number, query: string, parameters: (string | number | boolean | JSON | Date | null | undefined)[]}[];
+const database: Database<queryType> = new MySQLDatabase();
+
+export default function getDatabase() {
+    return database;
+}
 const options = {
     key: fs.readFileSync(path.join(__dirname, "../.keys/privkey.pem"), "utf-8"),
     cert: fs.readFileSync(path.join(__dirname, "../.keys/fullchain.pem"), "utf-8")
+};
+const dbSessionOptions = {
+    host: hostname,
+    user: username,
+    password,
+    database: dbSchema,
+    port: 3306,
+    schema: {
+        tableName: 'ak_session',
+        columnNames: {
+          session_id: 'session_id',
+          expires: 'expires',
+          data: 'data'
+        }
+      },
+      clearExpired: true,
+      checkExpirationInterval: 60000, // 1 minute
 };
 const portHttps:number = 8433;
 const app = express();
 // const port = 8080;
 
 process.env.TZ = 'Europe/Amsterdam';
+const sessionStore = new MySQLStore(dbSessionOptions);
 const sessionStore = new MySQLStore(dbOptions);
 dotenv.config();
 
@@ -56,7 +83,8 @@ app.use(session({
 
 
 app.all("/api/*", (req, res, next) => {
-    authenticateUser(req.sessionID).then(val => {
+    const auth = new UserAuthentication(database);
+    auth.authenticateUser(req.sessionID).then(val => {
         if (val) {
             next();
         } else {
@@ -86,5 +114,4 @@ app.use( (err: any, req: Request, res: Response, next:NextFunction) => {
 });
 
 https.createServer(options, app).listen(process.env.PORT_HTTPS);
-module.exports = app;
 export default app;
