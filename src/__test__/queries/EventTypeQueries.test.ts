@@ -16,6 +16,7 @@ describe('EventTypeQueriesTest', () => {
     beforeEach(() => {
         db.setDBState(true);
         db.setDuplicateInsert(false);
+        db.setIndexToUse(0);
     });
 
     //

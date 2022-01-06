@@ -172,7 +172,7 @@ export class MockDatabase<T> implements Database<T> {
                             }
                             break;
                         default:
-                            reject(new GeneralServerError("SQL Server is not able to be reached"));
+                            reject(new GeneralServerError("SQL Query wasn't recognized."));
                             break;
                     }
                     if (qry.id === queries.length) {
