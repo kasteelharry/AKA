@@ -142,7 +142,6 @@ export default class CustomerQueries {
             if (active != null) {
                 active = (active === "true") ? 1 : 0;
             }
-
             const numberID = parseInt(customerID, 10);
             if (isNaN(numberID)) {
                 queryOne = queryB;
@@ -156,7 +155,7 @@ export default class CustomerQueries {
                 {
                     id: 1,
                     query: queryOne,
-                    parameters: [name, birthday, bankaccount, active, customerID]
+                    parameters: [name, birthday, bankaccount, active, finalID]
                 },
                 {
                     id: 2,

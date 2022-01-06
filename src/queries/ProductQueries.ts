@@ -110,16 +110,16 @@ export default class ProductQueries {
     updateProductNameByID = (productID: string, newName: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = "UPDATE ak_products p SET p.name = ? WHERE p.id = ?;";
-            const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name LIKE ?";
+            const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name = ?";
             const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
-            const queryFour = "SELECT * FROM ak_products p WHERE p.name LIKE ?";
+            const queryFour = "SELECT * FROM ak_products p WHERE p.name = ?";
             let queryToPerform = "";
             let secondQuery = "";
             const numberID = parseInt(productID, 10);
             if (isNaN(numberID)) {
                 queryToPerform = queryTwo;
                 secondQuery = queryFour;
-                productID = '%' + productID + '%';
+                productID = newName;
             } else {
                 queryToPerform = queryOne;
                 secondQuery = queryThree;
@@ -154,9 +154,9 @@ export default class ProductQueries {
     archiveProductByID = (productID: string, archive: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = "UPDATE ak_products p SET p.archived = ? WHERE p.id = ?;";
-            const queryTwo = "UPDATE ak_products p SET p.archived = ? WHERE p.name LIKE ?;";
+            const queryTwo = "UPDATE ak_products p SET p.archived = ? WHERE p.name = ?;";
             const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
-            const queryFour = "SELECT * FROM ak_products p WHERE p.name LIKE ?";
+            const queryFour = "SELECT * FROM ak_products p WHERE p.name = ?";
             let queryToPerform = "";
             let secondQuery = "";
             const archiveNum = (archive === "true") ? 1 : 0;
@@ -164,7 +164,6 @@ export default class ProductQueries {
             if (isNaN(numberID)) {
                 queryToPerform = queryTwo;
                 secondQuery = queryFour;
-                productID = '%' + productID + '%';
             } else {
                 queryToPerform = queryOne;
                 secondQuery = queryThree;
