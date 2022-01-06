@@ -1,8 +1,7 @@
 
-import { OkPacket } from "mysql2";
-import { EmptySQLResultError } from "../exceptions/EmptySQLResultError";
-import { ItemAlreadyExistsError } from "../exceptions/ItemAlreadyExistsError";
-import { queryType } from "../app";
+import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
+import { ItemAlreadyExistsError } from "@dir/exceptions/ItemAlreadyExistsError";
+import { queryType } from "@dir/app";
 
 export default class ProductQueries {
 

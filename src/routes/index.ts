@@ -1,12 +1,10 @@
 import express from 'express';
-// import { retrieveHash } from '../database/queries/loginQueries';
-import { EmailNotRegisteredError } from '../exceptions/EmailNotRegisteredError';
+import { EmailNotRegisteredError } from '@dir/exceptions/EmailNotRegisteredError';
 import bcrypt from "bcryptjs";
-// import { logOutSession } from '../database/queries/authenticationQueries';
-import AuthenticateQueries from '../queries/AuthenticationQueries';
-import getDatabase from '../app';
-import LoginQueries from '../queries/LoginQueries';
-import UserAuthentication from '../util/UserAuthentication';
+import AuthenticateQueries from '@dir/queries/AuthenticationQueries';
+import getDatabase from '@dir/app';
+import LoginQueries from '@dir/queries/LoginQueries';
+import UserAuthentication from '@dir/util/UserAuthentication';
 
 const app = express();
 const router = express.Router();
@@ -21,7 +19,7 @@ app.get('/logout',(req, res, next) => {
     authUser.authenticateUser(req.sessionID).then(val => {
         if (val) {
             const auth = new AuthenticateQueries(getDatabase());
-            auth.logOutSession(req.sessionID).then(value => res.redirect("../")).catch(err => next(err));
+            auth.logOutSession(req.sessionID).then(value => res.redirect("@dir/")).catch(err => next(err));
         } else {
             return res.render("login");
         }
@@ -37,7 +35,7 @@ app.post('/', (req, res, next) => {
     const session = req.sessionID;
     const password: string = req.body.password;
     if (password === undefined || email === undefined) {
-        return res.status(401).redirect("../");
+        return res.status(401).redirect("@dir/");
     }
     try {
         login.retrieveHash(email).then(hash => {

@@ -1,4 +1,4 @@
-import { queryType } from "../app";
+import { queryType } from "@dir/app";
 export default class AuthenticateQueries {
 
     constructor(private database: Database<queryType>) {

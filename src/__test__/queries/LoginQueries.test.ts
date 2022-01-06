@@ -1,8 +1,8 @@
-import { queryType } from "../../app";
-import { MockDatabase } from "../../model/MockDatabase";
-import LoginQueries from "../../queries/LoginQueries";
-import { GeneralServerError } from "../../exceptions/GeneralServerError";
-import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
+import { queryType } from "@dir/app";
+import { MockDatabase } from "@dir/model/MockDatabase";
+import LoginQueries from "@dir/queries/LoginQueries";
+import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
+import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
 
 describe("LoginQueriesTest", () => {
 

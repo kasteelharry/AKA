@@ -1,3 +1,4 @@
+import 'module-alias/register';
 import express, { NextFunction } from 'express';
 import { Request, Response } from 'express';
 import session from 'express-session';
@@ -5,16 +6,16 @@ import createError from 'http-errors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-import indexRouter from './routes/index';
-import loginRouter from './routes/login';
-import apiRouter from './routes/apiRoutes';
+import indexRouter from '@dir/routes/index';
+import loginRouter from '@dir/routes/login';
+import apiRouter from '@dir/routes/apiRoutes';
 // tslint:disable-next-line: no-var-requires
 const MySQLStore = require('express-mysql-session')(session);
 import https from 'https';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import MySQLDatabase from './model/MySQLDatabase';
-import UserAuthentication  from './util/UserAuthentication';
+import MySQLDatabase from '@dir/model/MySQLDatabase';
+import UserAuthentication  from '@dir/util/UserAuthentication';
 
 dotenv.config();
 

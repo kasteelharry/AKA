@@ -1,9 +1,9 @@
-import EventTypeQueries from "../../queries/EventTypeQueries";
-import { MockDatabase } from "../../model/MockDatabase";
-import { queryType } from "../../app";
-import { GeneralServerError } from "../../exceptions/GeneralServerError";
-import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
-import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
+import EventTypeQueries from "@dir/queries/EventTypeQueries";
+import { MockDatabase } from "@dir/model/MockDatabase";
+import { queryType } from "@dir/app";
+import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
+import { ItemAlreadyExistsError } from "@dir/exceptions/ItemAlreadyExistsError";
+import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
 describe('EventTypeQueriesTest', () => {
     let event: EventTypeQueries;
     let db: MockDatabase<queryType>;

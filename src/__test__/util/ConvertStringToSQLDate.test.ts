@@ -1,4 +1,4 @@
-import { convertStringToSQLDate } from "../../util/ConvertStringToSQLDate";
+import { convertStringToSQLDate } from "@dir/util/ConvertStringToSQLDate";
 
 
 describe("ConvertStringToSQLDateTest", () => {

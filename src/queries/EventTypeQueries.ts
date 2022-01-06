@@ -1,6 +1,6 @@
-import { EmptySQLResultError } from "../exceptions/EmptySQLResultError";
-import { queryType } from "../app";
-import { ItemAlreadyExistsError } from "../exceptions/ItemAlreadyExistsError";
+import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
+import { queryType } from "@dir/app";
+import { ItemAlreadyExistsError } from "@dir/exceptions/ItemAlreadyExistsError";
 
 export default class EventTypeQueries {
 

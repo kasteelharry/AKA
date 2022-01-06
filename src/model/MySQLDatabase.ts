@@ -1,7 +1,7 @@
-import mysql, { FieldPacket } from 'mysql2';
+import mysql from 'mysql2';
 import dotenv from 'dotenv';
-import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
-import { UnexpectedSQLResultError } from '../exceptions/UnexpectedSQLResultError';
+import { ItemAlreadyExistsError } from '@dir/exceptions/ItemAlreadyExistsError';
+import { UnexpectedSQLResultError } from '@dir/exceptions/UnexpectedSQLResultError';
 dotenv.config();
 const hostname = process.env.DATABASE_HOST;
 const database = process.env.DATABASE_SCHEMA;

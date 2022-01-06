@@ -1,9 +1,9 @@
-import { GeneralServerError } from "../../exceptions/GeneralServerError";
-import { queryType } from "../../app";
-import { MockDatabase } from "../../model/MockDatabase";
-import { ItemAlreadyExistsError } from "../../exceptions/ItemAlreadyExistsError";
-import { EmptySQLResultError } from "../../exceptions/EmptySQLResultError";
-import ProductQueries from "../../queries/ProductQueries";
+import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
+import { queryType } from "@dir/app";
+import { MockDatabase } from "@dir/model/MockDatabase";
+import { ItemAlreadyExistsError } from "@dir/exceptions/ItemAlreadyExistsError";
+import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
+import ProductQueries from "@dir/queries/ProductQueries";
 
 describe('ProductQueriesTest', () => {
 
