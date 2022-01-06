@@ -7,7 +7,6 @@ import CustomerQueries from '../database/queries/customerQueries';
 import getDatabase from '../app';
 
 const router = express.Router();
-
 //
 // ------------------------- Create endpoints -------------------------
 //

@@ -1,6 +1,5 @@
 import { genSalt } from "bcryptjs";
 import bcrypt from "bcryptjs";
-
 import { queryType } from "../../app";
 export default class LoginQueries {
 

@@ -27,13 +27,10 @@ const database: Database<queryType> = new MySQLDatabase();
 export default function getDatabase() {
     return database;
 }
-
 const options = {
     key: fs.readFileSync(path.join(__dirname, "../.keys/privkey.pem"), "utf-8"),
     cert: fs.readFileSync(path.join(__dirname, "../.keys/fullchain.pem"), "utf-8")
 };
-
-
 const dbSessionOptions = {
     host: hostname,
     user: username,
@@ -51,13 +48,13 @@ const dbSessionOptions = {
       clearExpired: true,
       checkExpirationInterval: 60000, // 1 minute
 };
-
 const portHttps:number = 8433;
 const app = express();
 // const port = 8080;
 
 process.env.TZ = 'Europe/Amsterdam';
 const sessionStore = new MySQLStore(dbSessionOptions);
+const sessionStore = new MySQLStore(dbOptions);
 dotenv.config();
 
 
@@ -117,4 +114,4 @@ app.use( (err: any, req: Request, res: Response, next:NextFunction) => {
 });
 
 https.createServer(options, app).listen(process.env.PORT_HTTPS);
-module.exports = app;
+export default app;

@@ -59,7 +59,6 @@ router.get('/:productID', (req, res, next) => {
 router.post('/:productID', (req, res, next) => {
     const id = req.params.productID;
     const name = req.body.name;
-
     const prod = new ProductQueries(getDatabase());
     prod.updateProductNameByID(id, name, (err: Error | null, product: OkPacket) => {
         if (err) {

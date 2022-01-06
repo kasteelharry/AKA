@@ -7,8 +7,6 @@ import { UserAuthentication } from '../util/UserAuthentication';
 import getDatabase from '../app';
 import LoginQueries from '../database/queries/loginQueries';
 
-
-
 const router = express.Router();
 // define a route handler for the default home page
 router.get('/', (req, res, next) => {

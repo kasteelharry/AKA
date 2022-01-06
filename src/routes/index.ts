@@ -8,7 +8,6 @@ import getDatabase from '../app';
 import LoginQueries from '../database/queries/loginQueries';
 import { UserAuthentication } from '../util/UserAuthentication';
 
-
 const app = express();
 const router = express.Router();
 // define a route handler for the default home page
@@ -18,7 +17,6 @@ app.get('/',(req, res, next) => {
 
 /* POST logout an user*/
 app.get('/logout',(req, res, next) => {
-
     const authUser = new UserAuthentication(getDatabase());
     authUser.authenticateUser(req.sessionID).then(val => {
         if (val) {

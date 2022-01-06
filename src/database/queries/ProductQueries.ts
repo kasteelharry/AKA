@@ -11,7 +11,6 @@ export default class ProductQueries {
      }
 
 
-
 //
 // ------------------------- Create statements -------------------------
 //
@@ -37,7 +36,7 @@ createNewProduct = (product: string, callback:
             err => {
                 if (err instanceof ItemAlreadyExistsError && err.message.match("Duplicate entry")) {
                     if (err.message.match("name")) {
-                        callback(new ItemAlreadyExistsError("Given product already exists."));
+                        callback(new ItemAlreadyExistsError("Given product " + product + " already exists."));
                     }
                 } else {
                     callback(err);
@@ -89,6 +88,7 @@ getProductByID = (productID:string, callback:
     }
 
     this.database.executeTransactions([
+
         {
             id: 1,
             query: queryToPerform,
@@ -101,6 +101,7 @@ getProductByID = (productID:string, callback:
             err => callback(err)
         );
 }
+
 
 //
 // ------------------------- Update statements -------------------------

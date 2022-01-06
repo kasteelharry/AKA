@@ -1,5 +1,3 @@
-// import { retrieveUserID } from "../database/queries/loginQueries";
-
 import AuthenticateQueries from '../database/queries/authenticationQueries';
 import getDatabase, { queryType } from '../app';
 import LoginQueries from '../database/queries/loginQueries';
@@ -93,4 +91,3 @@ export class UserAuthentication {
         });
     }
 }
-
