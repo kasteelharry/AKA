@@ -46,6 +46,39 @@ describe('EventQueriesTest', () => {
         const promise = event.createNewEvent('EventName', "1", convertStringToSQLDate("2000-01-01 12:00:00"), undefined, "false");
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
+
+    test("Create a new event price", async () => {
+       const promise = event.setEventPrices("EventName", "ProductID", 100);
+       await expect(promise).resolves.toBeGreaterThanOrEqual(1);
+    });
+
+    test("Create a new event price with product id", async () => {
+        const promise = event.setEventPrices("EventName", "1", 100);
+        await expect(promise).resolves.toBeGreaterThanOrEqual(1);
+     });
+
+     test("Create a new event price with event id", async () => {
+        const promise = event.setEventPrices("1", "ProductID", 100);
+        await expect(promise).resolves.toBeGreaterThanOrEqual(1);
+     });
+
+     test("Create a new event price with id's", async () => {
+        const promise = event.setEventPrices("1", "1", 100);
+        await expect(promise).resolves.toBeGreaterThanOrEqual(1);
+     });
+
+     test("Create a new event price on closed database.", async () => {
+        db.setDBState(false);
+        const promise = event.setEventPrices("EventName", "ProductID", 100);
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+     });
+
+     test("Create a duplicate event price", async () => {
+        db.setDuplicateInsert(true);
+        const promise = event.setEventPrices("EventName", "ProductID", 100);
+        await expect(promise).rejects.toBeInstanceOf(ItemAlreadyExistsError);
+     });
+
     //
     // ------------------------- Retrieve statements test -------------------------
     //
@@ -85,6 +118,22 @@ describe('EventQueriesTest', () => {
     test("Retrieve all active events on a closed database", async () => {
         db.setDBState(false);
         const promise = event.getActiveEvent();
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
+    test("Retrieve all prices for an event", async () => {
+        const promise = event.getEventPricesByEvent("Joris");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Retrieve all prices for an event by event id", async () => {
+        const promise = event.getEventPricesByEvent("1");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Retrieve all prices for an event on a closed database", async () => {
+        db.setDBState(false);
+        const promise = event.getEventPricesByEvent("Joris");
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
@@ -168,6 +217,44 @@ describe('EventQueriesTest', () => {
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
+    test("Update Event Prices", async () => {
+        const promise = event.updateEventPrices("Joris", "ProductID", 100);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Update Event Prices by event id", async () => {
+        const promise = event.updateEventPrices("1", "ProductID", 100);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Update Event Prices by product id", async () => {
+        const promise = event.updateEventPrices("Joris", "1", 100);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Update Event Prices by id", async () => {
+        const promise = event.updateEventPrices("1", "1", 100);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Update non-existing event price", async () => {
+        db.setIndexToUse(2);
+        const promise = event.updateEventPrices("1", "1", 100);
+        await expect(promise).rejects.toBeInstanceOf(EmptySQLResultError);
+    });
+
+    test("Update event price by id no data change", async () => {
+        db.setIndexToUse(1);
+        const promise = event.updateEventPrices("1", "1", 100);
+        await expect(promise).rejects.toBeInstanceOf(ItemAlreadyExistsError);
+    });
+
+    test("Update existing event prices by id on closed server", async () => {
+        db.setDBState(false);
+        const promise = event.updateEventPrices("1", "1", 100);
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
     //
     // ------------------------- Delete statements test -------------------------
     //
@@ -185,6 +272,32 @@ describe('EventQueriesTest', () => {
     test("Delete event by name on closed database", async () => {
         db.setDBState(false);
         const promise = event.deleteEvent("Joris");
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
+    test("Delete event price entry by names", async () => {
+        const promise = event.deleteEventPrice("Joris", "Product");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Delete event price entry by event name and product id", async () => {
+        const promise = event.deleteEventPrice("Joris", "1");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Delete event price entry by event id and product name", async () => {
+        const promise = event.deleteEventPrice("1", "Product");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Delete event price entry by id's", async () => {
+        const promise = event.deleteEventPrice("1", "1");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Delete event price entry by names on a closed database", async () => {
+        db.setDBState(false);
+        const promise = event.deleteEventPrice("Joris", "Product");
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 

@@ -41,6 +41,39 @@ describe('EventTypeQueriesTest', () => {
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
+    test("Create a new event type price", async () => {
+        const promise = event.setEventTypePrices("EventName", "ProductID", 100);
+        await expect(promise).resolves.toBeGreaterThanOrEqual(1);
+     });
+
+     test("Create a new event type price with product id", async () => {
+         const promise = event.setEventTypePrices("EventName", "1", 100);
+         await expect(promise).resolves.toBeGreaterThanOrEqual(1);
+      });
+
+      test("Create a new event type price with event type id", async () => {
+         const promise = event.setEventTypePrices("1", "ProductID", 100);
+         await expect(promise).resolves.toBeGreaterThanOrEqual(1);
+      });
+
+      test("Create a new event type price with id's", async () => {
+         const promise = event.setEventTypePrices("1", "1", 100);
+         await expect(promise).resolves.toBeGreaterThanOrEqual(1);
+      });
+
+      test("Create a new event type price on closed database.", async () => {
+         db.setDBState(false);
+         const promise = event.setEventTypePrices("EventName", "ProductID", 100);
+         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+      });
+
+      test("Create a duplicate event type price", async () => {
+         db.setDuplicateInsert(true);
+         const promise = event.setEventTypePrices("EventName", "ProductID", 100);
+         await expect(promise).rejects.toBeInstanceOf(ItemAlreadyExistsError);
+      });
+
+
     //
     // ------------------------- Retrieve statements test -------------------------
     //
@@ -69,6 +102,22 @@ describe('EventTypeQueriesTest', () => {
     test("Retrieve a single event type on a closed database", async () => {
         db.setDBState(false);
         const promise = event.getEventType("1");
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
+    test("Retrieve all prices for an event type", async () => {
+        const promise = event.getEventTypePricesByEvent("Joris");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Retrieve all prices for an event by event type id", async () => {
+        const promise = event.getEventTypePricesByEvent("1");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Retrieve all prices for an event type on a closed database", async () => {
+        db.setDBState(false);
+        const promise = event.getEventTypePricesByEvent("Joris");
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
@@ -105,6 +154,44 @@ describe('EventTypeQueriesTest', () => {
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
+    test("Update Event Type Prices", async () => {
+        const promise = event.updateEventTypePrices("Joris", "ProductID", 100);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Update Event Type Prices by event type id", async () => {
+        const promise = event.updateEventTypePrices("1", "ProductID", 100);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Update Event Type Prices by product id", async () => {
+        const promise = event.updateEventTypePrices("Joris", "1", 100);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Update Event Type Prices by id", async () => {
+        const promise = event.updateEventTypePrices("1", "1", 100);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Update non-existing event type price", async () => {
+        db.setIndexToUse(2);
+        const promise = event.updateEventTypePrices("1", "1", 100);
+        await expect(promise).rejects.toBeInstanceOf(EmptySQLResultError);
+    });
+
+    test("Update event type price by id no data change", async () => {
+        db.setIndexToUse(1);
+        const promise = event.updateEventTypePrices("1", "1", 100);
+        await expect(promise).rejects.toBeInstanceOf(ItemAlreadyExistsError);
+    });
+
+    test("Update existing event type prices by id on closed server", async () => {
+        db.setDBState(false);
+        const promise = event.updateEventTypePrices("1", "1", 100);
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
     //
     // ------------------------- Delete statements test -------------------------
     //
@@ -122,6 +209,32 @@ describe('EventTypeQueriesTest', () => {
     test("Delete product failed.", async () => {
         db.setDBState(false);
         const promise = event.deleteEventType("Joris");
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
+    test("Delete event type type price entry by names", async () => {
+        const promise = event.deleteEventTypePrice("Joris", "Product");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Delete event type price entry by event type name and product id", async () => {
+        const promise = event.deleteEventTypePrice("Joris", "1");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Delete event type price entry by event type id and product name", async () => {
+        const promise = event.deleteEventTypePrice("1", "Product");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Delete event type price entry by id's", async () => {
+        const promise = event.deleteEventTypePrice("1", "1");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Delete event type price entry by names on a closed database", async () => {
+        db.setDBState(false);
+        const promise = event.deleteEventTypePrice("Joris", "Product");
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 });

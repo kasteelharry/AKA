@@ -47,6 +47,50 @@ export default class EventQueries {
         });
     }
 
+    setEventPrices = (eventID:string, ProductID:string, unitPrice:number): Promise<any> => {
+        return new Promise((resolve, reject) => {
+            const queryA = "INSERT INTO ak_eventprice e (eventID, ProductID, UnitPrice) "+
+            "VALUES(?,?,?)";
+            const queryB = "INSERT INTO ak_eventprice e (eventID, ProductID, UnitPrice) "+
+            "VALUES((SELECT et.id FROM ak_events et.name = ?),?,?)";
+            const queryC = "INSERT INTO ak_eventprice e (eventID, ProductID, UnitPrice) "+
+            "VALUES(?,(SELECT p.id FROM ak_products p WHERE p.name = ?),?)";
+            const queryD = "INSERT INTO ak_eventprice e (eventID, ProductID, UnitPrice) "+
+            "VALUES((SELECT et.id FROM ak_events et WHERE et.name = ?),"+
+            "(SELECT p.id FROM ak_products p WHERE p.name = ?),?)";
+            let query = "";
+            const eventNum = parseInt(eventID, 10);
+            const productNum = parseInt(ProductID, 10);
+            if (isNaN(eventNum) && isNaN(productNum)) {
+                query = queryD;
+            } else if (isNaN(eventNum)) {
+                query = queryB;
+            } else if (isNaN(productNum)) {
+                query = queryC;
+            } else {
+                query = queryA;
+            }
+            this.database.executeTransactions([
+                {
+                    id: 1,
+                    query,
+                    parameters: [eventID,ProductID,unitPrice]
+                }
+            ]).then(
+                val => {
+                    resolve(val[1].result.insertId);
+                }).catch(
+                    err => {
+                        if (err.message.match("Duplicate entry")) {
+                            reject(new ItemAlreadyExistsError("Given product for given event already exists."));
+                        } else {
+                            reject(err);
+                        }
+                    }
+                );
+        });
+    }
+
     //
     // ------------------------- Retrieve statements -------------------------
     //
@@ -116,6 +160,35 @@ export default class EventQueries {
                     resolve(val[1].result);
                 }).catch(
                     err => reject(err)
+                );
+        });
+    }
+
+    getEventPricesByEvent = (eventTypeID:string): Promise<any> => {
+        return new Promise((resolve, reject) => {
+            const queryA = "SELECT * FROM ak_eventprice e WHERE e.EventID = ?";
+            const queryB = "SELECT * FROM ak_eventprice e WHERE e.EventID = "
+            + "(SELECT et.id FROM ak_events et WHERE et.name = ?)";
+            let query = "";
+            const eventNum = parseInt(eventTypeID, 10);
+            if (isNaN(eventNum)) {
+                query = queryB;
+            } else {
+                query = queryA;
+            }
+            this.database.executeTransactions([
+                {
+                    id: 1,
+                    query,
+                    parameters: [eventTypeID]
+                }
+            ]).then(
+                val => {
+                    resolve(val[1].result);
+                }).catch(
+                    err => {
+                        reject(err);
+                    }
                 );
         });
     }
@@ -233,6 +306,72 @@ export default class EventQueries {
         });
     }
 
+    updateEventPrices = (eventID:string, productID:string, price:number):Promise<any> => {
+        return new Promise((resolve, reject) => {
+            const queryA = "UPDATE ak_eventprice et SET "
+            +"et.price = COALESCE(?, et.price) WHERE et.EventID = ? AND et.productID = ?";
+            const queryB = "UPDATE ak_eventprice et SET "
+            +"et.price = COALESCE(?, et.price) WHERE et.EventID = "
+            +"(SELECT e.id FROM ak_events WHERE e.name = ?) AND et.productID = ?;";
+            const queryC = "UPDATE ak_eventprice et SET "
+            +"et.price = COALESCE(?, et.price) WHERE et.EventID = ? AND "
+            +"(SELECT p.id FROM ak_products WHERE e.name = ?);";
+            const queryD = "UPDATE ak_eventprice et SET "
+            +"et.price = COALESCE(?, et.price) WHERE et.EventID = "
+            +"(SELECT e.id FROM ak_events WHERE e.name = ?) AND "
+            +"(SELECT p.id FROM ak_products WHERE e.name = ?);";
+            const queryE = "SELECT * FROM ak_eventprice p WHERE p.EventID = ? AND et.productID = ?";
+            const queryF = "SELECT * FROM ak_events p WHERE p.EventID = "
+            +"(SELECT e.id FROM ak_events WHERE e.name = ?) AND et.productID = ?";
+            const queryG = "SELECT * FROM ak_eventprice p WHERE p.EventID = ? AND et.productID = "
+            +"(SELECT p.id FROM ak_products WHERE e.name = ?);";
+            const queryH = "SELECT * FROM ak_events p WHERE p.EventID = "
+            +"(SELECT e.id FROM ak_events WHERE e.name = ?) AND et.productID = "
+            +"(SELECT p.id FROM ak_products WHERE e.name = ?);";
+            let queryToPerform = "";
+            let secondQuery = "";
+            const eventNum = parseInt(eventID, 10);
+            const productNum = parseInt(productID, 10);
+            if (isNaN(eventNum) && isNaN(productNum)) {
+                queryToPerform = queryD;
+                secondQuery = queryH;
+            } else if (isNaN(eventNum)) {
+                queryToPerform = queryB;
+                secondQuery = queryF;
+            } else if (isNaN(productNum)) {
+                queryToPerform = queryC;
+                secondQuery = queryG;
+            } else {
+                queryToPerform = queryA;
+                secondQuery = queryE;
+            }
+            this.database.executeTransactions([
+                {
+                    id: 1,
+                    query: queryToPerform,
+                    parameters: [price, eventID, productID]
+                },
+                {
+                    id: 2,
+                    query: secondQuery,
+                    parameters: [eventID, productID]
+                }
+            ]).then(
+                val => {
+                    const queryResults = val[1].result;
+                    if (queryResults.changedRows === 1) {
+                        resolve(val[2].result);
+                    } else if (queryResults.affectedRows === 1) {
+                        reject(new ItemAlreadyExistsError());
+                    } else {
+                        reject(new EmptySQLResultError('Was unable to find a match for the id.'));
+                    }
+                }).catch(
+                    err => reject(err)
+                );
+        });
+    }
+
     //
     // ------------------------- Delete statements -------------------------
     //
@@ -253,6 +392,43 @@ export default class EventQueries {
                     id: 1,
                     query,
                     parameters: [eventID]
+                }
+            ]).then(
+                val => {
+                    resolve(val[1].result);
+                }).catch(
+                    err => reject(err)
+                );
+        });
+    }
+
+    deleteEventPrice = (eventID:string, productID:string):Promise<any> => {
+        return new Promise((resolve, reject) => {
+            const queryA = "SELECT * FROM ak_eventprice e WHERE e.EventID = ? and e.ProductID = ?";
+            const queryB = "SELECT * FROM ak_eventprice e WHERE e.EventID = "+
+            "(SELECT et.id FROM ak_events et WHERE et.name = ?) and e.ProductID = ?";
+            const queryC = "SELECT * FROM ak_eventprice e WHERE e.EventID = "+
+            "? and e.ProductID = (SELECT p.id FROM ak_products WHERE e.name = ?)";
+            const queryD = "SELECT * FROM ak_eventprice e WHERE e.EventID = "+
+            "(SELECT et.id FROM ak_events et WHERE et.name = ?) "
+            +"and e.ProductID = (SELECT p.id FROM ak_products WHERE e.name = ?)";
+            let query = "";
+            const eventNum = parseInt(eventID, 10);
+            const productNum = parseInt(productID, 10);
+            if (isNaN(eventNum) && isNaN(productNum)) {
+                query = queryD;
+            } else if (isNaN(eventNum)) {
+                query = queryB;
+            } else if (isNaN(productNum)) {
+                query = queryC;
+            } else {
+                query = queryA;
+            }
+            this.database.executeTransactions([
+                {
+                    id: 1,
+                    query,
+                    parameters: [eventID, productID]
                 }
             ]).then(
                 val => {
