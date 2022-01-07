@@ -1,5 +1,6 @@
 import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
 import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
+import { rejects } from "assert";
 
 
 
@@ -114,8 +115,6 @@ export class MockDatabase<T> implements Database<T> {
         this.failInsert = fail;
     }
 
-
-
     setDuplicateInsert(duplicate: boolean):void{
         this.duplicateInsert = duplicate;
     }
@@ -126,6 +125,22 @@ export class MockDatabase<T> implements Database<T> {
 
     setIndexToUse(index:number): void {
         this.indexToUse = index;
+    }
+
+    getDBState():boolean {
+        return this.dbState;
+    }
+
+    getDuplicateInsert():boolean {
+        return this.duplicateInsert;
+    }
+
+    getFailInsert():boolean {
+        return this.failInsert;
+    }
+
+    getIndexToUse():number {
+        return this.indexToUse;
     }
 
     executeTransactions(queries: any[]): Promise<{ [id: string]: any }> {
@@ -156,20 +171,10 @@ export class MockDatabase<T> implements Database<T> {
                             res[qry.id] = this.createElements(param);
                             break;
                         case "UPDATE":
-                            const updateNum = parseInt(param[param.length - 1], 10);
-                            if (updateNum === undefined || param[1] === undefined) {
-                                reject(new GeneralServerError("Bad parameter given"));
-                            } else {
-                                res[qry.id] = this.updateElements(updateNum, param);
-                            }
+                            res[qry.id] = this.updateElements(param[param.length - 1], param);
                             break;
                         case "DELETE":
-                            const deleteNum = parseInt(param, 10);
-                            if (deleteNum === undefined) {
-                                reject(new GeneralServerError("Bad parameter given"));
-                            } else {
-                                res[qry.id] = this.deleteElements();
-                            }
+                            res[qry.id] = this.deleteElements();
                             break;
                         default:
                             reject(new GeneralServerError("SQL Query wasn't recognized."));
@@ -182,7 +187,6 @@ export class MockDatabase<T> implements Database<T> {
                 } catch (error) {
                     reject(error);
                 }
-
             }
         });
     }
@@ -250,26 +254,4 @@ export class MockDatabase<T> implements Database<T> {
             result: [this.itemList[this.indexToUse]],
         };
     }
-
-    private objects: any[] = [];
-
-    async create(object: T): Promise<void> {
-        this.objects.push(object);
-    }
-
-    async get(id: string): Promise<T> {
-        return this.objects.find(o => o.id === id);
-    }
-
-    async getAll(): Promise<T[]> {
-        return this.objects;
-    }
-
-    update(id: string, object: T): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    delete(id: string): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-
 }

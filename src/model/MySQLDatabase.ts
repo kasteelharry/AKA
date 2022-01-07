@@ -9,13 +9,6 @@ const password = process.env.DATABASE_PASSWORD;
 const username = process.env.DATABASE_USER;
 
 export default class MySqlDatabase<T> implements Database<T> {
-
-    setDBState(state:boolean): void {
-        throw new Error("Method not implemented.");
-    }
-
-    private dbState: boolean = true;
-
     options = {
         connectionLimit: 10,
         host: hostname,
@@ -23,33 +16,10 @@ export default class MySqlDatabase<T> implements Database<T> {
         password,
         database,
         port: 3306,
-        timezone: 'Europe/Amsterdam'
+        // timezone: 'Europe/Amsterdam'
     };
 
     db:mysql.Pool = mysql.createPool(this.options);
-
-
-    public get getdb() : mysql.Pool {
-        return this.db;
-    }
-
-
-    create(object: T): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    get(id: string): Promise<T> {
-        throw new Error("Method not implemented.");
-    }
-    getAll(): Promise<T[]> {
-        throw new Error("Method not implemented.");
-    }
-    update(id: string, object: T): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    delete(id: string): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-
 
     executeTransactions(queries: { id: number,
                                 query: string,
