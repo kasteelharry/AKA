@@ -16,7 +16,7 @@ export default class MySqlDatabase<T> implements Database<T> {
         password,
         database,
         port: 3306,
-        // timezone: 'Europe/Amsterdam'
+        timezone: 'Europe/Amsterdam'
     };
 
     db:mysql.Pool = mysql.createPool(this.options);
