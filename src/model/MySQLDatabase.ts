@@ -1,7 +1,7 @@
-import mysql, { FieldPacket } from 'mysql2';
+import mysql from 'mysql2';
 import dotenv from 'dotenv';
-import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
-import { UnexpectedSQLResultError } from '../exceptions/UnexpectedSQLResultError';
+import { ItemAlreadyExistsError } from '@dir/exceptions/ItemAlreadyExistsError';
+import { UnexpectedSQLResultError } from '@dir/exceptions/UnexpectedSQLResultError';
 dotenv.config();
 const hostname = process.env.DATABASE_HOST;
 const database = process.env.DATABASE_SCHEMA;
@@ -9,13 +9,6 @@ const password = process.env.DATABASE_PASSWORD;
 const username = process.env.DATABASE_USER;
 
 export default class MySqlDatabase<T> implements Database<T> {
-
-    setDBState(state:boolean): void {
-        throw new Error("Method not implemented.");
-    }
-
-    private dbState: boolean = true;
-
     options = {
         connectionLimit: 10,
         host: hostname,
@@ -27,29 +20,6 @@ export default class MySqlDatabase<T> implements Database<T> {
     };
 
     db:mysql.Pool = mysql.createPool(this.options);
-
-
-    public get getdb() : mysql.Pool {
-        return this.db;
-    }
-
-
-    create(object: T): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    get(id: string): Promise<T> {
-        throw new Error("Method not implemented.");
-    }
-    getAll(): Promise<T[]> {
-        throw new Error("Method not implemented.");
-    }
-    update(id: string, object: T): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    delete(id: string): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-
 
     executeTransactions(queries: { id: number,
                                 query: string,

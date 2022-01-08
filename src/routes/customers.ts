@@ -1,9 +1,9 @@
 import express from 'express';
-import { ItemAlreadyExistsError } from '../exceptions/ItemAlreadyExistsError';
-import { convertStringToSQLDate } from '../util/ConvertStringToSQLDate';
-import { EmptySQLResultError } from '../exceptions/EmptySQLResultError';
-import CustomerQueries from '../queries/CustomerQueries';
-import getDatabase from '../app';
+import { ItemAlreadyExistsError } from '@dir/exceptions/ItemAlreadyExistsError';
+import { convertStringToSQLDate } from '@dir/util/ConvertStringToSQLDate';
+import { EmptySQLResultError } from '@dir/exceptions/EmptySQLResultError';
+import CustomerQueries from '@dir/queries/CustomerQueries';
+import getDatabase from '@dir/app';
 
 const router = express.Router();
 //

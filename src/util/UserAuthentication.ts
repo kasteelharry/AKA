@@ -1,8 +1,6 @@
-// import { retrieveUserID } from "../database/queries/loginQueries";
-
-import AuthenticateQueries from '../queries/AuthenticationQueries';
-import { queryType } from '../app';
-import LoginQueries from '../queries/LoginQueries';
+import AuthenticateQueries from '@dir/queries/AuthenticationQueries';
+import { queryType } from '@dir/app';
+import LoginQueries from '@dir/queries/LoginQueries';
 
 export default class UserAuthentication {
 

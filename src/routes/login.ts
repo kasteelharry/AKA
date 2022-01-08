@@ -1,11 +1,11 @@
 import express from 'express';
 import bcrypt from "bcryptjs";
-import { EmailNotRegisteredError } from '../exceptions/EmailNotRegisteredError';
+import { EmailNotRegisteredError } from '@dir/exceptions/EmailNotRegisteredError';
 import { OAuth2Client } from 'google-auth-library';
 
-import UserAuthentication from '../util/UserAuthentication';
-import getDatabase from '../app';
-import LoginQueries from '../queries/LoginQueries';
+import UserAuthentication from '@dir/util/UserAuthentication';
+import getDatabase from '@dir/app';
+import LoginQueries from '@dir/queries/LoginQueries';
 
 const router = express.Router();
 // define a route handler for the default home page
@@ -20,7 +20,7 @@ router.post('/', (req, res, next) => {
     const session = req.sessionID;
     const password: string = req.body.password;
     if (password === undefined || email === undefined) {
-        return res.status(401).redirect("../");
+        return res.status(401).redirect("@dir/");
     }
     try {
         login.retrieveHash(email).then(hash => {
@@ -84,10 +84,10 @@ router.post('/google', async (req, res, next) => {
         const authUser = new UserAuthentication(getDatabase());
         authUser.registerGoogleSession(session, uniqueId)
             .then(val => {
-                res.redirect("../products");
+                res.redirect("@dir/products");
             }).catch(err => {
                 if (err === null) {
-                    res.redirect("../products");
+                    res.redirect("@dir/products");
                 }
                 next(err);
             });

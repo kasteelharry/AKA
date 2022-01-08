@@ -1,7 +1,7 @@
-import { MockDatabase } from "../../model/MockDatabase";
-import { queryType } from "../../app";
-import AuthenticationQueries from "../../queries/AuthenticationQueries";
-import { GeneralServerError } from "../../exceptions/GeneralServerError";
+import { MockDatabase } from "@dir/model/MockDatabase";
+import { queryType } from "@dir/app";
+import AuthenticationQueries from "@dir/queries/AuthenticationQueries";
+import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
 
 describe("AuthenticationQueriesTest", () => {
 

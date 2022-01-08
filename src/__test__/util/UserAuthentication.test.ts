@@ -1,7 +1,7 @@
-import UserAuthentication from "../../util/UserAuthentication";
-import { queryType } from "../../app";
-import { MockDatabase } from "../../model/MockDatabase";
-import { GeneralServerError } from "../../exceptions/GeneralServerError";
+import UserAuthentication from "@dir/util/UserAuthentication";
+import { queryType } from "@dir/app";
+import { MockDatabase } from "@dir/model/MockDatabase";
+import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
 describe('UserAuthenticationTests', () => {
     let auth: UserAuthentication;
     let db: MockDatabase<queryType>;

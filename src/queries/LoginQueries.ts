@@ -1,8 +1,8 @@
 import { genSalt } from "bcryptjs";
 import bcrypt from "bcryptjs";
 
-import { queryType } from "../app";
-import { EmptySQLResultError } from "../exceptions/EmptySQLResultError";
+import { queryType } from "@dir/app";
+import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
 export default class LoginQueries {
 
     constructor(private database: Database<queryType>) {

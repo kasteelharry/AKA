@@ -1,7 +1,7 @@
 import express from 'express';
-import getDatabase from '../app';
-import ProductQueries from '../queries/ProductQueries';
-import { EmptySQLResultError } from '../exceptions/EmptySQLResultError';
+import getDatabase from '@dir/app';
+import ProductQueries from '@dir/queries/ProductQueries';
+import { EmptySQLResultError } from '@dir/exceptions/EmptySQLResultError';
 
 const router = express.Router();
 

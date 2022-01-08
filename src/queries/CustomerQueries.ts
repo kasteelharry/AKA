@@ -1,6 +1,6 @@
-import { EmptySQLResultError } from "../exceptions/EmptySQLResultError";
-import { ItemAlreadyExistsError } from "../exceptions/ItemAlreadyExistsError";
-import { queryType } from "../app";
+import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
+import { ItemAlreadyExistsError } from "@dir/exceptions/ItemAlreadyExistsError";
+import { queryType } from "@dir/app";
 export default class CustomerQueries {
 
     constructor(private database: Database<queryType>) {
@@ -124,7 +124,12 @@ export default class CustomerQueries {
                 "c.bankaccount = COALESCE(?,c.bankaccount), " +
                 "c.active = COALESCE(?,c.active) " +
                 "WHERE c.id = ?;";
-            const queryB = "UPDATE ak_customers c SET c.bankaccount = ? WHERE c.name = ?;";
+            const queryB = "UPDATE ak_customers c SET " +
+            "c.name = COALESCE(?,c.name), " +
+            "c.birthdate = COALESCE(?,c.birthdate), " +
+            "c.bankaccount = COALESCE(?,c.bankaccount), " +
+            "c.active = COALESCE(?,c.active) " +
+            "WHERE c.name = ?;";
             const queryC = "SELECT * FROM ak_customers c WHERE c.id = ?;";
             const queryD = "SELECT * FROM ak_customers c WHERE c.name = ?;";
             let queryOne = "";
@@ -137,7 +142,6 @@ export default class CustomerQueries {
             if (active != null) {
                 active = (active === "true") ? 1 : 0;
             }
-
             const numberID = parseInt(customerID, 10);
             if (isNaN(numberID)) {
                 queryOne = queryB;
@@ -151,7 +155,7 @@ export default class CustomerQueries {
                 {
                     id: 1,
                     query: queryOne,
-                    parameters: [name, birthday, bankaccount, active, customerID]
+                    parameters: [name, birthday, bankaccount, active, finalID]
                 },
                 {
                     id: 2,
