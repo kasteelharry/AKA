@@ -133,9 +133,22 @@ export default class EventTypeQueries {
 
     getEventTypePricesByEvent = (eventTypeID:string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryA = "SELECT * FROM ak_eventtypeprice e WHERE e.EventTypeID = ?";
-            const queryB = "SELECT * FROM ak_eventtypeprice e WHERE e.EventTypeID = "+
-            "(SELECT et.id FROM ak_eventTypes et WHERE et.name = ?)";
+            const queryA = "SELECT et.id as eventID, et.name as eventType, "
+            +"p.name as product, ep.UnitPrice as price, p.archived "
+            +"FROM ak_eventTypes et "
+            +"LEFT JOIN ak_eventtypeprice ep "
+            +"ON ep.EventTypeID = et.ID "
+            +"LEFT JOIN ak_products p "
+            +"ON ep.ProductID = p.ID "
+            +"WHERE et.ID = ?";
+            const queryB = "SELECT et.id as eventID, et.name as eventType, "
+            +"p.name as product, ep.UnitPrice as price, p.archived "
+            +"FROM ak_eventTypes et "
+            +"LEFT JOIN ak_eventtypeprice ep "
+            +"ON ep.EventTypeID = et.ID "
+            +"LEFT JOIN ak_products p "
+            +"ON ep.ProductID = p.ID "
+            +"WHERE et.name = ?";
             let query = "";
             const eventNum = parseInt(eventTypeID, 10);
             if (isNaN(eventNum)) {
@@ -151,7 +164,85 @@ export default class EventTypeQueries {
                 }
             ]).then(
                 val => {
-                    resolve(val[1].result);
+                    const json = val[1].result;
+                    const newResult = {
+                        eventTpeID: json[0].eventTpeID,
+                        eventType: json[0].eventType,
+                        prices: [{}]
+                    };
+                    newResult.prices.pop();
+                    for (const res of json) {
+                            const priceEntry = {
+                                product: res.product,
+                                price: res.price,
+                                archived:res.archived
+                            };
+                            newResult.prices.push(priceEntry);
+                    }
+                    resolve(newResult);
+                }).catch(
+                    err => {
+                        reject(err);
+                    }
+                );
+        });
+    }
+
+    getEventTypePricesByEventAndProduct = (eventTypeID:string, productID:string): Promise<any> => {
+        return new Promise((resolve, reject) => {
+            const queryA = "SELECT et.id as eventID, et.name as eventType, "
+            +"p.name as product, ep.UnitPrice as price, p.archived "
+            +"FROM ak_eventTypes et "
+            +"LEFT JOIN ak_eventtypeprice ep "
+            +"ON ep.EventTypeID = et.ID "
+            +"LEFT JOIN ak_products p "
+            +"ON ep.ProductID = p.ID "
+            +"WHERE et.ID = ? AND ep.ProductID = ?";
+            const queryB = "SELECT et.id as eventID, et.name as eventType, "
+            +"p.name as product, ep.UnitPrice as price, p.archived "
+            +"FROM ak_eventTypes et "
+            +"LEFT JOIN ak_eventtypeprice ep "
+            +"ON ep.EventTypeID = et.ID "
+            +"LEFT JOIN ak_products p "
+            +"ON ep.ProductID = p.ID "
+            +"WHERE et.name = ? AND p.Name = ?";
+            const queryC = "SELECT et.id as eventID, et.name as eventType, "
+            +"p.name as product, ep.UnitPrice as price, p.archived "
+            +"FROM ak_eventTypes et "
+            +"LEFT JOIN ak_eventtypeprice ep "
+            +"ON ep.EventTypeID = et.ID "
+            +"LEFT JOIN ak_products p "
+            +"ON ep.ProductID = p.ID "
+            +"WHERE et.ID = ? AND p.Name = ?";
+            const queryD = "SELECT et.id as eventID, et.name as eventType, "
+            +"p.name as product, ep.UnitPrice as price, p.archived "
+            +"FROM ak_eventTypes et "
+            +"LEFT JOIN ak_eventtypeprice ep "
+            +"ON ep.EventTypeID = et.ID "
+            +"LEFT JOIN ak_products p "
+            +"ON ep.ProductID = p.ID "
+            +"WHERE et.name = ? AND ep.ProductID = ?";
+            let query = "";
+            const eventNum = parseInt(eventTypeID, 10);
+            const productNum = parseInt(productID, 10);
+            if (isNaN(eventNum) && isNaN(productNum)) {
+                query = queryB;
+            } else if (isNaN(eventNum)) {
+                query = queryD;
+            } else if (isNaN(productNum)) {
+                query = queryC;
+            } else {
+                query = queryA;
+            }
+            this.database.executeTransactions([
+                {
+                    id: 1,
+                    query,
+                    parameters: [eventTypeID, productID]
+                }
+            ]).then(
+                val => {
+                    resolve(val[1].result[0]);
                 }).catch(
                     err => {
                         reject(err);
@@ -223,14 +314,36 @@ export default class EventTypeQueries {
             +"(SELECT e.id FROM ak_eventtypes WHERE e.name = ?) AND "
             +"(SELECT p.id FROM ak_products WHERE e.name = ?);";
 
-            const queryE = "SELECT * FROM ak_eventtypeprice p WHERE p.EventID = ? AND et.productID = ?";
-            const queryF = "SELECT * FROM ak_eventtypes p WHERE p.EventID = "
-            +"(SELECT e.id FROM ak_eventtypes WHERE e.name = ?) AND et.productID = ?";
-            const queryG = "SELECT * FROM ak_eventtypeprice p WHERE p.EventID = ? AND et.productID = "
-            +"(SELECT p.id FROM ak_products WHERE e.name = ?);";
-            const queryH = "SELECT * FROM ak_eventtypes p WHERE p.EventID = "
-            +"(SELECT e.id FROM ak_eventtypes WHERE e.name = ?) AND et.productID = "
-            +"(SELECT p.id FROM ak_products WHERE e.name = ?);";
+            const queryE = "SELECT et.id as eventID, et.name as eventType, p.name, ep.UnitPrice, p.archived FROM ak_eventtypeprice ep "
+            +"INNER JOIN ak_eventTypes et "
+            +"ON ep.EventTypeID = et.ID "
+            +"INNER JOIN ak_products p "
+            +"ON ep.ProductID = p.ID "
+            +"WHERE p.EventID = ? AND et.productID = ?";
+            const queryF = "SELECT et.id as eventID, et.name as eventType, p.name, ep.UnitPrice, p.archived FROM ak_eventtypeprice ep "
+            +"INNER JOIN ak_eventTypes et "
+            +"ON ep.EventTypeID = et.ID "
+            +"INNER JOIN ak_products p "
+            +"ON ep.ProductID = p.ID "
+            +"WHERE et.name = ?"
+            // +"(SELECT e.id FROM ak_eventtypes WHERE e.name = ?) "
+            +"AND et.productID = ?";
+            const queryG = "SELECT et.id as eventID, et.name as eventType, p.name, ep.UnitPrice, p.archived FROM ak_eventtypeprice ep "
+            +"INNER JOIN ak_eventTypes et "
+            +"ON ep.EventTypeID = et.ID "
+            +"INNER JOIN ak_products p "
+            +"ON ep.ProductID = p.ID "
+            +"WHERE ep.EventID = ? AND p.name = ?";
+            // +"(SELECT p.id FROM ak_products WHERE e.name = ?);";
+            const queryH ="SELECT et.id as eventID, et.name as eventType, p.name, ep.UnitPrice, p.archived FROM ak_eventtypeprice ep "
+            +"INNER JOIN ak_eventTypes et "
+            +"ON ep.EventTypeID = et.ID "
+            +"INNER JOIN ak_products p "
+            +"ON ep.ProductID = p.ID "
+            +"WHERE et.name = ?"
+            // +"(SELECT e.id FROM ak_eventtypes WHERE e.name = ?) "
+            +"AND p.name = ?";
+            // +"(SELECT p.id FROM ak_products WHERE e.name = ?);";
             let queryToPerform = "";
             let secondQuery = "";
             const eventNum = parseInt(eventTypeID, 10);
@@ -309,12 +422,12 @@ export default class EventTypeQueries {
 
     deleteEventTypePrice = (eventTypeID:string, productID:string):Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryA = "SELECT * FROM ak_eventtypeprice e WHERE e.EventTypeID = ? and e.ProductID = ?";
-            const queryB = "SELECT * FROM ak_eventtypeprice e WHERE e.EventTypeID = "+
+            const queryA = "DELETE FROM ak_eventtypeprice e WHERE e.EventTypeID = ? and e.ProductID = ?";
+            const queryB = "DELETE FROM ak_eventtypeprice e WHERE e.EventTypeID = "+
             "(SELECT et.id FROM ak_eventTypes et WHERE et.name = ?) and e.ProductID = ?";
-            const queryC = "SELECT * FROM ak_eventtypeprice e WHERE e.EventTypeID = "+
+            const queryC = "DELETE FROM ak_eventtypeprice e WHERE e.EventTypeID = "+
             "? and e.ProductID = (SELECT p.id FROM ak_products WHERE e.name = ?)";
-            const queryD = "SELECT * FROM ak_eventtypeprice e WHERE e.EventTypeID = "+
+            const queryD = "DELETE FROM ak_eventtypeprice e WHERE e.EventTypeID = "+
             "(SELECT et.id FROM ak_eventTypes et WHERE et.name = ?) "
             +"and e.ProductID = (SELECT p.id FROM ak_products WHERE e.name = ?)";
             let query = "";

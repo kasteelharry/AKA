@@ -137,6 +137,32 @@ describe('EventQueriesTest', () => {
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
+    test("Retrieve single product price for an event", async () => {
+        const promise = event.getEventPricesByEventAndProduct("Joris","1");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Retrieve single product price for an event with ID's", async () => {
+        const promise = event.getEventPricesByEventAndProduct("1","1");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Retrieve single product price for an event with names", async () => {
+        const promise = event.getEventPricesByEventAndProduct("Joris","Joris");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Retrieve single product price for an event by event id", async () => {
+        const promise = event.getEventPricesByEventAndProduct("1", "Joris");
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Retrieve single product price for an event on a closed database", async () => {
+        db.setDBState(false);
+        const promise = event.getEventPricesByEventAndProduct("Joris", "1");
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
     //
     // ------------------------- Update statements test -------------------------
     //
