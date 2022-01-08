@@ -182,8 +182,26 @@ export default class ProductQueries {
         return new Promise((resolve, reject) => {
             const queryOne = "UPDATE ak_products p SET p.archived = ? WHERE p.id = ?;";
             const queryTwo = "UPDATE ak_products p SET p.archived = ? WHERE p.name = ?;";
-            const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
-            const queryFour = "SELECT * FROM ak_products p WHERE p.name = ?";
+            const queryThree = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"GROUP_CONCAT(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
+            +"WHERE p.id = ?;";
+            const queryFour = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"GROUP_CONCAT(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
+            +"WHERE p.name = ?;";
             let queryToPerform = "";
             let secondQuery = "";
             const archiveNum = (archive === "true") ? 1 : 0;
