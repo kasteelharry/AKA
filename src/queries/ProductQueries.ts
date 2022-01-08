@@ -53,10 +53,19 @@ export default class ProductQueries {
      */
     getAllProducts = (): Promise<any> => {
         return new Promise((resolve, reject) => {
+            const query = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"GROUP_CONCAT(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
             this.database.executeTransactions([
                 {
                     id: 1,
-                    query: "SELECT * FROM ak_products",
+                    query,
                     parameters: []
                 }
             ]).then(
@@ -75,8 +84,26 @@ export default class ProductQueries {
      */
     getProductByID = (productID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryOne = "SELECT * FROM ak_products p WHERE p.id = ?;";
-            const queryTwo = "SELECT * FROM ak_products p WHERE p.name LIKE ?";
+            const queryOne = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"GROUP_CONCAT(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
+            +"WHERE p.id = ?;";
+            const queryTwo = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"GROUP_CONCAT(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
+            +"WHERE p.name LIKE ?;";
             let queryToPerform = "";
             const numberID = parseInt(productID, 10);
             if (isNaN(numberID)) {
