@@ -92,8 +92,8 @@ export default class ProductQueries {
             +"ON pc.productID = p.id "
             +"LEFT JOIN ak_category c "
             +"ON c.id = pc.categoryID "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
-            +"WHERE p.id = ?;";
+            +"WHERE p.id = ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey;";
             const queryTwo = "SELECT p.id, p.name, p.archived, hk.hotkey, "
             +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
             +"LEFT JOIN ak_hotkeys hk "
@@ -102,8 +102,8 @@ export default class ProductQueries {
             +"ON pc.productID = p.id "
             +"LEFT JOIN ak_category c "
             +"ON c.id = pc.categoryID "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
-            +"WHERE p.name LIKE ?;";
+            +"WHERE p.name LIKE ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
             let queryToPerform = "";
             const numberID = parseInt(productID, 10);
             if (isNaN(numberID)) {
@@ -146,8 +146,8 @@ export default class ProductQueries {
             +"ON pc.productID = p.id "
             +"LEFT JOIN ak_category c "
             +"ON c.id = pc.categoryID "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
-            +"WHERE p.id = ?;";
+            +"WHERE p.id = ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey;";
             const queryFour = "SELECT p.id, p.name, p.archived, hk.hotkey, "
             +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
             +"LEFT JOIN ak_hotkeys hk "
@@ -156,8 +156,8 @@ export default class ProductQueries {
             +"ON pc.productID = p.id "
             +"LEFT JOIN ak_category c "
             +"ON c.id = pc.categoryID "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
-            +"WHERE p.name = ?;";
+            +"WHERE p.name LIKE ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
             let queryToPerform = "";
             let secondQuery = "";
             const numberID = parseInt(productID, 10);
@@ -209,8 +209,8 @@ export default class ProductQueries {
             +"ON pc.productID = p.id "
             +"LEFT JOIN ak_category c "
             +"ON c.id = pc.categoryID "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
-            +"WHERE p.id = ?;";
+            +"WHERE p.id = ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey;";
             const queryFour = "SELECT p.id, p.name, p.archived, hk.hotkey, "
             +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
             +"LEFT JOIN ak_hotkeys hk "
@@ -219,8 +219,8 @@ export default class ProductQueries {
             +"ON pc.productID = p.id "
             +"LEFT JOIN ak_category c "
             +"ON c.id = pc.categoryID "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
-            +"WHERE p.name = ?;";
+            +"WHERE p.name LIKE ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
             let queryToPerform = "";
             let secondQuery = "";
             const archiveNum = (archive === "true") ? 1 : 0;
