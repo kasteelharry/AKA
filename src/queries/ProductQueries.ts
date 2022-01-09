@@ -54,7 +54,7 @@ export default class ProductQueries {
     getAllProducts = (): Promise<any> => {
         return new Promise((resolve, reject) => {
             const query = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"GROUP_CONCAT(c.name) as category FROM ak_products p "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
             +"LEFT JOIN ak_hotkeys hk "
             +"ON p.id = hk.productID "
             +"LEFT JOIN ak_productcategory pc "
@@ -85,7 +85,7 @@ export default class ProductQueries {
     getProductByID = (productID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"GROUP_CONCAT(c.name) as category FROM ak_products p "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
             +"LEFT JOIN ak_hotkeys hk "
             +"ON p.id = hk.productID "
             +"LEFT JOIN ak_productcategory pc "
@@ -95,7 +95,7 @@ export default class ProductQueries {
             +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
             +"WHERE p.id = ?;";
             const queryTwo = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"GROUP_CONCAT(c.name) as category FROM ak_products p "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
             +"LEFT JOIN ak_hotkeys hk "
             +"ON p.id = hk.productID "
             +"LEFT JOIN ak_productcategory pc "
@@ -138,15 +138,34 @@ export default class ProductQueries {
         return new Promise((resolve, reject) => {
             const queryOne = "UPDATE ak_products p SET p.name = ? WHERE p.id = ?;";
             const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name = ?";
-            const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
-            const queryFour = "SELECT * FROM ak_products p WHERE p.name = ?";
+            const queryThree = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
+            +"WHERE p.id = ?;";
+            const queryFour = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
+            +"WHERE p.name = ?;";
             let queryToPerform = "";
             let secondQuery = "";
             const numberID = parseInt(productID, 10);
+            let finalID = productID;
             if (isNaN(numberID)) {
                 queryToPerform = queryTwo;
                 secondQuery = queryFour;
-                productID = newName;
+                finalID = newName;
             } else {
                 queryToPerform = queryOne;
                 secondQuery = queryThree;
@@ -161,7 +180,7 @@ export default class ProductQueries {
                 {
                     id: 2,
                     query: secondQuery,
-                    parameters: [productID]
+                    parameters: [finalID]
                 }
             ]).then(
                 val => {
@@ -183,7 +202,7 @@ export default class ProductQueries {
             const queryOne = "UPDATE ak_products p SET p.archived = ? WHERE p.id = ?;";
             const queryTwo = "UPDATE ak_products p SET p.archived = ? WHERE p.name = ?;";
             const queryThree = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"GROUP_CONCAT(c.name) as category FROM ak_products p "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
             +"LEFT JOIN ak_hotkeys hk "
             +"ON p.id = hk.productID "
             +"LEFT JOIN ak_productcategory pc "
@@ -193,7 +212,7 @@ export default class ProductQueries {
             +"GROUP BY p.id, p.name, p.archived, hk.hotkey"
             +"WHERE p.id = ?;";
             const queryFour = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"GROUP_CONCAT(c.name) as category FROM ak_products p "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
             +"LEFT JOIN ak_hotkeys hk "
             +"ON p.id = hk.productID "
             +"LEFT JOIN ak_productcategory pc "
