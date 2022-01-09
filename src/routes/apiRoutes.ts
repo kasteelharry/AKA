@@ -13,5 +13,5 @@ router.use('/eventtypes', eventTypesRouter);
 router.use('/events', eventsRouter);
 router.use('/hotkeys', hotkeyRouter);
 router.use('/flowstand', flowstandRouter);
-router.use('category', categoryRouter);
+router.use('/category', categoryRouter);
 export default router;
