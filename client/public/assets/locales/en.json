@@ -12,5 +12,15 @@
     "title": "Welcome to the $t(app_title)",
     "forgot_password": "Forgot password?"
   },
-  "app_title": "AKA V3.0"
+  "app_title": "AKA V3.0",
+  "nav": {
+    "login": "Login",
+    "register": "Register"
+  },
+  "menu": {
+    "language": {
+      "en": "English",
+      "nl": "Dutch"
+    }
+  }
 }

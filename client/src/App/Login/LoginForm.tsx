@@ -2,6 +2,7 @@ import React, { useState, SyntheticEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
+import { Link } from 'react-router-dom';
 
 
 function LoginForm() {
@@ -49,7 +50,7 @@ function LoginForm() {
                     <Form.Control type="password" placeholder={t('login.password.placeholder')} onChange={
                         (e) => setPassword(e.target.value)
                     }/>
-                    <a className="small" href="/login/forgotten">{t('login.forgot_password')}</a>
+                    <Link className="small" to="/login/forgotten">{t('login.forgot_password')}</Link>
                 </Form.Group>
                 <Button variant="primary" type="submit" disabled={!validateForm()}>
                     {t('login.submit')}

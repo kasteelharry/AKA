@@ -1,9 +1,26 @@
 {
   "login": {
     "email": {
-      "title": "Emailadres"
+      "title": "Emailadres",
+      "placeholder": "Vul hier je email in"
     },
-    "submit": "Inloggen"
+    "submit": "Inloggen",
+    "password": {
+      "placeholder": "Vul hier je wachtwoord in",
+      "title": "Wachtwoord"
+    },
+    "title": "Welkom bij de $t(app_title)",
+    "forgot_password": "Wachtwoord vergeten?"
   },
-  "app_title": "AKA V3.0"
+  "app_title": "AKA V3.0",
+  "nav": {
+    "login": "Log in",
+    "register": "Registreren"
+  },
+  "menu": {
+    "language": {
+      "en": "Engels",
+      "nl": "Nederlands"
+    }
+  }
 }
