@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {BrowserRouter as Router} from 'react-router-dom';
 
 import AppContainer from './App/AppContainer';
 
@@ -9,7 +10,9 @@ import './i18n'
 
 ReactDOM.render(
   <React.StrictMode>
-    <AppContainer />
+    <Router>
+      <AppContainer />
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );

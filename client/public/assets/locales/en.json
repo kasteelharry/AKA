@@ -8,7 +8,7 @@
       "title": "Password",
       "placeholder": "Enter password"
     },
-    "submit": "Submit",
+    "submit": "Log in",
     "title": "Welcome to the $t(app_title)",
     "forgot_password": "Forgot password?"
   },

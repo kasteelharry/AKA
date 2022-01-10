@@ -1,12 +1,12 @@
 import React from 'react'
 import { Container } from 'react-bootstrap'
 
-function AppBody() {
+function RegisterPage() {
     return (
         <Container>
-            <b>AppBody To be implemented</b>
+            <b>RegisterPage To be implemented</b>
         </Container>
     )
 }
 
-export default AppBody
+export default RegisterPage
