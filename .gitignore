@@ -149,10 +149,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 .vscode
-<<<<<<< HEAD
 *.env
-=======
-*.env
-
 .keys
->>>>>>> dev
