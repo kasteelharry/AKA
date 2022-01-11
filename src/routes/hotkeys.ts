@@ -47,8 +47,8 @@ router.get('/:productID',async (req, res, next) => {
 //
 // ------------------------- Update endpoints -------------------------
 //
-router.post('/:productID',async (req, res, next) => {
-    const productID = req.params.productID;
+router.post('/update',async (req, res, next) => {
+    const productID = req.body.productID;
     const newHotkey = req.body.hotkey;
     const hotkey = new HotKeyQueries(getDatabase());
     hotkey.updateHotkey(productID, newHotkey).then(key => {

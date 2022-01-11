@@ -52,8 +52,8 @@ router.get("/:eventID", async (req, res, next) => {
 // ------------------------- Update endpoints -------------------------
 //
 
-router.post("/:eventID", async (req, res, next) => {
-    const eventID = req.params.eventID;
+router.post("/update", async (req, res, next) => {
+    const eventID = req.body.eventID;
     const start = parseInt(req.body.eventID, 10);
     const end = parseInt(req.body.eventID, 10);
     if (isNaN(start) && start !== undefined) {

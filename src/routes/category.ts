@@ -76,8 +76,8 @@ router.get('/:categoryID', (req, res, next) => {
 //
 
 /* POST update a single category name */
-router.post('/:categoryID', (req, res, next) => {
-    const category = req.params.categoryID;
+router.post('/update', (req, res, next) => {
+    const category = req.body.categoryID;
     const newName = req.body.name;
     const cat = new CategoryQueries(getDatabase());
     cat.updateCategoryName(category, newName).then(result => {
@@ -86,8 +86,8 @@ router.post('/:categoryID', (req, res, next) => {
 });
 
 /* POST archive a category */
-router.post('/:categoryID/archive', (req, res, next) => {
-    const category = req.params.categoryID;
+router.post('/update/archive', (req, res, next) => {
+    const category = req.body.categoryID;
     const archive = req.body.archive;
     const cat = new CategoryQueries(getDatabase());
     cat.archiveCategory(category, archive).then(result => {
