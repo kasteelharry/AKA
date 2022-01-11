@@ -70,8 +70,8 @@ router.post("/:eventID", async (req, res, next) => {
 // ------------------------- Delete endpoints -------------------------
 //
 
-router.post("/:eventID/delete", async (req, res, next) => {
-    const eventID = req.params.eventID;
+router.post("/delete", async (req, res, next) => {
+    const eventID = req.body.eventID;
     const flow = new FlowStandQueries(getDatabase());
     flow.deleteFlowstand(eventID).then(stand => {
         if (stand.affectedRows === 1) {
