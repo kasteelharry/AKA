@@ -99,8 +99,8 @@ router.post('/:categoryID/archive', (req, res, next) => {
 //
 
 /* POST delete a category */
-router.post('/:categoryID/delete', (req, res, next) => {
-    const category = req.params.categoryID;
+router.post('/delete', (req, res, next) => {
+    const category = req.body.categoryID;
     const cat = new CategoryQueries(getDatabase());
     cat.deleteCategory(category).then(result => {
         if (result.affectedRows === 1) {

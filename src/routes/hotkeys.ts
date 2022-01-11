@@ -60,8 +60,8 @@ router.post('/:productID',async (req, res, next) => {
 // ------------------------- Delete endpoints -------------------------
 //
 
-router.post('/:productID/delete',async (req, res, next) => {
-    const productID = req.params.productID;
+router.post('/delete',async (req, res, next) => {
+    const productID = req.body.productID;
     const hotkey = new HotKeyQueries(getDatabase());
     hotkey.deleteHotkey(productID).then(product =>  {
         if (product.affectedRows === 1) {
