@@ -20,7 +20,7 @@ router.post('/', (req, res, next) => {
     const session = req.sessionID;
     const password: string = req.body.password;
     if (password === undefined || email === undefined) {
-        return res.status(401).redirect("@dir/");
+        return res.status(401).redirect("../");
     }
     try {
         login.retrieveHash(email).then(hash => {
@@ -84,10 +84,10 @@ router.post('/google', async (req, res, next) => {
         const authUser = new UserAuthentication(getDatabase());
         authUser.registerGoogleSession(session, uniqueId)
             .then(val => {
-                res.redirect("@dir/products");
+                res.redirect("../products");
             }).catch(err => {
                 if (err === null) {
-                    res.redirect("@dir/products");
+                    res.redirect("../products");
                 }
                 next(err);
             });

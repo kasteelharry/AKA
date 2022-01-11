@@ -8,7 +8,7 @@ export function convertStringToSQLDate(date:string) {
     try {
         const dateOfBirth = new Date(date).toISOString();
         const isoDate = new Date(dateOfBirth);
-        return isoDate.toJSON().slice(0, 19).replace('T', ' ');
+        return isoDate.toJSON().slice(0, 23).replace('T', ' ');
     } catch {
         return undefined;
     }
