@@ -17,6 +17,11 @@ describe("ConvertStringToSQLDateTest", () => {
         expect(res).toBeDefined();
     });
 
+    test("YYYY", async () => {
+        const res = convertStringToSQLDate("2000");
+        expect(res).toBeDefined();
+    });
+
     test("YYYY-MM-DD hh:mm:ss", async () => {
         const res = convertStringToSQLDate("2000-01-01 12:12:12");
         expect(res).toBeDefined();
