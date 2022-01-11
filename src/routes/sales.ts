@@ -72,7 +72,7 @@ router.get('/customers/:customerID/:eventID', (req, res, next) => {
 router.get('/timestamp/:timestamp', (req, res, next) => {
     const timestamp = convertStringToSQLDate(req.params.timestamp);
     if (timestamp === undefined) {
-        next(new GeneralServerError("Please enter a correct date."))
+        next(new GeneralServerError("Please enter a correct date."));
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.getSaleByTimeStamp(timestamp).then(result => {
@@ -85,7 +85,7 @@ router.get('/timestamp/:timestamp/:timestamp2', (req, res, next) => {
     const timestamp = convertStringToSQLDate(req.params.timestamp);
     const timestamp2 = convertStringToSQLDate(req.params.timestamp2);
     if (timestamp === undefined || timestamp2 === undefined) {
-        next(new GeneralServerError("Please enter a correct date."))
+        next(new GeneralServerError("Please enter a correct date."));
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.getSaleByTimeStampInterval(timestamp, timestamp2).then(result => {
@@ -105,7 +105,7 @@ router.post('/update', (req, res, next) => {
     const product = parseInt(req.body.productID, 10);
     const amount = parseInt(req.body.amount, 10);
     if (timestamp === undefined) {
-        next(new GeneralServerError("Please enter a correct date."))
+        next(new GeneralServerError("Please enter a correct date."));
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.updateSale(timestamp, event, product, amount).then(result => {
@@ -119,7 +119,7 @@ router.post('/customers/update', (req, res, next) => {
     const timestamp = convertStringToSQLDate(req.body.timestamp);
     const price = parseInt(req.body.totalPrice, 10);
     if (timestamp === undefined) {
-        next(new GeneralServerError("Please enter a correct date."))
+        next(new GeneralServerError("Please enter a correct date."));
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.updateUserSale(timestamp, customer, price).then(result => {
@@ -135,7 +135,7 @@ router.post('/customers/update', (req, res, next) => {
 router.post('/delete', (req, res, next) => {
     const timestamp = convertStringToSQLDate(req.body.timestamp);
     if (timestamp === undefined) {
-        next(new GeneralServerError("Please enter a correct date."))
+        next(new GeneralServerError("Please enter a correct date."));
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.deleteSale(timestamp).then(result => {
@@ -147,7 +147,7 @@ router.post('/delete', (req, res, next) => {
 router.post('/customer/delete', (req, res, next) => {
     const timestamp = convertStringToSQLDate(req.body.timestamp);
     if (timestamp === undefined) {
-        next(new GeneralServerError("Please enter a correct date."))
+        next(new GeneralServerError("Please enter a correct date."));
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.deleteUserSale(timestamp).then(result => {
