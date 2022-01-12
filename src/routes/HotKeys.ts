@@ -10,18 +10,12 @@ const router = express.Router();
 // ------------------------- Create endpoints -------------------------
 //
 router.post("/", async (req, res, next) => {
-    const product = req.body.product;
+    const product = req.body.productID;
     const newHotkey = req.body.hotkey;
     const hotkey = new HotKeyQueries(getDatabase());
     hotkey.createNewHotKey(product, newHotkey).then(key => {
         res.status(200).json({ "hotkey:": key });
-    }).catch(err => {
-        if (err.message.match("Duplicate entry")) {
-            next(new ItemAlreadyExistsError("Given event type " + newHotkey + " already exists."));
-        } else {
-            next(err);
-        }
-    });
+    }).catch(err => next(err));
 });
 
 //

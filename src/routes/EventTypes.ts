@@ -18,13 +18,7 @@ router.post('/', async (req, res, next) => {
     const event = new EventTypeQueries(getDatabase());
     event.createNewEventType(name).then(events => {
         res.status(200).json({ "eventTypes:": events });
-    }).catch(err => {
-        if (err.message.match("Duplicate entry")) {
-            next(new ItemAlreadyExistsError("Given event type " + name + " already exists."));
-        } else {
-            next(err);
-        }
-    });
+    }).catch(err => next(err));
 });
 
 /* POST create new event type price */
@@ -38,36 +32,7 @@ router.post('/prices', async (req, res, next) => {
         const event = new EventTypeQueries(getDatabase());
         event.setEventTypePrices(eventTypeID, productID, price).then(prices => {
             res.status(200).json({ "eventTypesPrices:": prices });
-        }).catch(err => {
-            if (err.message.match("Duplicate entry")) {
-                next(new ItemAlreadyExistsError(
-                    "Given product " + productID + " already has a price for " + eventTypeID));
-            } else {
-                next(err);
-            }
-        });
-    }
-});
-
-/* POST create new event type price */
-router.post('/:eventTypeID/prices', async (req, res, next) => {
-    const eventTypeID = req.params.eventTypeID;
-    const productID = req.body.productID;
-    const price = parseInt(req.body.price, 10);
-    if (isNaN(price)) {
-        next(new GeneralServerError("Please enter a price in cents."))
-    } else {
-        const event = new EventTypeQueries(getDatabase());
-        event.setEventTypePrices(eventTypeID, productID, price).then(prices => {
-            res.status(200).json({ "eventTypesPrices:": prices });
-        }).catch(err => {
-            if (err.message.match("Duplicate entry")) {
-                next(new ItemAlreadyExistsError(
-                    "Given product " + productID + " already has a price for " + eventTypeID));
-            } else {
-                next(err);
-            }
-        });
+        }).catch(err => next(err));
     }
 });
 

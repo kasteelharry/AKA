@@ -1,4 +1,5 @@
 import getDatabase from "@dir/app";
+import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
 import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
 import SalesQueries from "@dir/queries/SalesQueries";
 import { convertStringToSQLDate } from "@dir/util/ConvertStringToSQLDate";
@@ -11,7 +12,7 @@ const router = express.Router();
 //
 
 router.post('/', (req, res, next) => {
-    const event = parseInt(req.body.customerID, 10);
+    const event = parseInt(req.body.eventID, 10);
     const product = parseInt(req.body.productID, 10);
     const amount = parseInt(req.body.amount, 10);
     const timestamp = convertStringToSQLDate(req.body.timestamp);
@@ -22,9 +23,9 @@ router.post('/', (req, res, next) => {
 });
 
 
-router.post('/customer', (req, res, next) => {
+router.post('/customers', (req, res, next) => {
     const customer = parseInt(req.body.customerID, 10);
-    const event = parseInt(req.body.customerID, 10);
+    const event = parseInt(req.body.eventID, 10);
     const product = parseInt(req.body.productID, 10);
     const amount = parseInt(req.body.amount, 10);
     const timestamp = convertStringToSQLDate(req.body.timestamp);
@@ -101,7 +102,7 @@ router.get('/timestamp/:timestamp/:timestamp2', (req, res, next) => {
 
 router.post('/update', (req, res, next) => {
     const timestamp = convertStringToSQLDate(req.body.timestamp);
-    const event = parseInt(req.body.customerID, 10);
+    const event = parseInt(req.body.eventID, 10);
     const product = parseInt(req.body.productID, 10);
     const amount = parseInt(req.body.amount, 10);
     if (timestamp === undefined) {
@@ -138,20 +139,28 @@ router.post('/delete', (req, res, next) => {
         next(new GeneralServerError("Please enter a correct date."));
     } else {
         const sale = new SalesQueries(getDatabase());
-        sale.deleteSale(timestamp).then(result => {
-            res.status(200).json({"sale:": result});
+        sale.deleteUserSale(timestamp).then(result => {
+            if (result.affectedRows === 1) {
+                res.status(200).json({ "sale:": "The transaction has been deleted." });
+            } else {
+                next(new EmptySQLResultError("No entry found for " + timestamp));
+            }
         }).catch(err => next(err));
     }
 });
 
-router.post('/customer/delete', (req, res, next) => {
+router.post('/customers/delete', (req, res, next) => {
     const timestamp = convertStringToSQLDate(req.body.timestamp);
     if (timestamp === undefined) {
         next(new GeneralServerError("Please enter a correct date."));
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.deleteUserSale(timestamp).then(result => {
-            res.status(200).json({"sale:": result});
+            if (result.affectedRows === 1) {
+                res.status(200).json({ "sale:": "The transaction has been deleted." });
+            } else {
+                next(new EmptySQLResultError("No entry found for " + timestamp));
+            }
         }).catch(err => next(err));
     }
 });

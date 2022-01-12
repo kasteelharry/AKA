@@ -2,6 +2,7 @@ import { MockDatabase } from "@dir/model/MockDatabase";
 import { queryType } from "@dir/app";
 import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
 import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
+import { convertStringToSQLDate } from "@dir/util/ConvertStringToSQLDate";
 
 describe("Test MockDatabase", () => {
 
@@ -43,12 +44,14 @@ describe("Test MockDatabase", () => {
     });
 
     test("Test set database state", async () => {
-        db.setIndexToUse(2);
-        expect(db.getIndexToUse()).toEqual(2);
+        db.setIndexToUse(1);
+        expect(db.getIndexToUse()).toEqual(1);
     });
 
     test("Test delete elements function", async () => {
-        expect.assertions(2);
+        expect.assertions(3);
+        expect(db.deleteElements()).toBeDefined();
+        db.setIndexToUse(2);
         expect(db.deleteElements()).toBeDefined();
         db.setIndexToUse(3);
         try {
@@ -90,12 +93,18 @@ describe("Test MockDatabase", () => {
     });
 
     test("Get single element", async () => {
-        expect.assertions(6);
+        expect.assertions(8);
+        const ts = convertStringToSQLDate("2000-12-12");
+        if (ts === undefined) {
+            return;
+        }
         expect(db.getElements(1)).toBeDefined();
+        expect(db.getElements(-1)).toBeDefined();
         expect(db.getElements("Joris")).toBeDefined();
         expect(db.getElements("joriskuiper2@gmail.com")).toBeDefined();
         expect(db.getElements("NL22INGB0123456789")).toBeDefined();
         expect(db.getElements("existentSession")).toBeDefined();
+        expect(db.getElements(ts)).toBeDefined();
         try {
             db.getElements(100);
         } catch (error) {
@@ -104,6 +113,10 @@ describe("Test MockDatabase", () => {
     });
 
     test("Test mock execute transactions", async () => {
+        const ts = convertStringToSQLDate("2000-12-12");
+        if (ts === undefined) {
+            return;
+        }
         await expect(db.executeTransactions([""])).rejects.toBeInstanceOf(TypeError);
         db.setDBState(false);
         await expect(db.executeTransactions([""])).rejects.toBeInstanceOf(GeneralServerError);
@@ -127,6 +140,20 @@ describe("Test MockDatabase", () => {
                 id: 1,
                 query: "SELECT *",
                 parameters: ["1"]
+            }
+        ])).resolves.toBeDefined();
+        await expect(db.executeTransactions([
+            {
+                id: 1,
+                query: "SELECT *",
+                parameters: [ts]
+            }
+        ])).resolves.toBeDefined();
+        await expect(db.executeTransactions([
+            {
+                id: 1,
+                query: "SELECT *",
+                parameters: [1]
             }
         ])).resolves.toBeDefined();
         await expect(db.executeTransactions([

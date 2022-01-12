@@ -10,7 +10,10 @@ describe("SalesQueries", () => {
 
     let sale: SalesQueries;
     let db: MockDatabase<queryType>;
-
+    const ts = convertStringToSQLDate("2000-12-12");
+    if (ts === undefined) {
+        return;
+    }
     beforeAll(() => {
         db = new MockDatabase();
         sale = new SalesQueries(db);
@@ -122,27 +125,24 @@ describe("SalesQueries", () => {
     });
 
     test("Retrieve all sales by timestamp.", async () => {
-        expect.assertions(1);
-        const promise = sale.getSaleByTimeStamp("1");
+        const promise = sale.getSaleByTimeStamp(ts);
         await expect(promise).resolves.toBeDefined();
     });
 
     test("Retrieve all sales by timestamp on closed database.", async () => {
         db.setDBState(false);
-        const promise = sale.getSaleByTimeStamp("1");
+        const promise = sale.getSaleByTimeStamp(ts);
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
     test("Retrieve all sales by timestamp interval.", async () => {
-        expect.assertions(1);
-        const promise = sale.getSaleByTimeStampInterval("1", "1");
+        const promise = sale.getSaleByTimeStampInterval(ts, ts);
         await expect(promise).resolves.toBeDefined();
     });
 
     test("Retrieve all sales by timestamp on closed database.", async () => {
         db.setDBState(false);
-        expect.assertions(1);
-        const promise = sale.getSaleByTimeStampInterval("1", "1");
+        const promise = sale.getSaleByTimeStampInterval(ts, ts);
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
