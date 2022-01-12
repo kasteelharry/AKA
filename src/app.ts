@@ -6,8 +6,8 @@ import createError from 'http-errors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-import indexRouter from '@dir/routes/index';
-import loginRouter from '@dir/routes/login';
+import indexRouter from '@dir/routes/Index';
+import loginRouter from '@dir/routes/Login';
 import apiRouter from '@dir/routes/apiRoutes';
 
 
