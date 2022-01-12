@@ -534,12 +534,12 @@ export default class EventsQueries {
 
     deleteEventPrice = (eventID: string, productID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryA = "SELECT * FROM ak_eventprice e WHERE e.EventID = ? and e.ProductID = ?";
-            const queryB = "SELECT * FROM ak_eventprice e WHERE e.EventID = " +
+            const queryA = "DELETE FROM ak_eventprice e WHERE e.EventID = ? and e.ProductID = ?";
+            const queryB = "DELETE FROM ak_eventprice e WHERE e.EventID = " +
                 "(SELECT et.id FROM ak_events et WHERE et.name = ?) and e.ProductID = ?";
-            const queryC = "SELECT * FROM ak_eventprice e WHERE e.EventID = " +
+            const queryC = "DELETE FROM ak_eventprice e WHERE e.EventID = " +
                 "? and e.ProductID = (SELECT p.id FROM ak_products WHERE e.name = ?)";
-            const queryD = "SELECT * FROM ak_eventprice e WHERE e.EventID = " +
+            const queryD = "DELETE FROM ak_eventprice e WHERE e.EventID = " +
                 "(SELECT et.id FROM ak_events et WHERE et.name = ?) "
                 + "and e.ProductID = (SELECT p.id FROM ak_products WHERE e.name = ?)";
             let query = "";

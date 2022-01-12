@@ -13,21 +13,15 @@ const router = express.Router();
 //
 router.post("/", async (req, res, next) => {
     const eventID = parseInt(req.body.eventID, 10);
-    const start = parseInt(req.body.eventID, 10);
-    const end = parseInt(req.body.eventID, 10);
+    const start = parseInt(req.body.start, 10);
+    const end = parseInt(req.body.end, 10);
     if (isNaN(eventID) || isNaN(start)) {
         next(new GeneralServerError("Bad parameters given."));
     }
     const flow = new FlowStandQueries(getDatabase());
     flow.createNewFlowStand(eventID, start, end).then(stand => {
         res.status(200).json({ "flowstand:": stand });
-    }).catch(err => {
-        if (err.message.match("Duplicate entry")) {
-            next(new ItemAlreadyExistsError("Given flowstand for " +  eventID + " already exists."));
-        } else {
-            next(err);
-        }
-    });
+    }).catch(err => next(err));
 });
 //
 // ------------------------- Retrieve endpoints -------------------------
@@ -54,9 +48,9 @@ router.get("/:eventID", async (req, res, next) => {
 
 router.post("/update", async (req, res, next) => {
     const eventID = req.body.eventID;
-    const start = parseInt(req.body.eventID, 10);
-    const end = parseInt(req.body.eventID, 10);
-    if (isNaN(start) && start !== undefined) {
+    const start = parseInt(req.body.start, 10);
+    const end = parseInt(req.body.end, 10);
+    if (isNaN(eventID)) {
         next(new GeneralServerError("Bad parameters given."));
     }
     const flow = new FlowStandQueries(getDatabase());

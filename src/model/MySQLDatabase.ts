@@ -9,6 +9,11 @@ const password = process.env.DATABASE_PASSWORD;
 const username = process.env.DATABASE_USER;
 
 export default class MySqlDatabase<T> implements Database<T> {
+    private db:mysql.Pool;
+    constructor() {
+        this.db = mysql.createPool(this.options);
+    }
+
     options = {
         connectionLimit: 10,
         host: hostname,
@@ -19,12 +24,14 @@ export default class MySqlDatabase<T> implements Database<T> {
         timezone: 'Europe/Amsterdam'
     };
 
-    db:mysql.Pool = mysql.createPool(this.options);
+
 
     executeTransactions(queries: { id: number,
                                 query: string,
                                 parameters: (string | number | boolean | JSON | Date | null | undefined)[]}[]): Promise<{ [id: string]: any }> {
         return new Promise(async (resolve, reject) => {
+            console.log("I should not be visible");
+            
             const results: {[id: string]: {result: any} }= {};
             this.db.getConnection((err, connection) => {
                 connection.beginTransaction((error) => {

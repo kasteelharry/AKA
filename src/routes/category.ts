@@ -16,14 +16,7 @@ router.post("/", async (req, res, next) => {
     const category = new CategoryQueries(getDatabase());
     category.createNewCategory(name).then(result => {
         res.status(200).json({"categories:": result});
-    }).catch(err => {
-            if (err.message.match("Duplicate entry")) {
-                next(new ItemAlreadyExistsError(
-                    "Given category " + name + " already exists"));
-            } else {
-                next(err);
-            }
-        });
+    }).catch(err => next(err));
 });
 /* POST link category to a product */
 router.post("/products", async (req, res, next) => {
@@ -32,14 +25,7 @@ router.post("/products", async (req, res, next) => {
     const category = new CategoryQueries(getDatabase());
     category.setProductCategory(prod, cat).then(result => {
         res.status(200).json({"categories:": result});
-    }).catch(err => {
-            if (err.message.match("Duplicate entry")) {
-                next(new ItemAlreadyExistsError(
-                    "Given category " + cat + " for product "+ prod +" already exists"));
-            } else {
-                next(err);
-            }
-        });
+    }).catch(err => next(err));
 });
 
 //
