@@ -13,6 +13,19 @@ export default class EventsQueries {
     // ------------------------- Create statements -------------------------
     //
 
+    /**
+     * Creates a new event in the database. Once the event is created, new
+     * custom prices can be set using the {@link setEventPrices} method. All
+     * default prices will be retrieved from the event type. If the insertion
+     * goes successful, the promise will be resolved with the insertion ID.
+     * Otherwise it will be rejected with an error.
+     * @param name - The name of the new event.
+     * @param eventType - The type of the event.
+     * @param startTime - The starting time of the event.
+     * @param endTime (Optional) The time for when the event will end.
+     * @param saved - Indicates if the event is saved or not.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     createNewEvent = (name: string, eventType: string, startTime: string | undefined, endTime?: string, saved?: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "INSERT INTO ak_events (Name, EventTypeID, StartTime, EndTime, Saved) " +
@@ -47,6 +60,17 @@ export default class EventsQueries {
         });
     }
 
+    /**
+     * Sets the price of a product for a particular event. This price will override
+     * the price that has been set for the event type, if that type has the product.
+     * If the product has not an entry for the event type, it will use the custom price
+     * set here. If the price can be set, the promise will resolve with the inserted ID.
+     * Otherwise it will be rejected with an error.
+     * @param eventID - The ID or name of the event.
+     * @param ProductID - The ID or name of the product.
+     * @param unitPrice - The price of a single product purchase in euro cents.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     setEventPrices = (eventID: string, ProductID: string, unitPrice: number): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "INSERT INTO ak_eventprice e (eventID, ProductID, UnitPrice) " +
@@ -95,6 +119,10 @@ export default class EventsQueries {
     // ------------------------- Retrieve statements -------------------------
     //
 
+    /**
+     * Gets all the events from the database.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getAllEvents = (): Promise<any> => {
         return new Promise((resolve, reject) => {
             const query = "SELECT * FROM ak_events";
@@ -115,6 +143,12 @@ export default class EventsQueries {
         });
     }
 
+    /**
+     * Retrieves all the currently ongoing events from the database. This does not load their prices,
+     * that needs to be called after selecting an event. Saved events are not retrieved by this database
+     * query.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getActiveEvent = (): Promise<any> => {
         return new Promise((resolve, reject) => {
             const query = "SELECT * FROM ak_events e " +
@@ -137,6 +171,11 @@ export default class EventsQueries {
         });
     }
 
+    /**
+     * Retrieves the events from the database based on their name or ID.
+     * @param eventID - The event ID or name.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getEvent = (eventID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "SELECT * FROM ak_events e WHERE e.id =?";
@@ -164,11 +203,17 @@ export default class EventsQueries {
         });
     }
 
+    /**
+     * Retrieves the products and all the prices that are associated to the event.
+     * If the product has no price for the event, it is not loaded by this query.
+     * @param eventID - The name or ID of an event.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getEventPricesByEvent = (eventID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             // const queryA = "SELECT * FROM ak_eventprice e WHERE e.EventID = ?";
             const queryA = "SELECT e.id as eventID, e.name as eventName, et.name as eventType, "
-                + "p.name as product, "
+                + "p.name as product, p.id as productID, "
                 + "CASE WHEN EXISTS(SELECT * WHERE eps.EventID = e.ID AND eps.ProductID = ep.ProductID) "
                 + "THEN eps.UnitPrice ELSE ep.UnitPrice END AS price, p.archived "
                 + "FROM ak_events e "
@@ -184,7 +229,7 @@ export default class EventsQueries {
                 + "WHERE e.ID = ? "
                 + "ORDER BY e.id";
             const queryB = "SELECT e.id as event, et.name as event, "
-                + "p.name as product, "
+                + "p.name as product, p.id as productID, "
                 + "CASE WHEN EXISTS(SELECT * WHERE eps.EventID = e.ID AND eps.ProductID = ep.ProductID) "
                 + "THEN eps.UnitPrice ELSE ep.UnitPrice END AS price "
                 + "FROM ak_events e "
@@ -236,10 +281,17 @@ export default class EventsQueries {
         });
     }
 
+    /**
+     * Retrieves a single price for a product for a certain event. If the event does not
+     * have a price associated to the product, the promise will resolve empty.
+     * @param eventTypeID - The ID or name of the event.
+     * @param productID - The ID or name of the event.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getEventPricesByEventAndProduct = (eventTypeID:string, productID:string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "SELECT e.id as eventID, e.name as eventName, et.name as eventType, "
-            + "p.name as product, "
+            + "p.name as product, p.id as productID, "
             + "CASE WHEN EXISTS(SELECT * WHERE eps.EventID = e.ID AND eps.ProductID = ep.ProductID) "
             + "THEN eps.UnitPrice ELSE ep.UnitPrice END AS price, p.archived "
             + "FROM ak_events e "
@@ -254,7 +306,7 @@ export default class EventsQueries {
             + "ON e.EventTypeID = et.ID "
             +"WHERE et.ID = ? AND ep.ProductID = ?";
         const queryB = "SELECT e.id as event, et.name as event, "
-            + "p.name as product, "
+            + "p.name as product, p.id as productID, "
             + "CASE WHEN EXISTS(SELECT * WHERE eps.EventID = e.ID AND eps.ProductID = ep.ProductID) "
             + "THEN eps.UnitPrice ELSE ep.UnitPrice END AS price "
             + "FROM ak_events e "
@@ -267,7 +319,7 @@ export default class EventsQueries {
             + "ON ep.ProductID = p.ID "
             + "WHERE e.name = ? AND ep.ProductID = ?";
             const queryC = "SELECT e.id as eventID, e.name as eventName, et.name as eventType, "
-            + "p.name as product, "
+            + "p.name as product, p.id as ProductID, "
             + "CASE WHEN EXISTS(SELECT * WHERE eps.EventID = e.ID AND eps.ProductID = ep.ProductID) "
             + "THEN eps.UnitPrice ELSE ep.UnitPrice END AS price, p.archived "
             + "FROM ak_events e "
@@ -282,7 +334,7 @@ export default class EventsQueries {
             + "ON e.EventTypeID = et.ID "
             +"WHERE et.ID = ? AND p.name = ?";
         const queryD = "SELECT e.id as event, et.name as event, "
-            + "p.name as product, "
+            + "p.name as product, p.id as productID, "
             + "CASE WHEN EXISTS(SELECT * WHERE eps.EventID = e.ID AND eps.ProductID = ep.ProductID) "
             + "THEN eps.UnitPrice ELSE ep.UnitPrice END AS price "
             + "FROM ak_events e "
@@ -327,6 +379,18 @@ export default class EventsQueries {
     // ------------------------- Update statements -------------------------
     //
 
+    /**
+     * Updates an event based on the passed values in the parameters map. If an value
+     * does not exist in the map, it will not be updated in the events table.
+     * @param eventID - The id or name of the event.
+     * @param params - The map containing the new values for the event. This map can contain:
+     *  - **name** - The new name for the event.
+     *  - **eventType** - The new Event Type.
+     *  - **startTime** - The new starting time of the event.
+     *  - **endTime** - The new ending time of the event.
+     *  - **saved** - (true or false) The indication if the event is saved or not.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     updateEvent = (eventID: string, params: Map<string, string | number | undefined>): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "UPDATE ak_events e " +
@@ -392,6 +456,13 @@ export default class EventsQueries {
         });
     }
 
+    /**
+     * Saves an event. Saved events should not be altered or receive new transactions.
+     * Currently this is not implemented, it will be implemented in later versions of the AKA.
+     * @param eventID - The ID or name of the event.
+     * @param saved - Boolean as string indicating if the event needs to be saved.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     saveEvent = (eventID: string, saved: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = "UPDATE ak_events e SET e.saved = ? WHERE e.id = ?;";
@@ -436,6 +507,14 @@ export default class EventsQueries {
         });
     }
 
+    /**
+     * Updates the price of an product in the events prices table. This assumes that
+     * for the product and event there is an entry. If successful, the new price is returned.
+     * @param eventID - The name or ID of the event.
+     * @param productID - The name or ID of the product.
+     * @param price - The new price in euro cents.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     updateEventPrices = (eventID: string, productID: string, price: number): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "UPDATE ak_eventprice et SET "
@@ -506,6 +585,12 @@ export default class EventsQueries {
     // ------------------------- Delete statements -------------------------
     //
 
+    /**
+     * Deletes an event from the database. If failed, the promise will be rejected
+     * with the error.
+     * @param eventID - The name or ID of the event.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     deleteEvent = (eventID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "DELETE FROM ak_events e WHERE e.id = ?";
@@ -532,6 +617,12 @@ export default class EventsQueries {
         });
     }
 
+    /**
+     * Deletes an event price for a product from the database.
+     * @param eventID - The name or ID of the event.
+     * @param productID - The name or ID of the product.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     deleteEventPrice = (eventID: string, productID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "DELETE FROM ak_eventprice e WHERE e.EventID = ? and e.ProductID = ?";

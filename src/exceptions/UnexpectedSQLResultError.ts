@@ -1,3 +1,7 @@
+/**
+ * thrown when the SQL database returns an error.
+ * status: 502
+ */
 export class UnexpectedSQLResultError extends Error {
     public status: number;
     constructor(msg: string) {

@@ -1,3 +1,7 @@
+/**
+ * thrown when the database returns no result.
+ * status: 204
+ */
 export class EmptySQLResultError extends Error {
     public status: number;
     constructor(msg: string) {

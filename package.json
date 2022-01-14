@@ -6,7 +6,7 @@
     "scripts": {
         "start:build": "tsc -w",
         "start": "concurrently npm:start:*",
-        "start:run": "nodemon dist/app.js",
+        "start:run": "nodemon dist/server.js",
         "test": "jest --coverage --detectOpenHandles"
     },
     "_moduleAliases": {
@@ -14,6 +14,7 @@
     },
     "dependencies": {
         "@googleapis/docs": "^0.2.0",
+        "@microsoft/tsdoc": "^0.13.2",
         "@types/supertest": "^2.0.11",
         "bcrypt": "^5.0.1",
         "bcryptjs": "^2.4.3",

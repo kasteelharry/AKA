@@ -12,6 +12,14 @@ export default class FlowStandQueries {
     // ------------------------- Create statements -------------------------
     //
 
+    /**
+     * Creates a new record in the database where it can keep track of the flow meter counter.
+     * This can later be used in combination with the transactions to calculate the tap loss.
+     * @param eventID - The ID of the event.
+     * @param start - The starting count of the flow meter.
+     * @param end - The end count of the flow meter (optional)
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     createNewFlowStand = (eventID: number, start: number, end?: number): Promise<any> => {
         return new Promise((resolve, reject) => {
             const query = "INSERT INTO ak_flowstand (EventID, StartCount, EndCount) "
@@ -41,6 +49,10 @@ export default class FlowStandQueries {
     // ------------------------- Retrieve statements -------------------------
     //
 
+    /**
+     * Retrieves all the entries in the database for the flow stand.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getAllFlowStand = (): Promise<any> => {
         return new Promise((resolve, reject) => {
             const query = "SELECT f.EventID, e.name, f.StartCount, f.EndCount FROM ak_flowstand f "
@@ -60,6 +72,12 @@ export default class FlowStandQueries {
                 );
         });
     }
+
+    /**
+     * Retrieves the single entry for the event in the table for the flow meter.
+     * @param eventID - The ID or name of the event.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getFlowStandByEvent = (eventID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "SELECT f.EventID, e.name, f.StartCount, f.EndCount FROM ak_flowstand f "
@@ -97,6 +115,14 @@ export default class FlowStandQueries {
     // ------------------------- Update statements -------------------------
     //
 
+    /**
+     * Updates the flow stand with the new values. If only the final count needs to be
+     * recorded, a null or undefined value should be set for the start parameter.
+     * @param eventID - The ID or name of the event.
+     * @param start - The new starting count (Optional)
+     * @param end - The new end count (Optional)
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     updateFlowStand = (eventID: string, start?: number, end?: number): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "UPDATE ak_flowstand f SET '"
@@ -157,6 +183,11 @@ export default class FlowStandQueries {
     // ------------------------- Delete statements -------------------------
     //
 
+    /**
+     * Deletes an entry for the given event in the table that keeps track of the flow meter.
+     * @param eventID - The ID or name of the event.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     deleteFlowstand = (eventID:string):Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "DELETE FROM ak_flowstand f WHERE f.EventID = ?";

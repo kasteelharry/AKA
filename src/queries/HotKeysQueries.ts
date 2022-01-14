@@ -13,6 +13,13 @@ export default class HotKeyQueries {
     //
     // ------------------------- Create statements -------------------------
     //
+    /**
+     * Sets a new hotkey for a product. If the product already has a hotkey or the hotkey has
+     * already been taken, the promise will rejected with an error.
+     * @param product - The name or ID of the product.
+     * @param hotkey - The hotkey that will be set.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     createNewHotKey = (product:string, hotkey:string):Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "INSERT INTO ak_hotkeys (ProductID, Hotkey) "
@@ -51,6 +58,10 @@ export default class HotKeyQueries {
     // ------------------------- Retrieve statements -------------------------
     //
 
+    /**
+     * Retrieves all the hotkeys from the database.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getAllHotkeys = ():Promise<any> => {
         return new Promise((resolve, reject) => {
             const query = "SELECT h.productID, p.name, h.hotkey FROM ak_hotkeys h "
@@ -71,6 +82,11 @@ export default class HotKeyQueries {
         });
     }
 
+    /**
+     * Retrieves the hotkey for a single product from the database.
+     * @param productID - The ID or name of the product
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getHotkeyByProduct = (productID:string):Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "SELECT h.productID, p.name, h.hotkey FROM ak_hotkeys h "
@@ -109,6 +125,12 @@ export default class HotKeyQueries {
     // ------------------------- Update statements -------------------------
     //
 
+    /**
+     * Updates the hotkey for a product in the database.
+     * @param productID - The name or ID of the product.
+     * @param Hotkey - The new hotkey for the product.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     updateHotkey = (productID:string, Hotkey:string):Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "UPDATE ak_hotkeys h SET h.hotkey = ? WHERE h.productID = ?";
@@ -163,6 +185,11 @@ export default class HotKeyQueries {
     // ------------------------- Delete statements -------------------------
     //
 
+    /**
+     * 	Deletes a hotkey from the database.
+     * @param productID - the ID or name of the product.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     deleteHotkey = (productID:string):Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "DELETE FROM ak_hotkeys h WHERE h.productID = ?";

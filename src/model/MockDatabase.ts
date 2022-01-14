@@ -53,6 +53,11 @@ const updateNotFound = {
     warningStatus: 0
 };
 
+/**
+ * A mock database that emulates the SQL database with certain conditions
+ * that ensures every condition can be tested.
+ * The data is faked and hardcoded. Thus this does not test the SQL queries.
+ */
 export class MockDatabase<T> implements Database<T> {
 // This is faked data from the database. The real database does not
 // generate this data. The data below is data from all tables that

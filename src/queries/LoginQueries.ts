@@ -14,11 +14,10 @@ export default class LoginQueries {
 
     /**
      * Registers user into the database
-     * @param email the email of the user.
-     * @param hash the hashed password.
-     * @param salt the salt used when hashing.
-     * @param callback The callback function containing either the query result or the
-     * error if one is thrown.
+     * @param email - The email of the user.
+     * @param hash - The hashed password.
+     * @param salt - The salt used when hashing.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     registerLogin = (email: string, hash: string, salt: string): Promise<number> => {
         return new Promise((resolve, reject) => {
@@ -44,9 +43,9 @@ export default class LoginQueries {
     // ------------------------- Retrieve statements -------------------------
     //
     /**
-     * Retrieves the user id.
-     * @param email the email of the user
-     * @returns the id of the user or the error.
+     * Retrieves the user id from the database based on the email.
+     * @param email - The email of the user
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     retrieveUserID = (email: string): Promise<number> => {
         return new Promise((resolve, reject) => {
@@ -74,9 +73,8 @@ export default class LoginQueries {
 
     /**
      * Retrieves the salt of the user from the database.
-     * @param email the email of the user.
-     * @param callback The callback function containing either the query result or the
-     * error if one is thrown.
+     * @param email - The email of the user.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     retrieveSalt = (email: string): Promise<any> => {
         return new Promise((resolve, reject) => {
@@ -105,8 +103,8 @@ export default class LoginQueries {
 
     /**
      * Retrieves the user hash from the database.
-     * @param email the email of the user
-     * @param callback The callback function containing the result or the error
+     * @param email - The email of the user
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     retrieveHash = (email: string): Promise<any> => {
         return new Promise((resolve, reject) => {
