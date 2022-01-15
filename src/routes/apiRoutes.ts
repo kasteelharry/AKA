@@ -8,6 +8,8 @@ import flowstandRouter from './FlowStand';
 import categoryRouter from './Category';
 import salesRouter from './Sales';
 const router = express.Router();
+
+// Sets the routes of the api different type of endpoints.
 router.use('/customers', customersRouter);
 router.use('/products', productRouter);
 router.use('/eventtypes', eventTypesRouter);

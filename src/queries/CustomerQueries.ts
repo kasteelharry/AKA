@@ -14,11 +14,11 @@ export default class CustomerQueries {
     /**
      * Creates a new customer in the database. By default this customer is active and assumes that a SEPA
      * crediting permission is given. It returns either the result id or the error.
-     * @param name the name of the customer.
-     * @param birthDate the birthday of the customer.
-     * @param bank the bank account of the customer. This account should be unique and not already stored
+     * @param name - the name of the customer.
+     * @param birthDate - the birthday of the customer.
+     * @param bank - the bank account of the customer. This account should be unique and not already stored
      *             in the database.
-     * @param callback the callback function either containing the error or the query result.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     createNewCustomer = (name: string, birthDate: string | undefined, bank: string): Promise<any> => {
         return new Promise((resolve, reject) => {
@@ -47,7 +47,7 @@ export default class CustomerQueries {
 
     /**
      * Queries all the customers in the database, regardless if they are active or not.
-     * @param callback the callback function containing either the query result or the error if
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      * one is thrown.
      */
     getAllCustomers = (): Promise<any> => {
@@ -73,10 +73,9 @@ export default class CustomerQueries {
 
     /**
      * Queries a customer from the database and shows its information.
-     * @param customerID the customer id whose information is being requested.
+     * @param customerID - the customer id whose information is being requested.
      *                   this can either be the unique customer id or their name.
-     * @param callback The callback function containing either the query result or the
-     * error if one is thrown.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     getCustomerByID = (customerID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
@@ -111,10 +110,9 @@ export default class CustomerQueries {
 
     /**
      * Updates the customer in the database based on the params input.
-     * @param customerID the id or name of the customer that needs to be updated
-     * @param params a map containing the values and keys that need to be updated.
-     * @param callback The callback function containing either the query result or the
-     * error if one is thrown.
+     * @param customerID - the id or name of the customer that needs to be updated
+     * @param params - a map containing the values and keys that need to be updated.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     updateCustomer = (customerID: string, params: Map<string, string | number | undefined>): Promise<any> => {
         return new Promise((resolve, reject) => {
@@ -185,9 +183,8 @@ export default class CustomerQueries {
 
     /**
      * Deletes a customer from the database.
-     * @param customerID the id or name of the customer that needs to be deleted.
-     * @param callback The callback function containing either the query result or the
-     * error if one is thrown.
+     * @param customerID - the id or name of the customer that needs to be deleted.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     deleteCustomer = (customerID: string): Promise<any> => {
         return new Promise((resolve, reject) => {

@@ -192,4 +192,15 @@ describe("Test category queries", () => {
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
+    test("Delete product category by ID", async () => {
+        const promise = category.deleteProductCategory(1,1);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Delete product category on closed database", async () => {
+        db.setDBState(false);
+        const promise = category.deleteProductCategory(1,1);
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
 });

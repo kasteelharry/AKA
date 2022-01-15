@@ -105,11 +105,12 @@ router.post('/update', (req, res, next) => {
     const event = parseInt(req.body.eventID, 10);
     const product = parseInt(req.body.productID, 10);
     const amount = parseInt(req.body.amount, 10);
+    const customer = parseInt(req.body.customerID, 10);
     if (timestamp === undefined) {
         next(new GeneralServerError("Please enter a correct date."));
     } else {
         const sale = new SalesQueries(getDatabase());
-        sale.updateSale(timestamp, event, product, amount).then(result => {
+        sale.updateSalesAndUsers(timestamp, event, customer, product, amount).then(result => {
             res.status(200).json({"sale:": result});
         }).catch(err => next(err));
     }

@@ -75,6 +75,29 @@ describe("SalesQueries", () => {
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
+    test("Create new user sale with multiple products.", async () => {
+        const promise = sale.createCombinedCustomerSale(1, 1, [{productID:1,amount:1}, {productID: 2, amount: 2}]);
+        await expect(promise).resolves.toBeGreaterThanOrEqual(1);
+    });
+
+    test("Create new sale with timestamps and multiple products.", async () => {
+        const promise = sale.createCombinedCustomerSale(1, 1, [{productID:1,amount:1, timestamp:convertStringToSQLDate(2000)}, {productID: 2, amount: 2,timestamp:convertStringToSQLDate(2000)}]);
+        await expect(promise).resolves.toBeGreaterThanOrEqual(1);
+    });
+
+
+    test("Create duplicate sale.", async () => {
+        db.setDuplicateInsert(true);
+        const promise = sale.createCombinedCustomerSale(1, 1, [{productID:1,amount:1}, {productID: 2, amount: 2}]);
+        await expect(promise).rejects.toBeInstanceOf(ItemAlreadyExistsError);
+    });
+
+    test("Failure create duplicate product.", async () => {
+        db.setFailInsert(true);
+        const promise = sale.createCombinedCustomerSale(1, 1, [{productID:1,amount:1}, {productID: 2, amount: 2}]);
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
     //
     // ------------------------- Retrieve statements test -------------------------
     //
@@ -203,6 +226,33 @@ describe("SalesQueries", () => {
         db.setDBState(false);
         expect.assertions(1);
         const promise = sale.updateUserSale("1", 1, 1);
+        await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
+    });
+
+    test("Update customer sale and regular sale", async () => {
+        expect.assertions(1);
+        const promise = sale.updateSalesAndUsers("1", 1, 1);
+        await expect(promise).resolves.toBeDefined();
+    });
+
+    test("Update customer sale and regular sale that already exists", async () => {
+        db.setIndexToUse(1);
+        expect.assertions(1);
+        const promise = sale.updateSalesAndUsers("1", 1, 1);
+        await expect(promise).rejects.toBeInstanceOf(ItemAlreadyExistsError);
+    });
+
+    test("Update customer sale and regular sale that does not exists", async () => {
+        db.setIndexToUse(2);
+        expect.assertions(1);
+        const promise = sale.updateSalesAndUsers("1", 1, 1);
+        await expect(promise).rejects.toBeInstanceOf(EmptySQLResultError);
+    });
+
+    test("Update customer sale and regular sale on closed database", async () => {
+        db.setDBState(false);
+        expect.assertions(1);
+        const promise = sale.updateSalesAndUsers("1", 1, 1);
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
