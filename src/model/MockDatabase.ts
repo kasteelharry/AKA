@@ -1,6 +1,7 @@
 import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
 import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
 import { rejects } from "assert";
+import { convertStringToSQLDate } from "@dir/util/ConvertStringToSQLDate";
 
 
 
@@ -52,6 +53,11 @@ const updateNotFound = {
     warningStatus: 0
 };
 
+/**
+ * A mock database that emulates the SQL database with certain conditions
+ * that ensures every condition can be tested.
+ * The data is faked and hardcoded. Thus this does not test the SQL queries.
+ */
 export class MockDatabase<T> implements Database<T> {
 // This is faked data from the database. The real database does not
 // generate this data. The data below is data from all tables that
@@ -93,7 +99,8 @@ export class MockDatabase<T> implements Database<T> {
         googleId: 112233445566778899,
         session_id: "existentSession",
         salt: "testSalt",
-        password: "testHash"
+        password: "testHash",
+        timestamp: convertStringToSQLDate("2000-12-12")
     },
     {
         ID: 3,
@@ -159,10 +166,24 @@ export class MockDatabase<T> implements Database<T> {
                                 res[qry.id] = this.getAllElements();
                                 break;
                             }
-                            const id = param[0];
-                            const num = parseInt(id, 10);
-                            if (isNaN(num)) {
-                                res[qry.id] = this.getElements(id);
+                            const id:string|number = param[0];
+                            let num;
+                            let bool = false;
+                            if (typeof id === "number") {
+                                num = id;
+                            } else {
+                                num = parseInt(id, 10);
+                                if (id.match(":")) {
+                                    bool = true;
+                                }
+                            }
+                            if (isNaN(num) || bool) {
+                                const ts = convertStringToSQLDate(id);
+                                if (ts !== undefined) {
+                                    res[qry.id] = this.getElements(ts);
+                                } else {
+                                    res[qry.id] = this.getElements(id);
+                                }
                             } else {
                                 res[qry.id] = this.getElements(num);
                             }
@@ -194,6 +215,10 @@ export class MockDatabase<T> implements Database<T> {
     deleteElements() {
         if (this.indexToUse === 3) {
             throw new EmptySQLResultError("Could not delete");
+        } else if (this.indexToUse === 2) {
+            return {
+                result: updateNotFound,
+            };
         }
         return {
             result: updateResult
@@ -242,7 +267,7 @@ export class MockDatabase<T> implements Database<T> {
 
     getElements(index: number | string): any {
         if (typeof index === 'string' ) {
-            const values = this.itemList.filter(e =>e.Name === index || e.Email === index || e.Bankaccount === index || e.session_id === index);
+            const values = this.itemList.filter(e =>e.Name === index || e.Email === index || e.Bankaccount === index || e.session_id === index || e.timestamp === index);
             return {
                 result:values,
             };

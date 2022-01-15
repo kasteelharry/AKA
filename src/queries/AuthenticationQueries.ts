@@ -1,6 +1,16 @@
 import { queryType } from "@dir/app";
+/**
+ * This class contains all the queries that are used by the
+ * API endpoints for authenticating users for the website.
+ */
 export default class AuthenticateQueries {
 
+    /**
+     * Constructor method that sets the database that the class will use.
+     * This database can be a real one or can be a mock database for testing
+     * purposes.
+     * @param database - The database to use.
+     */
     constructor(private database: Database<queryType>) {
         this.database = database;
     }
@@ -11,9 +21,9 @@ export default class AuthenticateQueries {
 
     /**
      * Adds the session and the login id of the user to the active sessions table.
-     * @param loginID the id of the user
-     * @param session the session of the user
-     * @param callback the callback method with either the error or the result
+     * @param loginID - The id of the user
+     * @param session - The session of the user
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     authenticateUserInDB = (loginID: number, session: string): Promise<any> => {
         return new Promise((resolve, reject) => {
@@ -43,9 +53,13 @@ export default class AuthenticateQueries {
 
     /**
      * Adds the session and the google id of the user to the active google sessions table.
-     * @param googleSession the id of the user
-     * @param session the session of the user
-     * @param callback the callback method with either the error or the result
+     * This method will return an error if the session or the google ID is already inside
+     * the table. The Google ID is as of this version not stored somewhere else in the
+     * database. In future versions this will happen such that user specific permissions
+     * can be given to said user without losing their google ID and information in the database.
+     * @param googleSession - the id of the user
+     * @param session - the session of the user
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     authenticateGUserInDB = (googleSession: string, session: string): Promise<any> => {
         return new Promise((resolve, reject) => {
@@ -78,9 +92,12 @@ export default class AuthenticateQueries {
     //
 
     /**
-     * Retrieves the active session information from the database based on the session.
-     * @param session the session that needs to be verified.
-     * @param callback the callback method containing the error or the (google) id and expire date of the session
+     * Retrieves the active session information from the database based on the session. The
+     * result can be used to check if the User does indeed exist in the database and has a
+     * valid session. If the results are empty then the user is not allowed to go further
+     * and has to login first.
+     * @param session - The session that needs to be verified.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     verifyUserInDB = (session: string): Promise<any> => {
         return new Promise((resolve, reject) => {
@@ -123,9 +140,17 @@ export default class AuthenticateQueries {
     //
 
     /**
-     * Logs an user out of the database.
-     * @param loginID The id of the user.
-     * @param callback the callback method with either the error or the result
+     * Logs an user out of the database by removing the user from the active
+     * sessions table. An user that logs out will still retain their session on
+     * their browser, however if they now try to login again with said token,
+     * they will no longer be able to gain access to the API routes.
+     *
+     * @remarks
+     * This will also delete any other session the user has logged into. With a
+     * different session token.
+     *
+     * @param loginID - The ID of the user.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     logOutUser = (loginID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
@@ -146,9 +171,15 @@ export default class AuthenticateQueries {
     }
 
     /**
-     * Logs a session out of the database.
-     * @param session the session to log out.
-     * @param callback the callback method with either the error or the result
+     * Logs a session out of the database by deleting the entry of the session.
+     * This will only log out the single session and not all the sessions associated to
+     * an user.
+     *
+     * @remark
+     * This will also log out a google login.
+     *
+     * @param session - The session to log out.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     logOutSession = (session: string): Promise<any> => {
         return new Promise((resolve, reject) => {

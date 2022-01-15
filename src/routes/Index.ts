@@ -19,7 +19,7 @@ app.get('/logout',(req, res, next) => {
     authUser.authenticateUser(req.sessionID).then(val => {
         if (val) {
             const auth = new AuthenticateQueries(getDatabase());
-            auth.logOutSession(req.sessionID).then(value => res.redirect("@dir/")).catch(err => next(err));
+            auth.logOutSession(req.sessionID).then(value => res.redirect("../")).catch(err => next(err));
         } else {
             return res.render("login");
         }
@@ -35,7 +35,7 @@ app.post('/', (req, res, next) => {
     const session = req.sessionID;
     const password: string = req.body.password;
     if (password === undefined || email === undefined) {
-        return res.status(401).redirect("@dir/");
+        return res.status(401).redirect("../");
     }
     try {
         login.retrieveHash(email).then(hash => {

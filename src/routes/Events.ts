@@ -21,13 +21,7 @@ router.post('/', async (req, res, next) => {
     const event = new EventsQueries(getDatabase());
     event.createNewEvent(name, type, startTime, endTime, saved).then(events => {
         res.status(200).json({ "event:": events });
-    }).catch(err => {
-        if (err.message.match("Duplicate entry")) {
-            next(new ItemAlreadyExistsError("Given event type " + name + " already exists."));
-        } else {
-            next(err);
-        }
-    });
+    }).catch(err => next(err));
 });
 
 /* POST create new event type price */
@@ -41,14 +35,7 @@ router.post('/:eventsID/prices', async (req, res, next) => {
         const event = new EventsQueries(getDatabase());
         event.setEventPrices(eventsID, productID, price).then(prices => {
             res.status(200).json({ "eventTypesPrices:": prices });
-        }).catch(err => {
-            if (err.message.match("Duplicate entry")) {
-                next(new ItemAlreadyExistsError(
-                    "Given product " + productID + " already has a price for " + eventsID));
-            } else {
-                next(err);
-            }
-        });
+        }).catch(err => next(err));
     }
 });
 
@@ -126,7 +113,7 @@ router.post('/:eventID/save', (req, res, next) => {
     const eventID = req.params.eventID;
     const saved = req.body.saved;
     const event = new EventsQueries(getDatabase());
-    event.updateEvent(eventID, saved).then(result => {
+    event.saveEvent(eventID, saved).then(result => {
         res.status(200).json(result);
     }).catch(err => next(err));
 });

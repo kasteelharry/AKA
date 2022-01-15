@@ -13,6 +13,12 @@ export default class EventTypeQueries {
     // ------------------------- Create statements -------------------------
     //
 
+    /**
+     * Creates a new event type in the database. If successful, the promise will resolve
+     * with the insert ID of the new entry. Otherwise it will be rejected with the error.
+     * @param name - The name of the new event type.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     createNewEventType = (name:string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const query = "INSERT INTO ak_eventtypes (Name) VALUES (?);";
@@ -37,6 +43,14 @@ export default class EventTypeQueries {
         });
     }
 
+    /**
+     * Sets a price for a product for a given event type. If the product and event type already
+     * has a price associated to it, the promise will be rejected.
+     * @param eventTypeID - The event type name or ID.
+     * @param ProductID - The product name or ID.
+     * @param unitPrice - The price for the product at the given event type in euro cents.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     setEventTypePrices = (eventTypeID:string, ProductID:string, unitPrice:number): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "INSERT INTO ak_eventtypeprice e (EventTypeID, ProductID, UnitPrice) "+
@@ -85,6 +99,10 @@ export default class EventTypeQueries {
     // ------------------------- Retrieve statements -------------------------
     //
 
+    /**
+     * Retrieves all the event types from the database.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getAllEventTypes = (): Promise<any> => {
         return new Promise((resolve, reject) => {
             this.database.executeTransactions([
@@ -102,6 +120,11 @@ export default class EventTypeQueries {
         });
     }
 
+    /**
+     * Retrieves a singular event type from the database, either by name or by ID.
+     * @param eventTypeID - The event type name or ID.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getEventType = (eventTypeID:string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = "SELECT * FROM ak_eventtypes p WHERE p.id = ?;";
@@ -131,10 +154,15 @@ export default class EventTypeQueries {
     }
 
 
+    /**
+     * Retrieves all the products and their prices from the database for the associated event.
+     * @param eventTypeID - The name or ID of the event type.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getEventTypePricesByEvent = (eventTypeID:string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "SELECT et.id as eventID, et.name as eventType, "
-            +"p.name as product, ep.UnitPrice as price, p.archived "
+            +"p.name as product, p.id as productID ep.UnitPrice as price, p.archived "
             +"FROM ak_eventTypes et "
             +"LEFT JOIN ak_eventtypeprice ep "
             +"ON ep.EventTypeID = et.ID "
@@ -188,6 +216,12 @@ export default class EventTypeQueries {
         });
     }
 
+    /**
+     * Retrieves the price that is associated to a single product for a given event type.
+     * @param eventTypeID - The ID or name of the event type.
+     * @param productID - The product ID or name.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     getEventTypePricesByEventAndProduct = (eventTypeID:string, productID:string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "SELECT et.id as eventID, et.name as eventType, "
@@ -255,6 +289,12 @@ export default class EventTypeQueries {
     // ------------------------- Update statements -------------------------
     //
 
+    /**
+     * Updates the name of a given event type.
+     * @param eventTypeID - The ID or name of the event typ.
+     * @param newName - The new name for the event type
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     updateEventType = (eventTypeID: string, newName: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = "UPDATE ak_eventtypes p SET p.name = ? WHERE p.id = ?;";
@@ -299,6 +339,13 @@ export default class EventTypeQueries {
         });
     }
 
+    /**
+     * Updates the price for a single product for the given event type.
+     * @param eventTypeID - The ID or name of the event type.
+     * @param productID - The ID or name of the product.
+     * @param price - The new price for the product in euro cents.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     updateEventTypePrices = (eventTypeID:string, productID:string, price?:number):Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "UPDATE ak_eventtypeprice et SET "
@@ -392,6 +439,11 @@ export default class EventTypeQueries {
     // ------------------------- Delete statements -------------------------
     //
 
+    /**
+     * Deletes an event type from the database.
+     * @param eventTypeID - The ID or name of the event type.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     deleteEventType = (eventTypeID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = "DELETE FROM ak_eventtypes p WHERE p.id = ?;";
@@ -420,6 +472,12 @@ export default class EventTypeQueries {
         });
     }
 
+    /**
+     * Deletes the price for a product for the given event type.
+     * @param eventTypeID - The ID or name of the event type.
+     * @param productID - The ID or name of the product.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     deleteEventTypePrice = (eventTypeID:string, productID:string):Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = "DELETE FROM ak_eventtypeprice e WHERE e.EventTypeID = ? and e.ProductID = ?";

@@ -15,9 +15,11 @@ export default class ProductQueries {
     //
 
     /**
-     * Creates a new product with just the name.
-     * @param product the name of the product.
-     * @param callback callback method containing the result of the queryToPerform.
+     * Creates a new product in the database by inserting the new name. The promise
+     * resolves with the insertion id if the product does not already exists. Otherwise
+     * it will be rejected with an error.
+     * @param product - The name of the new product.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     createNewProduct = (product: string): Promise<any> => {
         return new Promise((resolve, reject) => {
@@ -48,15 +50,24 @@ export default class ProductQueries {
     //
 
     /**
-     * Gets all the products from the database.
-     * @param callback callback method containing the result of the queryToPerform.
+     * Retrieves all the products from the database.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     getAllProducts = (): Promise<any> => {
         return new Promise((resolve, reject) => {
+            const query = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
             this.database.executeTransactions([
                 {
                     id: 1,
-                    query: "SELECT * FROM ak_products",
+                    query,
                     parameters: []
                 }
             ]).then(
@@ -71,12 +82,30 @@ export default class ProductQueries {
     /**
      * Gets a single product from the database.
      * @param productID the product ID, can be the name or the id.
-     * @param callback callback method containing the result of the queryToPerform.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
      */
     getProductByID = (productID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryOne = "SELECT * FROM ak_products p WHERE p.id = ?;";
-            const queryTwo = "SELECT * FROM ak_products p WHERE p.name LIKE ?";
+            const queryOne = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"WHERE p.id = ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey;";
+            const queryTwo = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"WHERE p.name LIKE ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
             let queryToPerform = "";
             const numberID = parseInt(productID, 10);
             if (isNaN(numberID)) {
@@ -107,19 +136,45 @@ export default class ProductQueries {
     // ------------------------- Update statements -------------------------
     //
 
+    /**
+     * Updates the product in the database. If the product was updated successfully
+     * then the promise will be resolved with the newly updated product.
+     * @param productID - The name or ID of the product.
+     * @param newName - The new name for the product.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     updateProductNameByID = (productID: string, newName: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = "UPDATE ak_products p SET p.name = ? WHERE p.id = ?;";
             const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name = ?";
-            const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
-            const queryFour = "SELECT * FROM ak_products p WHERE p.name = ?";
+            const queryThree = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"WHERE p.id = ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey;";
+            const queryFour = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"WHERE p.name LIKE ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
             let queryToPerform = "";
             let secondQuery = "";
             const numberID = parseInt(productID, 10);
+            let finalID = productID;
             if (isNaN(numberID)) {
                 queryToPerform = queryTwo;
                 secondQuery = queryFour;
-                productID = newName;
+                finalID = newName;
             } else {
                 queryToPerform = queryOne;
                 secondQuery = queryThree;
@@ -134,7 +189,7 @@ export default class ProductQueries {
                 {
                     id: 2,
                     query: secondQuery,
-                    parameters: [productID]
+                    parameters: [finalID]
                 }
             ]).then(
                 val => {
@@ -151,12 +206,39 @@ export default class ProductQueries {
                 );
         });
     }
+
+    /**
+     * Archives a product in the database. As for now this will not have any effect
+     * on the entire system but in future versions, archived products will not be able
+     * to be used in other parts of the system.
+     * @param productID - The product ID or name.
+     * @param archive - (true or false) which will archive the product.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     archiveProductByID = (productID: string, archive: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = "UPDATE ak_products p SET p.archived = ? WHERE p.id = ?;";
             const queryTwo = "UPDATE ak_products p SET p.archived = ? WHERE p.name = ?;";
-            const queryThree = "SELECT * FROM ak_products p WHERE p.id = ?;";
-            const queryFour = "SELECT * FROM ak_products p WHERE p.name = ?";
+            const queryThree = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"WHERE p.id = ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey;";
+            const queryFour = "SELECT p.id, p.name, p.archived, hk.hotkey, "
+            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
+            +"LEFT JOIN ak_hotkeys hk "
+            +"ON p.id = hk.productID "
+            +"LEFT JOIN ak_productcategory pc "
+            +"ON pc.productID = p.id "
+            +"LEFT JOIN ak_category c "
+            +"ON c.id = pc.categoryID "
+            +"WHERE p.name LIKE ? "
+            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
             let queryToPerform = "";
             let secondQuery = "";
             const archiveNum = (archive === "true") ? 1 : 0;
@@ -199,6 +281,11 @@ export default class ProductQueries {
     // ------------------------- Delete statements -------------------------
     //
 
+    /**
+     * Deletes a product from the database.
+     * @param productId - The ID or name of the product.
+     * @returns - The Promise object containing the resolved result or the rejected failure.
+     */
     deleteProductNameByID = (productId: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = "DELETE FROM ak_products p WHERE p.id = ?;";

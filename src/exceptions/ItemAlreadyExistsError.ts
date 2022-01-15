@@ -1,3 +1,7 @@
+/**
+ * thrown when the item that is being inserted in the database already exists.
+ * status: 403
+ */
 export class ItemAlreadyExistsError extends Error {
     public status: number;
     constructor(msg?:string) {

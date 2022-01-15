@@ -6,17 +6,20 @@
     "scripts": {
         "start:build": "tsc -w",
         "start": "concurrently npm:start:*",
-        "start:run": "nodemon dist/app.js",
-        "test": "jest --coverage"
+        "start:run": "nodemon dist/server.js",
+        "test": "jest --coverage --detectOpenHandles"
     },
     "_moduleAliases": {
         "@dir": "dist"
     },
     "dependencies": {
         "@googleapis/docs": "^0.2.0",
+        "@microsoft/tsdoc": "^0.13.2",
+        "@types/supertest": "^2.0.11",
         "bcrypt": "^5.0.1",
         "bcryptjs": "^2.4.3",
         "concurrency": "^0.1.4",
+        "concurrently": "^7.0.0",
         "cookie-parser": "~1.4.4",
         "cors": "^2.8.5",
         "debug": "~2.6.9",
@@ -58,6 +61,7 @@
         "concurrently": "^7.0.0",
         "jest": "^27.4.5",
         "nodemon": "^2.0.15",
+        "supertest": "^6.2.1",
         "ts-jest": "^27.1.2",
         "ts-node": "^8.10.2",
         "tslint": "^6.1.3",
