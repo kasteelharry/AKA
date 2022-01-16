@@ -211,7 +211,6 @@ export default class EventsQueries {
      */
     getEventPricesByEvent = (eventID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            // const queryA = "SELECT * FROM ak_eventprice e WHERE e.EventID = ?";
             const queryA = "SELECT e.id as eventID, e.name as eventName, et.name as eventType, "
                 + "p.name as product, p.id as productID, "
                 + "CASE WHEN EXISTS(SELECT * WHERE eps.EventID = e.ID AND eps.ProductID = ep.ProductID) "

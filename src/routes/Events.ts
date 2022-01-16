@@ -30,7 +30,7 @@ router.post('/:eventsID/prices', async (req, res, next) => {
     const productID = req.body.productID;
     const price = parseInt(req.body.price, 10);
     if (isNaN(price)) {
-        next(new GeneralServerError("Please enter a price in cents."))
+        next(new GeneralServerError("Please enter a price in cents."));
     } else {
         const event = new EventsQueries(getDatabase());
         event.setEventPrices(eventsID, productID, price).then(prices => {
@@ -126,7 +126,7 @@ router.post('/:eventID/prices/update', (req, res, next) => {
     const price = req.body.price;
     const priceNum = parseInt(price, 10);
     if (isNaN(priceNum) || (priceNum % 1) !== 0) {
-        next(new GeneralServerError("Please enter a price in euro cents."))
+        next(new GeneralServerError("Please enter a price in euro cents."));
     }
     const event = new EventsQueries(getDatabase());
     event.updateEventPrices(eventID, productID, priceNum).then(result => {

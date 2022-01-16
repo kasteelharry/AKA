@@ -23,6 +23,7 @@ DATABASE_HOST={YOUR HOST NAME}
 DATABASE_USER={USERNAME}
 DATABASE_PASSWORD={PASSWORD}
 DATABASE_SCHEMA={SCHEMA NAME}
+DATABASE_LIMIT={CONNECTION POOL LIMIT}
 ```
 
 Make sure that the .env file contains the correct credentials to access the database.

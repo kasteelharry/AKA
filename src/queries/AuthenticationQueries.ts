@@ -101,10 +101,6 @@ export default class AuthenticateQueries {
      */
     verifyUserInDB = (session: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            // const queryToPerform = "SELECT a.loginID, s.expires FROM ak_activesessions a "+
-            // "INNER JOIN ak_session s " +
-            // "ON a.sessionId = s.session_id " +
-            // "WHERE a.sessionId = ?";
             const queryToPerform = "SELECT * FROM ak_activesessions a "
                 + "RIGHT JOIN ak_session s "
                 + "ON a.sessionId = s.session_id "

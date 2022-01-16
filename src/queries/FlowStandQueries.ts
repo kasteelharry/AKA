@@ -111,6 +111,7 @@ export default class FlowStandQueries {
                 );
         });
     }
+
     //
     // ------------------------- Update statements -------------------------
     //

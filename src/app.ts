@@ -35,7 +35,6 @@ export default function getDatabase(test?:boolean) {
 
 const portHttps: number = 8433;
 const app = express();
-// const port = 8080;
 
 process.env.TZ = 'Europe/Amsterdam';
 
