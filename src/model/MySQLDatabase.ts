@@ -7,6 +7,7 @@ const hostname = process.env.DATABASE_HOST;
 const database = process.env.DATABASE_SCHEMA;
 const password = process.env.DATABASE_PASSWORD;
 const username = process.env.DATABASE_USER;
+const limit = process.env.DATABASE_LIMIT;
 
 /**
  * The MySQL database model. This class handles pool creation, queries and transactions

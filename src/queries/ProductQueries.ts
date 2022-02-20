@@ -179,7 +179,6 @@ export default class ProductQueries {
                 queryToPerform = queryOne;
                 secondQuery = queryThree;
             }
-            // executePreparedQuery(queryToPerform, callback, [newName, productID]);
             this.database.executeTransactions([
                 {
                     id: 1,
