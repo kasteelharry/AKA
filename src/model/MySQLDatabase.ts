@@ -7,7 +7,7 @@ const hostname = process.env.DATABASE_HOST;
 const database = process.env.DATABASE_SCHEMA;
 const password = process.env.DATABASE_PASSWORD;
 const username = process.env.DATABASE_USER;
-const limit = process.env.DATABASE_LIMIT;
+// const limit = process.env.DATABASE_LIMIT;
 
 /**
  * The MySQL database model. This class handles pool creation, queries and transactions
@@ -16,7 +16,7 @@ const limit = process.env.DATABASE_LIMIT;
  */
 export default class MySqlDatabase<T> implements Database<T> {
     private db:mysql.Pool;
-    constructor() {
+    constructor () {
         this.db = mysql.createPool(this.options);
     }
 
@@ -29,7 +29,6 @@ export default class MySqlDatabase<T> implements Database<T> {
         port: 3306,
         timezone: 'Europe/Amsterdam'
     };
-
 
     /**
      * Performs a transaction of one or multiple queries on the database. A connection will be
@@ -55,17 +54,17 @@ export default class MySqlDatabase<T> implements Database<T> {
      * @returns The {@link Promise} object holding either the failure or the success.
      *
      */
-    executeTransactions(queries: { id: number,
+    executeTransactions (queries: { id: number,
                                 query: string,
                                 parameters: (string | number | boolean | JSON | Date | null | undefined)[]}[]): Promise<{ [id: string]: any }> {
         return new Promise(async (resolve, reject) => {
-            const results: {[id: string]: {result: any} }= {};
+            const results: {[id: string]: {result: any} } = {};
             this.db.getConnection((err, connection) => {
                 connection.beginTransaction((error) => {
                     if (error) {
                         connection.rollback(() => {
                             connection.release();
-                            reject(new UnexpectedSQLResultError("Something went wrong with the connection."));
+                            reject(new UnexpectedSQLResultError('Something went wrong with the connection.'));
                         });
                     }
                     for (const query of queries) {
@@ -76,35 +75,35 @@ export default class MySqlDatabase<T> implements Database<T> {
                                 try {
                                     connection.rollback(() => {
                                         connection.release();
-                                        reject(new UnexpectedSQLResultError("Something went wrong with query " + query.id + "."));
+                                        reject(new UnexpectedSQLResultError('Something went wrong with query ' + query.id + '.'));
                                     });
                                 } catch (rollbackError) {
                                     connection.release();
-                                    reject(new UnexpectedSQLResultError("Failed to roll back."));
+                                    reject(new UnexpectedSQLResultError('Failed to roll back.'));
                                 }
                             }
-                            if(queryResult === undefined) {
+                            if (queryResult === undefined) {
                                 connection.rollback(() => {
-                                connection.release();
+                                    connection.release();
                                 });
                                 // If the server has thrown a SQL error, catch it here otherwise nothing was found.
                                 if (err) {
                                     reject(new ItemAlreadyExistsError(err.message));
                                 } else {
-                                    reject(new UnexpectedSQLResultError("No match found."));
+                                    reject(new UnexpectedSQLResultError('No match found.'));
                                 }
                             }
                             // Push the result into an array and index it with the ID passed for searching later
                             results[query.id] = {
-                                result: queryResult,
+                                result: queryResult
                             };
                         });
                     }
                     connection.commit((commitError) => {
                         if (commitError) {
                             connection.rollback(() => {
-                            connection.release();
-                            reject(new UnexpectedSQLResultError("Something went wrong with the query."));
+                                connection.release();
+                                reject(new UnexpectedSQLResultError('Something went wrong with the query.'));
                             });
                         }
                         resolve(results);
@@ -114,6 +113,4 @@ export default class MySqlDatabase<T> implements Database<T> {
             });
         });
     }
-
-
 }

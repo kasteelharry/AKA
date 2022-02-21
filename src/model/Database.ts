@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Model class for the database.
  */

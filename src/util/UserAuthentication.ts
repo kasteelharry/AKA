@@ -3,21 +3,21 @@ import { queryType } from '@dir/app';
 import LoginQueries from '@dir/queries/LoginQueries';
 
 export default class UserAuthentication {
-
     private auth: AuthenticateQueries;
     private login: LoginQueries;
 
-    constructor(private database: Database<queryType>) {
+    constructor (private database: Database<queryType>) {
         this.database = database;
         this.auth = new AuthenticateQueries(this.database);
         this.login = new LoginQueries(this.database);
     }
+
     /**
      * Authenticates a session.
      * @param session the session to authenticate.
      * @returns true if the user is authenticated, false if not.
      */
-    authenticateUser(session: string): Promise<boolean> {
+    authenticateUser (session: string): Promise<boolean> {
         return new Promise(async (resolve) => {
             this.auth.verifyUserInDB(session).then(result => {
                 const loginID = result[0];
@@ -30,8 +30,8 @@ export default class UserAuthentication {
                         resolve(true);
                     } else {
                         this.auth.logOutSession(session)
-                        .then(() => resolve(false))
-                        .catch(() => resolve(false));
+                            .then(() => resolve(false))
+                            .catch(() => resolve(false));
                     }
                 }
             }).catch(() => {
@@ -46,7 +46,7 @@ export default class UserAuthentication {
      * @param email the email of the user that needs to be registered.
      * @returns true if the authentication process has been completed, false if not.
      */
-    registerSession(session: string, email: string): Promise<boolean> {
+    registerSession (session: string, email: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             this.login.retrieveUserID(email).then(result => {
                 if (result === undefined) {
@@ -65,14 +65,13 @@ export default class UserAuthentication {
         });
     }
 
-
     /**
      * Authenticates an user with a valid session such that the other endpoints can be queried.
      * @param session the session to register
      * @param email the email of the user that needs to be registered.
      * @returns true if the authentication process has been completed, false if not.
      */
-    registerGoogleSession(session: string, googleID: string): Promise<boolean> {
+    registerGoogleSession (session: string, googleID: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             const auth = new AuthenticateQueries(this.database);
             auth.authenticateGUserInDB(googleID, session).then(res => {

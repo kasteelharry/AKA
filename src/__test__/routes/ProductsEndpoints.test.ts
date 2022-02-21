@@ -1,10 +1,9 @@
-import * as app from "@dir/app";
-import { MockDatabase } from "@dir/model/MockDatabase";
-import supertest, { SuperTest, Test } from "supertest";
-import UserAuthentication from "@dir/util/UserAuthentication";
-jest.mock("@dir/model/MySQLDatabase");
-describe("Test Products Routing", () => {
-
+import * as app from '@dir/app';
+import { MockDatabase } from '@dir/model/MockDatabase';
+import supertest, { SuperTest, Test } from 'supertest';
+import UserAuthentication from '@dir/util/UserAuthentication';
+jest.mock('@dir/model/MySQLDatabase');
+describe('Test Products Routing', () => {
     let mock: jest.SpyInstance;
     let request: SuperTest<Test>;
     let database:MockDatabase<app.queryType>;
@@ -33,58 +32,57 @@ describe("Test Products Routing", () => {
     // ------------------------- Create statements test -------------------------
     //
 
-    test("POST /", async () => {
-        const promise = await request.post("/api/products/")
-        .send({
-            name: "Product"
-        });
+    test('POST /', async () => {
+        const promise = await request.post('/api/products/')
+            .send({
+                name: 'Product'
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST / GeneralError", async () => {
+    test('POST / GeneralError', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/products/")
-        .send({
-            name: "Product"
-        });
+        const promise = await request.post('/api/products/')
+            .send({
+                name: 'Product'
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST / Duplicate Error", async () => {
+    test('POST / Duplicate Error', async () => {
         database.setDuplicateInsert(true);
-        const promise = await request.post("/api/products/")
-        .send({
-            name: "Product"
-        });
+        const promise = await request.post('/api/products/')
+            .send({
+                name: 'Product'
+            });
         expect(promise.statusCode).toBe(403);
     });
-
 
     //
     // ------------------------- Retrieve statements test -------------------------
     //
 
-    test("GET /", async () => {
-        const promise = await request.get("/api/products/");
+    test('GET /', async () => {
+        const promise = await request.get('/api/products/');
         expect(promise.statusCode).toBe(200);
     });
 
-    test("GET / Error", async () => {
+    test('GET / Error', async () => {
         expect.assertions(1);
         database.setDBState(false);
-        const promise = await request.get("/api/products/");
+        const promise = await request.get('/api/products/');
         expect(promise.statusCode).toBe(500);
     });
 
-    test("GET /:productID", async () => {
-        const promise = await request.get("/api/products/1");
+    test('GET /:productID', async () => {
+        const promise = await request.get('/api/products/1');
         expect(promise.statusCode).toBe(200);
     });
 
-    test("GET /:productID Error", async () => {
+    test('GET /:productID Error', async () => {
         expect.assertions(1);
         database.setDBState(false);
-        const promise = await request.get("/api/products/1");
+        const promise = await request.get('/api/products/1');
         expect(promise.statusCode).toBe(500);
     });
 
@@ -92,41 +90,41 @@ describe("Test Products Routing", () => {
     // ------------------------- Update statements test -------------------------
     //
 
-    test("POST /:productID", async () => {
-        const promise = await request.post("/api/products/1")
-        .send({
-            name: "joris",
-            archive: "true"
-        });
+    test('POST /:productID', async () => {
+        const promise = await request.post('/api/products/1')
+            .send({
+                name: 'joris',
+                archive: 'true'
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /:productID Error", async () => {
+    test('POST /:productID Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/products/1")
-        .send({
-            name: "joris",
-            archive: "true"
-        });
+        const promise = await request.post('/api/products/1')
+            .send({
+                name: 'joris',
+                archive: 'true'
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST /:productID/archive", async () => {
-        const promise = await request.post("/api/products/1/archive")
-        .send({
-            name: "joris",
-            archive: "true"
-        });
+    test('POST /:productID/archive', async () => {
+        const promise = await request.post('/api/products/1/archive')
+            .send({
+                name: 'joris',
+                archive: 'true'
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /:productID/archive Error", async () => {
+    test('POST /:productID/archive Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/products/1/archive")
-        .send({
-            name: "joris",
-            archive: "true"
-        });
+        const promise = await request.post('/api/products/1/archive')
+            .send({
+                name: 'joris',
+                archive: 'true'
+            });
         expect(promise.statusCode).toBe(500);
     });
 
@@ -134,23 +132,23 @@ describe("Test Products Routing", () => {
     // ------------------------- Delete statements test -------------------------
     //
 
-    test("DELETE /:productID/delete", async () => {
-        const promise = await request.post("/api/products/1/delete")
-        .send();
+    test('DELETE /:productID/delete', async () => {
+        const promise = await request.post('/api/products/1/delete')
+            .send();
         expect(promise.statusCode).toBe(200);
     });
 
-    test("DELETE /:productID/delete Error Not Found", async () => {
+    test('DELETE /:productID/delete Error Not Found', async () => {
         database.setIndexToUse(2);
-        const promise = await request.post("/api/products/1/delete")
-        .send();
+        const promise = await request.post('/api/products/1/delete')
+            .send();
         expect(promise.statusCode).toBe(204);
     });
 
-    test("DELETE /:productID/delete Error", async () => {
+    test('DELETE /:productID/delete Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/products/1/delete")
-        .send();
+        const promise = await request.post('/api/products/1/delete')
+            .send();
         expect(promise.statusCode).toBe(500);
     });
 });

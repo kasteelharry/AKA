@@ -1,6 +1,5 @@
 import 'module-alias/register';
-import express, { NextFunction } from 'express';
-import { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 
 import createError from 'http-errors';
 import path from 'path';
@@ -10,7 +9,6 @@ import indexRouter from '@dir/routes/Index';
 import loginRouter from '@dir/routes/Login';
 import apiRouter from '@dir/routes/apiRoutes';
 
-
 import dotenv from 'dotenv';
 import MySQLDatabase from '@dir/model/MySQLDatabase';
 import UserAuthentication from '@dir/util/UserAuthentication';
@@ -18,28 +16,24 @@ import { MockDatabase } from './model/MockDatabase';
 
 dotenv.config();
 
-
 export type queryType = { id: number, query: string, parameters: (string | number | boolean | JSON | Date | null | undefined)[] }[];
-let database: Database<queryType> ;
+let database: Database<queryType>;
 
-export default function getDatabase(test?:boolean) {
+export default function getDatabase (test?:boolean) {
     if (test) {
         return new MockDatabase();
     }
     if (database === undefined) {
-        database= new MySQLDatabase();
+        database = new MySQLDatabase();
     }
     return database;
 }
 
-
-const portHttps: number = 8433;
 const app = express();
 
 process.env.TZ = 'Europe/Amsterdam';
 
 dotenv.config();
-
 
 // view engine setups
 app.set('views', path.join(__dirname, '../views'));
@@ -51,14 +45,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
-
-app.all("/api/*", (req, res, next) => {
+app.all('/api/*', (req, res, next) => {
     const auth = new UserAuthentication(database);
     auth.authenticateUser(req.sessionID).then(val => {
         if (val) {
             next();
         } else {
-            return res.redirect("/");
+            return res.redirect('/');
         }
     });
 });
@@ -73,7 +66,6 @@ app.use((req: Request, res: Response, next) => {
 
 // error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-
     // render the error page
     res.status(err.status || 500);
     res.render('error', {
@@ -81,7 +73,5 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
         error: err
     });
 });
-
-
 
 export const appExport = app;
