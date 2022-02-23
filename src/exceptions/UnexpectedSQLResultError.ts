@@ -4,7 +4,7 @@
  */
 export class UnexpectedSQLResultError extends Error {
     public status: number;
-    constructor(msg: string) {
+    constructor (msg: string) {
         super(msg);
         this.status = 502;
 

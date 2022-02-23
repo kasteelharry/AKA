@@ -21,5 +21,10 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "indent": ["error", 4],
+        "semi": 0,
+        "no-undef": "off",
+        "no-async-promise-executor": "off" ,
+        "no-unused-vars": "warn"
     }
 }

@@ -4,7 +4,7 @@
  * @param date string containing the date format.
  * @returns the string formatted for MySQL support.
  */
-export function convertStringToSQLDate(date:string|number) {
+export function convertStringToSQLDate (date:string|number) {
     try {
         const dateOfBirth = new Date(date).toISOString();
         const isoDate = new Date(dateOfBirth);

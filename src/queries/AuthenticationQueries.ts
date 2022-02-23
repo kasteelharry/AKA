@@ -1,17 +1,16 @@
-import { queryType } from "@dir/app";
+import { queryType } from '@dir/app';
 /**
  * This class contains all the queries that are used by the
  * API endpoints for authenticating users for the website.
  */
 export default class AuthenticateQueries {
-
     /**
      * Constructor method that sets the database that the class will use.
      * This database can be a real one or can be a mock database for testing
      * purposes.
      * @param database - The database to use.
      */
-    constructor(private database: Database<queryType>) {
+    constructor (private database: Database<queryType>) {
         this.database = database;
     }
 
@@ -27,8 +26,8 @@ export default class AuthenticateQueries {
      */
     authenticateUserInDB = (loginID: number, session: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const qry = "INSERT INTO ak_activesessions (loginID, sessionId) " +
-                "VALUES (?,?);";
+            const qry = 'INSERT INTO ak_activesessions (loginID, sessionId) ' +
+                'VALUES (?,?);';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -39,15 +38,15 @@ export default class AuthenticateQueries {
                 val => {
                     resolve(val[1].result.insertId);
                 }).catch(
-                    err => {
-                        const msg: string = err.message;
-                        if (msg.match("Duplicate")) {
-                            resolve(0);
-                        } else {
-                            reject(err);
-                        }
+                err => {
+                    const msg: string = err.message;
+                    if (msg.match('Duplicate')) {
+                        resolve(0);
+                    } else {
+                        reject(err);
                     }
-                );
+                }
+            );
         });
     }
 
@@ -63,8 +62,8 @@ export default class AuthenticateQueries {
      */
     authenticateGUserInDB = (googleSession: string, session: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const qry = "INSERT INTO ak_googleSessions (googleSession, sessionId) " +
-                "VALUES (?,?);";
+            const qry = 'INSERT INTO ak_googleSessions (googleSession, sessionId) ' +
+                'VALUES (?,?);';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -75,15 +74,15 @@ export default class AuthenticateQueries {
                 val => {
                     resolve(val[1].result.insertId);
                 }).catch(
-                    err => {
-                        const msg: string = err.message;
-                        if (msg.match("Duplicate")) {
-                            resolve(0);
-                        } else {
-                            reject(err);
-                        }
+                err => {
+                    const msg: string = err.message;
+                    if (msg.match('Duplicate')) {
+                        resolve(0);
+                    } else {
+                        reject(err);
                     }
-                );
+                }
+            );
         });
     }
 
@@ -101,12 +100,12 @@ export default class AuthenticateQueries {
      */
     verifyUserInDB = (session: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryToPerform = "SELECT * FROM ak_activesessions a "
-                + "RIGHT JOIN ak_session s "
-                + "ON a.sessionId = s.session_id "
-                + "LEFT JOIN ak_googleSessions g "
-                + "ON s.session_id = g.sessionId "
-                + "WHERE g.sessionId = ? OR a.sessionId = ?";
+            const queryToPerform = 'SELECT * FROM ak_activesessions a ' +
+            'RIGHT JOIN ak_session s ' +
+            'ON a.sessionId = s.session_id ' +
+            'LEFT JOIN ak_googleSessions g ' +
+            'ON s.session_id = g.sessionId ' +
+            'WHERE g.sessionId = ? OR a.sessionId = ?';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -126,8 +125,8 @@ export default class AuthenticateQueries {
                     }
                     resolve([login, expire, google]);
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
 
@@ -150,7 +149,7 @@ export default class AuthenticateQueries {
      */
     logOutUser = (loginID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const qry = "DELETE FROM ak_activesessions a WHERE a.loginID = ?;";
+            const qry = 'DELETE FROM ak_activesessions a WHERE a.loginID = ?;';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -161,8 +160,8 @@ export default class AuthenticateQueries {
                 val => {
                     resolve(val[1].result);
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
 
@@ -179,8 +178,8 @@ export default class AuthenticateQueries {
      */
     logOutSession = (session: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const qry = "DELETE FROM ak_activesessions a WHERE a.sessionId = ?;";
-            const qry2 = "DELETE FROM ak_googlesessions g WHERE g.sessionID = ?;";
+            const qry = 'DELETE FROM ak_activesessions a WHERE a.sessionId = ?;';
+            const qry2 = 'DELETE FROM ak_googlesessions g WHERE g.sessionID = ?;';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -196,9 +195,8 @@ export default class AuthenticateQueries {
                 val => {
                     resolve(val[1].result);
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
 }
-

@@ -1,10 +1,9 @@
-import * as app from "@dir/app";
-import { MockDatabase } from "@dir/model/MockDatabase";
-import supertest, { SuperTest, Test } from "supertest";
-import UserAuthentication from "@dir/util/UserAuthentication";
-jest.mock("@dir/model/MySQLDatabase");
-describe("Test Events Routing", () => {
-
+import * as app from '@dir/app';
+import { MockDatabase } from '@dir/model/MockDatabase';
+import supertest, { SuperTest, Test } from 'supertest';
+import UserAuthentication from '@dir/util/UserAuthentication';
+jest.mock('@dir/model/MySQLDatabase');
+describe('Test Events Routing', () => {
     let mock: jest.SpyInstance;
     let request: SuperTest<Test>;
     let database:MockDatabase<app.queryType>;
@@ -34,91 +33,91 @@ describe("Test Events Routing", () => {
     // ------------------------- Create statements test -------------------------
     //
 
-    test("POST /", async () => {
-        const promise = await request.post("/api/events/")
-        .send({
-            name: "Event names",
-            type: 1,
-            startTime: "12-12-2022 12:00:00",
-            endTime: "12-13-2022 04:00:00",
-            saved: "false"
-        });
+    test('POST /', async () => {
+        const promise = await request.post('/api/events/')
+            .send({
+                name: 'Event names',
+                type: 1,
+                startTime: '12-12-2022 12:00:00',
+                endTime: '12-13-2022 04:00:00',
+                saved: 'false'
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST / General Error", async () => {
+    test('POST / General Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/events/")
-        .send({
-            name: "Event names",
-            type: 1,
-            startTime: "12-12-2022 12:00:00",
-            endTime: "12-13-2022 04:00:00",
-            saved: "false"
-        });
+        const promise = await request.post('/api/events/')
+            .send({
+                name: 'Event names',
+                type: 1,
+                startTime: '12-12-2022 12:00:00',
+                endTime: '12-13-2022 04:00:00',
+                saved: 'false'
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST / Duplicate Error", async () => {
+    test('POST / Duplicate Error', async () => {
         database.setDuplicateInsert(true);
-        const promise = await request.post("/api/events/")
-        .send({
-            name: "Event names",
-            type: 1,
-            startTime: "12-12-2022 12:00:00",
-            endTime: "12-13-2022 04:00:00",
-            saved: "false"
-        });
+        const promise = await request.post('/api/events/')
+            .send({
+                name: 'Event names',
+                type: 1,
+                startTime: '12-12-2022 12:00:00',
+                endTime: '12-13-2022 04:00:00',
+                saved: 'false'
+            });
         expect(promise.statusCode).toBe(403);
     });
 
-    test("POST /:eventsID/prices", async () => {
+    test('POST /:eventsID/prices', async () => {
         database.setDBState(true);
         database.setFailInsert(false);
         database.setDuplicateInsert(false);
         database.setIndexToUse(0);
-        const promise = await request.post("/api/events/joris/prices/")
-        .send({
-            eventsID: 1,
-            productID: 2,
-            price: 100
-        });
+        const promise = await request.post('/api/events/joris/prices/')
+            .send({
+                eventsID: 1,
+                productID: 2,
+                price: 100
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /:eventsID/prices", async () => {
+    test('POST /:eventsID/prices', async () => {
         database.setDBState(true);
         database.setFailInsert(false);
         database.setDuplicateInsert(false);
         database.setIndexToUse(0);
-        const promise = await request.post("/api/events/joris/prices/")
-        .send({
-            eventsID: 1,
-            productID: 2,
-            price: "Not a price"
-        });
+        const promise = await request.post('/api/events/joris/prices/')
+            .send({
+                eventsID: 1,
+                productID: 2,
+                price: 'Not a price'
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST /:eventsID/prices General Error", async () => {
+    test('POST /:eventsID/prices General Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/events/joris/prices/")
-        .send({
-            eventsID: 1,
-            productID: 2,
-            price: 100
-        });
+        const promise = await request.post('/api/events/joris/prices/')
+            .send({
+                eventsID: 1,
+                productID: 2,
+                price: 100
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST /:eventsID/prices Duplicate Error", async () => {
+    test('POST /:eventsID/prices Duplicate Error', async () => {
         database.setDuplicateInsert(true);
-        const promise = await request.post("/api/events/joris/prices/")
-        .send({
-            eventsID: 1,
-            productID: 2,
-            price: 100
-        });
+        const promise = await request.post('/api/events/joris/prices/')
+            .send({
+                eventsID: 1,
+                productID: 2,
+                price: 100
+            });
         expect(promise.statusCode).toBe(403);
     });
 
@@ -126,64 +125,63 @@ describe("Test Events Routing", () => {
     // ------------------------- Retrieve statements test -------------------------
     //
 
-    test("GET /", async () => {
-        const promise = await request.get("/api/events/");
+    test('GET /', async () => {
+        const promise = await request.get('/api/events/');
         expect(promise.statusCode).toBe(200);
     });
 
-    test("GET / Error", async () => {
+    test('GET / Error', async () => {
         expect.assertions(1);
         database.setDBState(false);
-        const promise = await request.get("/api/events/");
+        const promise = await request.get('/api/events/');
         expect(promise.statusCode).toBe(500);
     });
 
-    test("GET /active", async () => {
-        const promise = await request.get("/api/events/active/");
+    test('GET /active', async () => {
+        const promise = await request.get('/api/events/active/');
         expect(promise.statusCode).toBe(200);
     });
 
-    test("GET /active Error", async () => {
+    test('GET /active Error', async () => {
         expect.assertions(1);
         database.setDBState(false);
-        const promise = await request.get("/api/events/active/");
+        const promise = await request.get('/api/events/active/');
         expect(promise.statusCode).toBe(500);
     });
 
-
-    test("GET /:eventID", async () => {
-        const promise = await request.get("/api/events/1");
+    test('GET /:eventID', async () => {
+        const promise = await request.get('/api/events/1');
         expect(promise.statusCode).toBe(200);
     });
 
-    test("GET /:eventID Error", async () => {
+    test('GET /:eventID Error', async () => {
         expect.assertions(1);
         database.setDBState(false);
-        const promise = await request.get("/api/events/1");
+        const promise = await request.get('/api/events/1');
         expect(promise.statusCode).toBe(500);
     });
 
-    test("GET /:eventID/prices", async () => {
-        const promise = await request.get("/api/events/1/prices");
+    test('GET /:eventID/prices', async () => {
+        const promise = await request.get('/api/events/1/prices');
         expect(promise.statusCode).toBe(200);
     });
 
-    test("GET /:eventID/prices Error", async () => {
+    test('GET /:eventID/prices Error', async () => {
         expect.assertions(1);
         database.setDBState(false);
-        const promise = await request.get("/api/events/1/prices");
+        const promise = await request.get('/api/events/1/prices');
         expect(promise.statusCode).toBe(500);
     });
 
-    test("GET /:eventID/:productID/prices", async () => {
-        const promise = await request.get("/api/events/1/1/prices");
+    test('GET /:eventID/:productID/prices', async () => {
+        const promise = await request.get('/api/events/1/1/prices');
         expect(promise.statusCode).toBe(200);
     });
 
-    test("GET /:eventID/:productID/prices Error", async () => {
+    test('GET /:eventID/:productID/prices Error', async () => {
         expect.assertions(1);
         database.setDBState(false);
-        const promise = await request.get("/api/events/1/1/prices");
+        const promise = await request.get('/api/events/1/1/prices');
         expect(promise.statusCode).toBe(500);
     });
 
@@ -191,73 +189,73 @@ describe("Test Events Routing", () => {
     // ------------------------- Update statements test -------------------------
     //
 
-    test("POST /:eventID", async () => {
-        const promise = await request.post("/api/events/1/")
-        .send({
-            name: "event",
-            type: 1,
-            startTime: "12-12-2022 12:00:00",
-            endTime: "12-13-2022 04:00:00",
-            saved: "false"
-        });
+    test('POST /:eventID', async () => {
+        const promise = await request.post('/api/events/1/')
+            .send({
+                name: 'event',
+                type: 1,
+                startTime: '12-12-2022 12:00:00',
+                endTime: '12-13-2022 04:00:00',
+                saved: 'false'
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /:eventID Error", async () => {
+    test('POST /:eventID Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/events/1/")
-        .send({
-            name: "event",
-            type: 1,
-            startTime: "12-12-2022 12:00:00",
-            endTime: "12-13-2022 04:00:00",
-            saved: "false"
-        });
+        const promise = await request.post('/api/events/1/')
+            .send({
+                name: 'event',
+                type: 1,
+                startTime: '12-12-2022 12:00:00',
+                endTime: '12-13-2022 04:00:00',
+                saved: 'false'
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST /:eventID/save", async () => {
-        const promise = await request.post("/api/events/Joris/save/")
-        .send({
-            saved: "true"
-        });
+    test('POST /:eventID/save', async () => {
+        const promise = await request.post('/api/events/Joris/save/')
+            .send({
+                saved: 'true'
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /:eventID/save Error", async () => {
+    test('POST /:eventID/save Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/events/update/save/")
-        .send({
-            saved: "false"
-        });
+        const promise = await request.post('/api/events/update/save/')
+            .send({
+                saved: 'false'
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST /:eventID/prices/update", async () => {
-        const promise = await request.post("/api/events/Joris/prices/update/")
-        .send({
-            productID: 1,
-            price: "100"
-        });
+    test('POST /:eventID/prices/update', async () => {
+        const promise = await request.post('/api/events/Joris/prices/update/')
+            .send({
+                productID: 1,
+                price: '100'
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /:eventID/prices/update Bad price", async () => {
-        const promise2 = await request.post("/api/events/Joris/prices/update/")
-        .send({
-            productID: 1,
-            price: "Bad price"
-        });
+    test('POST /:eventID/prices/update Bad price', async () => {
+        const promise2 = await request.post('/api/events/Joris/prices/update/')
+            .send({
+                productID: 1,
+                price: 'Bad price'
+            });
         expect(promise2.statusCode).toBe(500);
     });
 
-    test("POST /:eventID/save Error", async () => {
+    test('POST /:eventID/save Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/events/Joris/prices/update/")
-        .send({
-            productID: 1,
-            saved: "false"
-        });
+        const promise = await request.post('/api/events/Joris/prices/update/')
+            .send({
+                productID: 1,
+                saved: 'false'
+            });
         expect(promise.statusCode).toBe(500);
     });
 
@@ -265,54 +263,54 @@ describe("Test Events Routing", () => {
     // ------------------------- Delete statements test -------------------------
     //
 
-    test("POST /:eventID/delete", async () => {
-        const promise = await request.post("/api/events/Joris/delete/")
-        .send();
+    test('POST /:eventID/delete', async () => {
+        const promise = await request.post('/api/events/Joris/delete/')
+            .send();
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /:eventID/delete Error Not Found", async () => {
+    test('POST /:eventID/delete Error Not Found', async () => {
         database.setIndexToUse(2);
-        const promise = await request.post("/api/events/1/delete/")
-        .send({
-            eventsID: 1
-        });
+        const promise = await request.post('/api/events/1/delete/')
+            .send({
+                eventsID: 1
+            });
         expect(promise.statusCode).toBe(204);
     });
 
-    test("POST /:eventID/delete Error", async () => {
+    test('POST /:eventID/delete Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/events/1/delete/")
-        .send({
-            eventsID: 1
-        });
+        const promise = await request.post('/api/events/1/delete/')
+            .send({
+                eventsID: 1
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST /:eventID/prices/delete", async () => {
+    test('POST /:eventID/prices/delete', async () => {
         database.setIndexToUse(0);
-        const promise = await request.post("/api/events/Joris/prices/delete/")
-        .send({
-            productID: 1
-        });
+        const promise = await request.post('/api/events/Joris/prices/delete/')
+            .send({
+                productID: 1
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /:eventID/delete Error Not Found", async () => {
+    test('POST /:eventID/delete Error Not Found', async () => {
         database.setIndexToUse(2);
-        const promise = await request.post("/api/events/1/prices/delete/")
-        .send({
-            productID: 1
-        });
+        const promise = await request.post('/api/events/1/prices/delete/')
+            .send({
+                productID: 1
+            });
         expect(promise.statusCode).toBe(204);
     });
 
-    test("POST /:eventID/prices/delete Error", async () => {
+    test('POST /:eventID/prices/delete Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/events/1/prices/delete/")
-        .send({
-            productID: 1
-        });
+        const promise = await request.post('/api/events/1/prices/delete/')
+            .send({
+                productID: 1
+            });
         expect(promise.statusCode).toBe(500);
     });
 });

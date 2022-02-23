@@ -1,12 +1,11 @@
-import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
-import { queryType } from "@dir/app";
-import { MockDatabase } from "@dir/model/MockDatabase";
-import { ItemAlreadyExistsError } from "@dir/exceptions/ItemAlreadyExistsError";
-import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
-import ProductQueries from "@dir/queries/ProductQueries";
+import { GeneralServerError } from '@dir/exceptions/GeneralServerError';
+import { queryType } from '@dir/app';
+import { MockDatabase } from '@dir/model/MockDatabase';
+import { ItemAlreadyExistsError } from '@dir/exceptions/ItemAlreadyExistsError';
+import { EmptySQLResultError } from '@dir/exceptions/EmptySQLResultError';
+import ProductQueries from '@dir/queries/ProductQueries';
 
 describe('ProductQueriesTest', () => {
-
     let product: ProductQueries;
     let db: MockDatabase<queryType>;
 
@@ -26,20 +25,20 @@ describe('ProductQueriesTest', () => {
     // ------------------------- Create statements test -------------------------
     //
 
-    test("Create new product.", async () => {
-        const promise = product.createNewProduct("product");
+    test('Create new product.', async () => {
+        const promise = product.createNewProduct('product');
         await expect(promise).resolves.toBeGreaterThanOrEqual(1);
     });
 
-    test("Create duplicate product.", async () => {
+    test('Create duplicate product.', async () => {
         db.setDuplicateInsert(true);
-        const promise = product.createNewProduct("product");
+        const promise = product.createNewProduct('product');
         await expect(promise).rejects.toBeInstanceOf(ItemAlreadyExistsError);
     });
 
-    test("Failure create duplicate product.", async () => {
+    test('Failure create duplicate product.', async () => {
         db.setFailInsert(true);
-        const promise = product.createNewProduct("product");
+        const promise = product.createNewProduct('product');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
@@ -47,31 +46,30 @@ describe('ProductQueriesTest', () => {
     // ------------------------- Retrieve statements test -------------------------
     //
 
-    test("Retrieve all products.", async () => {
+    test('Retrieve all products.', async () => {
         const promise = product.getAllProducts();
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Retrieve all products in closed database.", async () => {
+    test('Retrieve all products in closed database.', async () => {
         db.setDBState(false);
         const promise = product.getAllProducts();
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
-
-    test("Retrieve single product.", async () => {
-        const promise = product.getProductByID("Joris");
+    test('Retrieve single product.', async () => {
+        const promise = product.getProductByID('Joris');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Retrieve single product by ID.", async () => {
-        const promise = product.getProductByID("1");
+    test('Retrieve single product by ID.', async () => {
+        const promise = product.getProductByID('1');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Retrieve single products in closed database.", async () => {
+    test('Retrieve single products in closed database.', async () => {
         db.setDBState(false);
-        const promise = product.getProductByID("Joris");
+        const promise = product.getProductByID('Joris');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
@@ -79,66 +77,64 @@ describe('ProductQueriesTest', () => {
     // ------------------------- Update statements test -------------------------
     //
 
-    test("Update product name.", async () => {
-        const promise = product.updateProductNameByID("Joris", "newName");
+    test('Update product name.', async () => {
+        const promise = product.updateProductNameByID('Joris', 'newName');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Update product name by ID.", async () => {
-        const promise = product.updateProductNameByID("1", "newName");
+    test('Update product name by ID.', async () => {
+        const promise = product.updateProductNameByID('1', 'newName');
         await expect(promise).resolves.toBeDefined();
     });
 
-
-    test("Update product name already exists.", async () => {
+    test('Update product name already exists.', async () => {
         db.setIndexToUse(1);
-        const promise = product.updateProductNameByID("Joris", "newName");
+        const promise = product.updateProductNameByID('Joris', 'newName');
         await expect(promise).rejects.toBeInstanceOf(ItemAlreadyExistsError);
     });
 
-    test("Update product name not found.", async () => {
+    test('Update product name not found.', async () => {
         db.setIndexToUse(2);
-        const promise = product.updateProductNameByID("Joris", "newName");
+        const promise = product.updateProductNameByID('Joris', 'newName');
         await expect(promise).rejects.toBeInstanceOf(EmptySQLResultError);
     });
 
-    test("Update product name failed.", async () => {
+    test('Update product name failed.', async () => {
         db.setDBState(false);
-        const promise = product.updateProductNameByID("Joris", "newName");
+        const promise = product.updateProductNameByID('Joris', 'newName');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
-    test("Archive product.", async () => {
-        const promise = product.archiveProductByID("Joris", "true");
+    test('Archive product.', async () => {
+        const promise = product.archiveProductByID('Joris', 'true');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Unarchive product.", async () => {
-        const promise = product.archiveProductByID("Joris", "false");
+    test('Unarchive product.', async () => {
+        const promise = product.archiveProductByID('Joris', 'false');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Archive product by ID.", async () => {
-        const promise = product.archiveProductByID("1", "false");
+    test('Archive product by ID.', async () => {
+        const promise = product.archiveProductByID('1', 'false');
         await expect(promise).resolves.toBeDefined();
     });
 
-
-    test("Archive product already exists.", async () => {
+    test('Archive product already exists.', async () => {
         db.setIndexToUse(1);
-        const promise = product.archiveProductByID("Joris", "false");
+        const promise = product.archiveProductByID('Joris', 'false');
         await expect(promise).rejects.toBeInstanceOf(ItemAlreadyExistsError);
     });
 
-    test("Archive product not found.", async () => {
+    test('Archive product not found.', async () => {
         db.setIndexToUse(2);
-        const promise = product.archiveProductByID("Joris", "false");
+        const promise = product.archiveProductByID('Joris', 'false');
         await expect(promise).rejects.toBeInstanceOf(EmptySQLResultError);
     });
 
-    test("Archive product failed.", async () => {
+    test('Archive product failed.', async () => {
         db.setDBState(false);
-        const promise = product.archiveProductByID("Joris", "false");
+        const promise = product.archiveProductByID('Joris', 'false');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
@@ -146,19 +142,19 @@ describe('ProductQueriesTest', () => {
     // ------------------------- Delete statements test -------------------------
     //
 
-    test("Delete product.", async () => {
-        const promise = product.deleteProductNameByID("Joris");
+    test('Delete product.', async () => {
+        const promise = product.deleteProductNameByID('Joris');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Delete product by ID.", async () => {
-        const promise = product.deleteProductNameByID("1");
+    test('Delete product by ID.', async () => {
+        const promise = product.deleteProductNameByID('1');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Delete product failed.", async () => {
+    test('Delete product failed.', async () => {
         db.setDBState(false);
-        const promise = product.deleteProductNameByID("Joris");
+        const promise = product.deleteProductNameByID('Joris');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 });
