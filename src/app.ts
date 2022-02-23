@@ -1,6 +1,5 @@
 import 'module-alias/register';
-import express, { NextFunction } from 'express';
-import { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 
 import createError from 'http-errors';
 import path from 'path';
