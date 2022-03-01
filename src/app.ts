@@ -26,6 +26,7 @@ const hostname = process.env.DATABASE_HOST;
 const dbSchema = process.env.DATABASE_SCHEMA;
 const password = process.env.DATABASE_PASSWORD;
 const username = process.env.DATABASE_USER;
+const env:boolean = process.env.PRODUCTION === 'true';
 
 const dbSessionOptions = {
     host: hostname,
@@ -41,7 +42,7 @@ const dbSessionOptions = {
             data: 'data'
         }
     },
-    clearExpired: false,
+    clearExpired: true,
     checkExpirationInterval: 60000 // 1 minute
 };
 
@@ -56,7 +57,7 @@ app.use(session({
     store: sessionStore,
     // TODO set this to secure
     cookie: {
-        secure: false,
+        secure: env,
         maxAge: 1000 * 12 * 60 * 60, // 12 hours expiration rate
         sameSite: true
     }
@@ -70,8 +71,8 @@ const options = {
 export type queryType = { id: number, query: string, parameters: (string | number | boolean | JSON | Date | null | undefined)[] }[];
 let database: Database<queryType>;
 
-export default function getDatabase (test?:boolean) {
-    if (test) {
+export default function getDatabase (test? : boolean) {
+    if (!env) {
         return new MockDatabase();
     }
     if (database === undefined) {
