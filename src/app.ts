@@ -15,6 +15,7 @@ import dotenv from 'dotenv';
 import MySQLDatabase from '@dir/model/MySQLDatabase';
 import UserAuthentication from '@dir/util/UserAuthentication';
 import { MockDatabase } from './model/MockDatabase';
+import cors from 'cors';
 
 const app = express();
 
@@ -59,7 +60,7 @@ app.use(session({
     cookie: {
         secure: env,
         maxAge: 1000 * 12 * 60 * 60, // 12 hours expiration rate
-        sameSite: true
+        sameSite: false
     }
 }));
 
@@ -90,6 +91,7 @@ app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
