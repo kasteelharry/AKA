@@ -15,12 +15,40 @@
   "app_title": "AKA V3.0",
   "nav": {
     "login": "Login",
-    "register": "Register"
+    "register": "Register",
+    "transaction": "Transactions",
+    "dashboard": "Dashboard",
+    "statistics": "Statistics"
+  },
+  "user": {
+      "profile": "Profile",
+      "account": "Account",
+      "dashboard":"Dashboard",
+      "logout": "Logout"
+  },
+  "transaction": {
+      "confirm": "Confirm",
+      "update": "Update",
+      "delete": "Delete"
   },
   "menu": {
     "language": {
       "en": "English",
       "nl": "Dutch"
     }
+  },
+  "search": {
+      "box": "Search members",
+      "history": "Order history"
+  },
+  "previous": {
+      "name": "Customer name",
+      "product": "Product name",
+      "category": "Product category",
+      "amount": "Amount",
+      "price": "Total price",
+      "timestamp": "Time of sell",
+      "update": "Update",
+      "delete": "Delete"
   }
 }

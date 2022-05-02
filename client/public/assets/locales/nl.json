@@ -15,12 +15,40 @@
   "app_title": "AKA V3.0",
   "nav": {
     "login": "Log in",
-    "register": "Registreren"
+    "register": "Registreren",
+    "transaction": "Transacties",
+    "dashboard": "Dashboard",
+    "statistics": "Statistieken"
   },
+  "user": {
+      "profile": "Profile",
+      "account": "Account",
+      "dashboard":"Dashboard",
+      "logout": "Uitloggen"
+  },
+  "transaction": {
+    "confirm": "Bevestigen",
+    "update": "Update",
+    "delete": "Verwijder"
+},
   "menu": {
     "language": {
       "en": "Engels",
       "nl": "Nederlands"
     }
-  }
+  },
+  "search": {
+      "box": "Zoek leden",
+      "history": "Bestel geschiedenis"
+  },
+  "previous": {
+    "name": "Naam kroegbezoeker",
+    "product": "Product naam",
+    "category": "Product categorie",
+    "amount": "Hoeveelheid",
+    "price": "Totale prijs",
+    "timestamp": "Tijd van verkoop",
+    "update": "Update",
+    "delete": "Verwijderen"
+}
 }
