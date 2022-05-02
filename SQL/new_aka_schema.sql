@@ -19,14 +19,15 @@ DROP TABLE IF EXISTS `ak_login` CASCADE;
 DROP TABLE IF EXISTS `ak_session` CASCADE;
 DROP TABLE IF EXISTS `ak_activesessions` CASCADE;
 DROP TABLE IF EXISTS `ak_googleSessions` CASCADE;
+DROP TABLE IF EXISTS `ak_groups` CASCADE;
+DROP TABLE IF EXISTS `ak_customersAndGroups` CASCADE;
 SET FOREIGN_KEY_CHECKS = 1;
 
 
 CREATE TABLE `ak_customers` (
-    `ID` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `ID` varchar(255) NOT NULL UNIQUE,
     `Name` VARCHAR(255) NOT NULL,
     `BirthDate` DATE NOT NULL,
-    `PicturePath` VARCHAR(255) DEFAULT NULL,
     `Bankaccount` varchar(34) NOT NULL UNIQUE,
     `Active` BOOLEAN DEFAULT 1,
 
@@ -120,7 +121,7 @@ CREATE TABLE `ak_eventprice` (
 CREATE TABLE `ak_flowstand` (
     `EventID`  INT UNSIGNED NOT NULL,
     `StartCount` DOUBLE NOT NULL,
-    `EndCount` DOUBLE DEFAULT NULL
+    `EndCount` DOUBLE DEFAULT NULL,
 		CONSTRAINT end_bigger
         CHECK(`StartCount` <= `EndCount`),
 
@@ -158,7 +159,7 @@ CREATE TABLE `ak_sales` (
 
 CREATE TABLE `ak_usersales` (
     `TimeSold` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `UserID` INT UNSIGNED NOT NULL,
+    `UserID` VARCHAR(255) NOT NULL,
     `TotalPrice` INT NOT NULL,
 
     PRIMARY KEY (`TimeSold`, `UserID`),
@@ -176,8 +177,8 @@ CREATE TABLE `ak_groups` (
 );
 
 CREATE TABLE `ak_customersAndGroups` (
-	`clubID` BIGINT NOT NULL,
-    `customerID` INT UNSIGNED NOT NULL,
+	`clubID` BIGINT UNSIGNED NOT NULL,
+    `customerID` VARCHAR(255) NOT NULL,
     FOREIGN KEY (`clubID`)
         REFERENCES `ak_groups`(`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (`customerID`)
@@ -220,10 +221,10 @@ CREATE TABLE `ak_googleSessions` (
         REFERENCES `ak_session`(`session_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO ak_customers (Name, BirthDate, Bankaccount, Active)
-    values ('Joris', '2001-01-26', 'NL22INGB0123456789', True),
-    ('Alice', '1988-06-2', 'NL12AMRO00112233445', True),
-    ('Bob', '2003-12-01', 'NL22RABO0987654321', False);
+INSERT INTO ak_customers (ID, Name, BirthDate, Bankaccount, Active)
+    values ('joris.kuiper','Joris', '2001-01-26', 'NL22INGB0123456789', True),
+    ('alice.smith','Alice', '1988-06-2', 'NL12AMRO00112233445', True),
+    ('bob.parker','Bob', '2003-12-01', 'NL22RABO0987654321', False);
 
 INSERT INTO ak_products (Name, Archived)
     VALUES ('Bier Glas', 0),
