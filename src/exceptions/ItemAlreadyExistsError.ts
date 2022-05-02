@@ -1,6 +1,6 @@
 /**
  * thrown when the item that is being inserted in the database already exists.
- * status: 403
+ * status: 503
  */
 export class ItemAlreadyExistsError extends Error {
     public status: number;
@@ -9,7 +9,7 @@ export class ItemAlreadyExistsError extends Error {
             msg = 'Item already exists in the database or no value was changed.';
         }
         super(msg);
-        this.status = 403;
+        this.status = 503;
 
         // Set the prototype explicitly.
         Object.setPrototypeOf(this, ItemAlreadyExistsError.prototype);
