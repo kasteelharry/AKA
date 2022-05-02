@@ -19,16 +19,16 @@ export default class CustomerQueries {
      *             in the database.
      * @returns - The Promise object containing the resolved result or the rejected failure.
      */
-    createNewCustomer = (name: string, birthDate: string | undefined, bank: string): Promise<any> => {
+    createNewCustomer = (id:string, name: string, birthDate: string | undefined, bank: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = 'INSERT INTO ak_customers (Name, BirthDate, Bankaccount) ' +
-                'VALUES (?, ?, ?);';
+            const query = 'INSERT INTO ak_customers (ID, Name, BirthDate, Bankaccount) ' +
+                'VALUES (?,?, ?, ?);';
 
             this.database.executeTransactions([
                 {
                     id: 1,
                     query,
-                    parameters: [name, birthDate, bank]
+                    parameters: [id, name, birthDate, bank]
                 }
             ]).then(
                 val => {
@@ -80,13 +80,14 @@ export default class CustomerQueries {
             const queryOne = 'SELECT * FROM ak_customers c WHERE c.id = ?';
             const queryTwo = 'SELECT * FROM ak_customers c WHERE c.name LIKE ?';
             let query = '';
-            const numberID = parseInt(customerID, 10);
-            if (isNaN(numberID)) {
-                query = queryTwo;
-                customerID = '%' + customerID + '%';
-            } else {
-                query = queryOne;
-            }
+            // const numberID = parseInt(customerID, 10);
+            // if (isNaN(numberID)) {
+            //     query = queryTwo;
+            //     customerID = '%' + customerID + '%';
+            // } else {
+            //     query = queryOne;
+            // }
+            query = queryOne;
             this.database.executeTransactions([
                 {
                     id: 1,

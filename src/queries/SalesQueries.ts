@@ -17,12 +17,12 @@ export default class SalesQueries {
      * group. Therefore this method should not be used when the sale is done by any person
      * or group.
      * @param eventID - The ID of the event.
-     * @param productID - The ID of the product.
+     * @param id - The ID of the product.
      * @param amount - The amount of the product that was sold.
      * @param timestamp - The timestamp of the transaction in milliseconds.
      * @returns - The Promise object containing the resolved result or the rejected failure.
      */
-    createSale = (eventID: number, productID: number, amount: number, timestamp?: string): Promise<any> => {
+    createSale = (eventID: number, id: number, amount: number, timestamp?: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             if (timestamp === undefined) {
                 timestamp = convertStringToSQLDate((new Date()).toISOString());
@@ -33,7 +33,7 @@ export default class SalesQueries {
                 {
                     id: 1,
                     query,
-                    parameters: [eventID, productID, amount, timestamp]
+                    parameters: [eventID, id, amount, timestamp]
                 }
             ]).then(
                 val => {
@@ -62,7 +62,7 @@ export default class SalesQueries {
      * @param timestamp - The timestamp of the transaction in milliseconds.
      * @returns - The Promise object containing the resolved result or the rejected failure.
      */
-    createCustomerSale = (customerID: number, eventID: number, productID: number, amount: number, timestamp?: string): Promise<any> => {
+    createCustomerSale = (customerID: string, eventID: number, id: number, amount: number, timestamp?: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             if (timestamp === undefined) {
                 timestamp = convertStringToSQLDate((new Date()).toISOString());
@@ -88,12 +88,12 @@ export default class SalesQueries {
                 {
                     id: 1,
                     query: createSale,
-                    parameters: [eventID, productID, amount, timestamp]
+                    parameters: [eventID, id, amount, timestamp]
                 },
                 {
                     id: 2,
                     query,
-                    parameters: [timestamp, customerID, eventID, productID, amount]
+                    parameters: [timestamp, customerID, eventID, id, amount]
                 }
             ]).then(
                 val => {
@@ -130,7 +130,7 @@ export default class SalesQueries {
      * ```
      * @returns - The Promise object containing the resolved result or the rejected failure.
      */
-    createCombinedCustomerSale = (customerID: number, eventID: number, products: { productID: number, amount: number, timestamp?: string }[]): Promise<any> => {
+    createCombinedCustomerSale = (customerID: string, eventID: number, products: { id: number, amount: number, timestamp?: string }[]): Promise<any> => {
         return new Promise((resolve, reject) => {
             const createSale = 'INSERT INTO ak_sales (EventID, ProductID, amount, TimeSold) ' +
                 'VALUES(?,?,?,?);';
@@ -154,17 +154,19 @@ export default class SalesQueries {
             for (const qry of products) {
                 if (qry.timestamp === undefined) {
                     qry.timestamp = convertStringToSQLDate((new Date()).toISOString());
+                } else {
+                    qry.timestamp = convertStringToSQLDate(qry.timestamp);
                 }
                 queries.push(
                     {
                         id: index + 1,
                         query: createSale,
-                        parameters: [eventID, qry.productID, qry.amount, qry.timestamp]
+                        parameters: [eventID, qry.id, qry.amount, qry.timestamp]
                     });
                 queries.push({
                     id: index + 2,
                     query,
-                    parameters: [qry.timestamp, customerID, eventID, qry.productID, qry.amount]
+                    parameters: [qry.timestamp, customerID, eventID, qry.id, qry.amount]
                 }
                 );
                 index += 2;
@@ -177,6 +179,7 @@ export default class SalesQueries {
                     if (err.message.match('Duplicate entry')) {
                         reject(new ItemAlreadyExistsError('Given transaction already exists.'));
                     } else {
+                        console.log(err);
                         reject(err);
                     }
                 }
@@ -194,9 +197,11 @@ export default class SalesQueries {
      */
     getAllSales = (): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name, ' +
+            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice FROM ak_sales s ' +
+                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
+                'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
                 'ON p.ID = s.ProductID ' +
                 'LEFT JOIN (SELECT e.ID, ep.ProductID, CASE WHEN EXISTS(SELECT * ' +
@@ -211,7 +216,16 @@ export default class SalesQueries {
                 'LEFT JOIN ak_products p ' +
                 'ON ep.ProductID = p.ID) ps ' +
                 'ON ps.ID = s.EventID ' +
-                'AND p.ID = ps.ProductID;';
+                'AND p.ID = ps.ProductID ' +
+                'LEFT JOIN ak_usersales us ' +
+                'ON s.TimeSold = us.TimeSold ' +
+                'LEFT JOIN ak_productcategory pc ' +
+                'ON pc.productID = p.ID ' +
+                'LEFT JOIN ak_category ca ' +
+                'ON ca.id = pc.categoryID ' +
+                'LEFT JOIN ak_customers c ' +
+                'ON us.UserID = c.ID ' +
+                'GROUP BY s.TimeSold, s.EventID, s.ProductID, ProductName, UnitPrice, s.amount, TotalPrice, us.UserID, c.Name;';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -234,9 +248,11 @@ export default class SalesQueries {
      */
     getAllSalesEvent = (eventID: number): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name, ' +
+            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice FROM ak_sales s ' +
+                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
+                'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
                 'ON p.ID = s.ProductID ' +
                 'LEFT JOIN (SELECT e.ID, ep.ProductID, CASE WHEN EXISTS(SELECT * ' +
@@ -252,7 +268,16 @@ export default class SalesQueries {
                 'ON ep.ProductID = p.ID) ps ' +
                 'ON ps.ID = s.EventID ' +
                 'AND p.ID = ps.ProductID ' +
-                'WHERE s.EventID = ?';
+                'LEFT JOIN ak_usersales us ' +
+                'ON s.TimeSold = us.TimeSold ' +
+                'LEFT JOIN ak_customers c ' +
+                'ON us.UserID = c.ID ' +
+                'LEFT JOIN ak_productcategory pc ' +
+                'ON pc.productID = p.ID ' +
+                'LEFT JOIN ak_category ca ' +
+                'ON ca.id = pc.categoryID ' +
+                'WHERE s.EventID = ? ' +
+                'GROUP BY s.TimeSold, s.EventID, s.ProductID, ProductName, UnitPrice, s.amount, TotalPrice, us.UserID, c.Name;';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -275,9 +300,11 @@ export default class SalesQueries {
      */
     getAllSalesByUser = (userID: number): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name, ' +
+            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice FROM ak_sales s ' +
+                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
+                'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
                 'ON p.ID = s.ProductID ' +
                 'LEFT JOIN (SELECT e.ID, ep.ProductID, CASE WHEN EXISTS(SELECT * ' +
@@ -294,8 +321,15 @@ export default class SalesQueries {
                 'ON ps.ID = s.EventID ' +
                 'AND p.ID = ps.ProductID ' +
                 'LEFT JOIN ak_usersales us ' +
-                'ON us.TimeSold = s.TimeSold ' +
-                'WHERE us.UserID = ?';
+                'ON s.TimeSold = us.TimeSold ' +
+                'LEFT JOIN ak_customers c ' +
+                'ON us.UserID = c.ID ' +
+                'LEFT JOIN ak_productcategory pc ' +
+                'ON pc.productID = p.ID ' +
+                'LEFT JOIN ak_category ca ' +
+                'ON ca.id = pc.categoryID ' +
+                'WHERE us.UserID = ? ' +
+                'GROUP BY s.TimeSold, s.EventID, s.ProductID, ProductName, UnitPrice, s.amount, TotalPrice, us.UserID, c.Name;';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -319,9 +353,11 @@ export default class SalesQueries {
      */
     getAllSalesByUserAndEvent = (userID: number, eventID: number): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name, ' +
+            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice FROM ak_sales s ' +
+                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
+                'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
                 'ON p.ID = s.ProductID ' +
                 'LEFT JOIN (SELECT e.ID, ep.ProductID, CASE WHEN EXISTS(SELECT * ' +
@@ -338,9 +374,16 @@ export default class SalesQueries {
                 'ON ps.ID = s.EventID ' +
                 'AND p.ID = ps.ProductID ' +
                 'LEFT JOIN ak_usersales us ' +
-                'ON us.TimeSold = s.TimeSold ' +
+                'ON s.TimeSold = us.TimeSold ' +
+                'LEFT JOIN ak_customers c ' +
+                'ON us.UserID = c.ID ' +
+                'LEFT JOIN ak_productcategory pc ' +
+                'ON pc.productID = p.ID ' +
+                'LEFT JOIN ak_category ca ' +
+                'ON ca.id = pc.categoryID ' +
                 'WHERE us.UserID = ? ' +
-                'AMD s.EventID = ?';
+                'AMD s.EventID = ? ' +
+                'GROUP BY s.TimeSold, s.EventID, s.ProductID, ProductName, UnitPrice, s.amount, TotalPrice, us.UserID, c.Name;';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -363,9 +406,11 @@ export default class SalesQueries {
      */
     getSaleByTimeStamp = (timestamp: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name, ' +
+            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice FROM ak_sales s ' +
+                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
+                'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
                 'ON p.ID = s.ProductID ' +
                 'LEFT JOIN (SELECT e.ID, ep.ProductID, CASE WHEN EXISTS(SELECT * ' +
@@ -382,8 +427,15 @@ export default class SalesQueries {
                 'ON ps.ID = s.EventID ' +
                 'AND p.ID = ps.ProductID ' +
                 'LEFT JOIN ak_usersales us ' +
-                'ON us.TimeSold = s.TimeSold ' +
-                'WHERE s.TimeSold = ?';
+                'ON s.TimeSold = us.TimeSold ' +
+                'LEFT JOIN ak_customers c ' +
+                'ON us.UserID = c.ID ' +
+                'LEFT JOIN ak_productcategory pc ' +
+                'ON pc.productID = p.ID ' +
+                'LEFT JOIN ak_category ca ' +
+                'ON ca.id = pc.categoryID ' +
+                'WHERE s.TimeSold = ? ' +
+                'GROUP BY s.TimeSold, s.EventID, s.ProductID, ProductName, UnitPrice, s.amount, TotalPrice, us.UserID, c.Name;';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -407,9 +459,11 @@ export default class SalesQueries {
      */
     getSaleByTimeStampInterval = (lowerBoundTimeStamp: string, upperBoundTimeStamp: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name, ' +
+            const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice FROM ak_sales s ' +
+                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
+                'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
                 'ON p.ID = s.ProductID ' +
                 'LEFT JOIN (SELECT e.ID, ep.ProductID, CASE WHEN EXISTS(SELECT * ' +
@@ -426,8 +480,15 @@ export default class SalesQueries {
                 'ON ps.ID = s.EventID ' +
                 'AND p.ID = ps.ProductID ' +
                 'LEFT JOIN ak_usersales us ' +
-                'ON us.TimeSold = s.TimeSold ' +
-                'WHERE s.TimeSold BETWEEN ? AND ?;';
+                'ON s.TimeSold = us.TimeSold ' +
+                'LEFT JOIN ak_customers c ' +
+                'ON us.UserID = c.ID ' +
+                'LEFT JOIN ak_productcategory pc ' +
+                'ON pc.productID = p.ID ' +
+                'LEFT JOIN ak_category ca ' +
+                'ON ca.id = pc.categoryID ' +
+                'WHERE s.TimeSold BETWEEN ? AND ? ' +
+                'GROUP BY s.TimeSold, s.EventID, s.ProductID, ProductName, UnitPrice, s.amount, TotalPrice, us.UserID, c.Name;';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -542,10 +603,10 @@ export default class SalesQueries {
         });
     }
 
-    updateSalesAndUsers = (timestamp:string, eventID?: number, customerID?:number, productID?: number, amount?: number): Promise<any> => {
+    updateSalesAndUsers = (timestamp:string, eventID?: number, customerID?:string, productID?: number, amount?: number): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryA = 'UPDATE ak_sales s SET s.EventID = COALESCE(?, s.EventID), ' +
-            's.ProductID = COALESCE(?,s.ProductID), s.amount = (?, s.amount) ' +
+            's.ProductID = COALESCE(?,s.ProductID), s.amount = COALESCE(?, s.amount) ' +
             'WHERE s.TimeSold = ?';
             const queryB = 'UPDATE ak_usersales s SET s.UserID = COALESCE(?, s.UserID), ' +
             's.TotalPrice = COALESCE(((SELECT CASE WHEN EXISTS(SELECT * ' +
@@ -609,7 +670,7 @@ export default class SalesQueries {
      */
     deleteSale = (timestamp: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = 'DELETE FROM ak_sales s WHERE s.timestamp = ?;';
+            const query = 'DELETE FROM ak_sales s WHERE s.TimeSold = ?;';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -633,7 +694,7 @@ export default class SalesQueries {
      */
     deleteUserSale = (timestamp: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = 'DELETE FROM ak_usersales s WHERE s.timestamp = ?;';
+            const query = 'DELETE FROM ak_usersales s WHERE s.timesold = ?;';
             this.database.executeTransactions([
                 {
                     id: 1,

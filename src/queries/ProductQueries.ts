@@ -54,7 +54,8 @@ export default class ProductQueries {
     getAllProducts = (): Promise<any> => {
         return new Promise((resolve, reject) => {
             const query = 'SELECT p.id, p.name, p.archived, hk.hotkey, ' +
-            'JSON_ARRAYAGG(c.name) as category FROM ak_products p ' +
+            'JSON_ARRAYAGG(JSON_OBJECT("categoryID",c.id, "categoryName", c.name)) ' +
+            'as category FROM ak_products p  ' +
             'LEFT JOIN ak_hotkeys hk ' +
             'ON p.id = hk.productID ' +
             'LEFT JOIN ak_productcategory pc ' +
@@ -85,7 +86,8 @@ export default class ProductQueries {
     getProductByID = (productID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
             const queryOne = 'SELECT p.id, p.name, p.archived, hk.hotkey, ' +
-            'JSON_ARRAYAGG(c.name) as category FROM ak_products p ' +
+            'JSON_ARRAYAGG(JSON_OBJECT("categoryID",c.id, "categoryName", c.name)) ' +
+            'as category FROM ak_products p  ' +
             'LEFT JOIN ak_hotkeys hk ' +
             'ON p.id = hk.productID ' +
             'LEFT JOIN ak_productcategory pc ' +
