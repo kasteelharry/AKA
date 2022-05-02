@@ -23,13 +23,13 @@ describe('CustomerQueriesTest', () => {
     // ------------------------- Create statements test -------------------------
     //
     test('Create a customer', async () => {
-        const promise = customer.createNewCustomer('testName', convertStringToSQLDate('2000-01-01'), 'NL22INGB00000000');
+        const promise = customer.createNewCustomer('', 'testName', convertStringToSQLDate('2000-01-01'), 'NL22INGB00000000');
         await expect(promise).resolves.toBeGreaterThanOrEqual(1);
     });
 
     test('Create a customer on a closed database', async () => {
         db.setDBState(false);
-        const promise = customer.createNewCustomer('testName', convertStringToSQLDate('2000-01-01'), 'NL22INGB00000000');
+        const promise = customer.createNewCustomer('', 'testName', convertStringToSQLDate('2000-01-01'), 'NL22INGB00000000');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
