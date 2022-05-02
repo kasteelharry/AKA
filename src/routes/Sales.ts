@@ -18,19 +18,39 @@ router.post('/', (req, res, next) => {
     const timestamp = convertStringToSQLDate(req.body.timestamp);
     const sale = new SalesQueries(getDatabase());
     sale.createSale(event, product, amount, timestamp).then(result => {
-        res.status(200).json({ 'sale:': result });
+        res.status(200).json({ sale: result });
     }).catch(err => next(err));
 });
 
+// router.post('/customers', (req, res, next) => {
+//     const customer = parseInt(req.body.customerID, 10);
+//     const event = parseInt(req.body.eventID, 10);
+//     const product = parseInt(req.body.products[0].productID, 10);
+//     const amount = parseInt(req.body.products[0].productID, 10);
+//     const timestamp = convertStringToSQLDate(req.body.timestamp);
+//     const sale = new SalesQueries(getDatabase());
+//     sale.createCustomerSale(customer, event, product, amount, timestamp).then(result => {
+//         res.status(200).json({ sale: result });
+//     }).catch(err => next(err));
+// });
+
 router.post('/customers', (req, res, next) => {
-    const customer = parseInt(req.body.customerID, 10);
+    const customer = req.body.customerID;
     const event = parseInt(req.body.eventID, 10);
-    const product = parseInt(req.body.productID, 10);
-    const amount = parseInt(req.body.amount, 10);
-    const timestamp = convertStringToSQLDate(req.body.timestamp);
+    const sales:{ id: number, amount: number, timestamp: string}[] = req.body.products;
     const sale = new SalesQueries(getDatabase());
-    sale.createCustomerSale(customer, event, product, amount, timestamp).then(result => {
-        res.status(200).json({ 'sale:': result });
+    sale.createCombinedCustomerSale(customer, event, sales).then(result => {
+        const values:any[] = []
+        const promises: any[] = [];
+        sales.forEach(async (entry) => {
+            console.log(entry);
+            promises.push(sale.getSaleByTimeStamp(entry.timestamp).then(result => {
+                values.push(result[0]);
+            }))
+        });
+        Promise.all(promises).then(() => {
+            res.status(200).json({ result: values })
+        });
     }).catch(err => next(err));
 });
 
@@ -40,7 +60,7 @@ router.post('/customers', (req, res, next) => {
 router.get('/', (req, res, next) => {
     const sale = new SalesQueries(getDatabase());
     sale.getAllSales().then(result => {
-        res.status(200).json({ 'sale:': result });
+        res.status(200).json({ sale: result });
     }).catch(err => next(err));
 });
 
@@ -48,7 +68,7 @@ router.get('/events/:eventID', (req, res, next) => {
     const event = parseInt(req.params.eventID, 10);
     const sale = new SalesQueries(getDatabase());
     sale.getAllSalesEvent(event).then(result => {
-        res.status(200).json({ 'sale:': result });
+        res.status(200).json({ sale: result });
     }).catch(err => next(err));
 });
 
@@ -56,7 +76,7 @@ router.get('/customers/:customerID', (req, res, next) => {
     const customer = parseInt(req.params.customerID, 10);
     const sale = new SalesQueries(getDatabase());
     sale.getAllSalesByUser(customer).then(result => {
-        res.status(200).json({ 'sale:': result });
+        res.status(200).json({ sale: result });
     }).catch(err => next(err));
 });
 
@@ -65,7 +85,7 @@ router.get('/customers/:customerID/:eventID', (req, res, next) => {
     const event = parseInt(req.params.eventID, 10);
     const sale = new SalesQueries(getDatabase());
     sale.getAllSalesByUserAndEvent(customer, event).then(result => {
-        res.status(200).json({ 'sale:': result });
+        res.status(200).json({ sale: result });
     }).catch(err => next(err));
 });
 
@@ -76,7 +96,7 @@ router.get('/timestamp/:timestamp', (req, res, next) => {
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.getSaleByTimeStamp(timestamp).then(result => {
-            res.status(200).json({ 'sale:': result });
+            res.status(200).json({ sale: result });
         }).catch(err => next(err));
     }
 });
@@ -89,7 +109,7 @@ router.get('/timestamp/:timestamp/:timestamp2', (req, res, next) => {
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.getSaleByTimeStampInterval(timestamp, timestamp2).then(result => {
-            res.status(200).json({ 'sale:': result });
+            res.status(200).json({ sale: result });
         }).catch(err => next(err));
     }
 });
@@ -103,13 +123,14 @@ router.post('/update', (req, res, next) => {
     const event = parseInt(req.body.eventID, 10);
     const product = parseInt(req.body.productID, 10);
     const amount = parseInt(req.body.amount, 10);
-    const customer = parseInt(req.body.customerID, 10);
+    const customer = req.body.customerID;
+    console.log(timestamp);
     if (timestamp === undefined) {
         next(new GeneralServerError('Please enter a correct date.'));
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.updateSalesAndUsers(timestamp, event, customer, product, amount).then(result => {
-            res.status(200).json({ 'sale:': result });
+            res.status(200).json({ sale: result });
         }).catch(err => next(err));
     }
 });
@@ -123,7 +144,7 @@ router.post('/customers/update', (req, res, next) => {
     } else {
         const sale = new SalesQueries(getDatabase());
         sale.updateUserSale(timestamp, customer, price).then(result => {
-            res.status(200).json({ 'sale:': result });
+            res.status(200).json({ sale: result });
         }).catch(err => next(err));
     }
 });
@@ -138,9 +159,9 @@ router.post('/delete', (req, res, next) => {
         next(new GeneralServerError('Please enter a correct date.'));
     } else {
         const sale = new SalesQueries(getDatabase());
-        sale.deleteUserSale(timestamp).then(result => {
+        sale.deleteSale(timestamp).then(result => {
             if (result.affectedRows === 1) {
-                res.status(200).json({ 'sale:': 'The transaction has been deleted.' });
+                res.status(200).json({ sale: 'The transaction has been deleted.' });
             } else {
                 next(new EmptySQLResultError('No entry found for ' + timestamp));
             }
@@ -156,7 +177,7 @@ router.post('/customers/delete', (req, res, next) => {
         const sale = new SalesQueries(getDatabase());
         sale.deleteUserSale(timestamp).then(result => {
             if (result.affectedRows === 1) {
-                res.status(200).json({ 'sale:': 'The transaction has been deleted.' });
+                res.status(200).json({ sale: 'The transaction has been deleted.' });
             } else {
                 next(new EmptySQLResultError('No entry found for ' + timestamp));
             }
