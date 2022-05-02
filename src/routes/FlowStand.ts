@@ -18,7 +18,7 @@ router.post('/', async (req, res, next) => {
     }
     const flow = new FlowStandQueries(getDatabase());
     flow.createNewFlowStand(eventID, start, end).then(stand => {
-        res.status(200).json({ 'flowstand:': stand });
+        res.status(200).json({ flowstand: stand });
     }).catch(err => next(err));
 });
 //
@@ -28,7 +28,7 @@ router.post('/', async (req, res, next) => {
 router.get('/', async (req, res, next) => {
     const flow = new FlowStandQueries(getDatabase());
     flow.getAllFlowStand().then(stand => {
-        res.status(200).json({ 'flowstand:': stand });
+        res.status(200).json({ flowstand: stand });
     }).catch(err => next(err));
 });
 
@@ -36,7 +36,7 @@ router.get('/:eventID', async (req, res, next) => {
     const eventID = req.params.eventID;
     const flow = new FlowStandQueries(getDatabase());
     flow.getFlowStandByEvent(eventID).then(stand => {
-        res.status(200).json({ 'flowstand:': stand });
+        res.status(200).json({ flowstand: stand });
     }).catch(err => next(err));
 });
 
@@ -53,7 +53,7 @@ router.post('/update', async (req, res, next) => {
     }
     const flow = new FlowStandQueries(getDatabase());
     flow.updateFlowStand(eventID, start, end).then(stand => {
-        res.status(200).json({ 'flowstand:': stand });
+        res.status(200).json({ flowstand: stand });
     }).catch(err => next(err));
 });
 

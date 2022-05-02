@@ -10,7 +10,9 @@ const app = express();
 // const router = express.Router();
 // define a route handler for the default home page
 app.get('/', (req, res, next) => {
-    return res.render('login');
+    console.log(req.sessionID);
+
+    return res.status(200).json({ status: 'active' });
 });
 
 /* POST logout an user */
@@ -19,9 +21,9 @@ app.get('/logout', (req, res, next) => {
     authUser.authenticateUser(req.sessionID).then(val => {
         if (val) {
             const auth = new AuthenticateQueries(getDatabase());
-            auth.logOutSession(req.sessionID).then(value => res.redirect('../')).catch(err => next(err));
+            auth.logOutSession(req.sessionID).then(value => res.status(200).json({ loggedOut: true })).catch(err => next(err));
         } else {
-            return res.render('login');
+            return res.status(201).json({ loggedOut: true })
         }
     });
 });

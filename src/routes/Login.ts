@@ -17,6 +17,7 @@ router.post('/', (req, res, next) => {
     const login = new LoginQueries(getDatabase());
     const authUser = new UserAuthentication(getDatabase());
     const email = req.body.email;
+    console.log(email);
     const session = req.sessionID;
     const password: string = req.body.password;
     if (password === undefined || email === undefined) {
@@ -29,14 +30,21 @@ router.post('/', (req, res, next) => {
             } else {
                 bcrypt.compare(password, hash, (error2, result2) => {
                     if (result2) {
+                        console.log(result2);
                         authUser.registerSession(session, email).then(val => {
                             // TODO change this to redirect to the dashboard.
-                            res.status(200).json({ 'login:': result2 });
+                            res.status(200).json({ login: result2 });
                         }).catch(failure => {
-                            next(failure);
+                            // next(failure);
+                            if (failure.message.includes('No match found')) {
+                                res.status(200).json({ login: result2 });
+                            } else {
+                                next(failure)
+                            }
+                            // res.status(200).json({ login: result2 });
                         });
                     } else {
-                        res.status(401).json({ 'login:': result2 });
+                        res.status(401).json({ login: result2 });
                     }
                 });
             }
@@ -58,7 +66,7 @@ router.post('/register', (req, res, next) => {
                 bcrypt.hash(password, salt, (hashError, result1) => {
                     const hash = result1;
                     login.registerLogin(email, hash, salt).then(result => {
-                        res.status(200).json({ 'registered:': result });
+                        res.status(200).json({ registered: result });
                     }).catch(error => next(error));
                 });
             }).catch(err => next(err));

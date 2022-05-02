@@ -12,13 +12,14 @@ const router = express.Router();
 
 /* POST create new customer */
 router.post('/', async (req, res, next) => {
+    const id = req.body.id;
     const name = req.body.name;
     const bank = req.body.bank;
     const birthDate = req.body.birthday;
     const mySQLDateString = convertStringToSQLDate(birthDate);
     const customer = new CustomerQueries(getDatabase());
-    customer.createNewCustomer(name, mySQLDateString, bank).then(customers => {
-        res.status(200).json({ 'customer:': customers });
+    customer.createNewCustomer(id, name, mySQLDateString, bank).then(customers => {
+        res.status(200).json({ customer: customers });
     }).catch(err => {
         if (err.message.match('Duplicate entry')) {
             next(new ItemAlreadyExistsError('Given bankaccount already exists.'));
@@ -36,7 +37,7 @@ router.post('/', async (req, res, next) => {
 router.get('/', (req, res, next) => {
     const customer = new CustomerQueries(getDatabase());
     customer.getAllCustomers().then(customers => {
-        res.status(200).json({ 'customer:': customers });
+        res.status(200).json({ customer: customers });
     }).catch(err => next(err));
 });
 
@@ -44,7 +45,7 @@ router.get('/', (req, res, next) => {
 router.get('/:customerID', (req, res, next) => {
     const customer = new CustomerQueries(getDatabase());
     customer.getCustomerByID(req.params.customerID).then(customers => {
-        res.status(200).json({ 'customer:': customers });
+        res.status(200).json({ customer: customers });
     }).catch(err => next(err));
 });
 
@@ -62,7 +63,7 @@ router.post('/:customerID', (req, res, next) => {
     params.set('active', req.body.active);
     const customer = new CustomerQueries(getDatabase());
     customer.updateCustomer(req.params.customerID, params).then(customers => {
-        res.status(200).json({ 'customer:': customers });
+        res.status(200).json({ customer: customers });
     }).catch(err => next(err));
 });
 

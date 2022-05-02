@@ -14,12 +14,15 @@ const router = express.Router();
 router.post('/', async (req, res, next) => {
     const name = req.body.name;
     const type = req.body.eventID;
-    const startTime = convertStringToSQLDate(req.body.startTime);
+    let startTime = convertStringToSQLDate(req.body.startTime);
+    if (startTime === undefined) {
+        startTime = convertStringToSQLDate((new Date()).toISOString());
+    }
     const endTime = req.body.endTime;
     const saved = req.body.saved;
     const event = new EventsQueries(getDatabase());
     event.createNewEvent(name, type, startTime, endTime, saved).then(events => {
-        res.status(200).json({ 'event:': events });
+        res.status(200).json({ event: events });
     }).catch(err => next(err));
 });
 
@@ -33,7 +36,7 @@ router.post('/:eventsID/prices', async (req, res, next) => {
     } else {
         const event = new EventsQueries(getDatabase());
         event.setEventPrices(eventsID, productID, price).then(prices => {
-            res.status(200).json({ 'eventTypesPrices:': prices });
+            res.status(200).json({ eventTypesPrices: prices });
         }).catch(err => next(err));
     }
 });
@@ -46,7 +49,7 @@ router.post('/:eventsID/prices', async (req, res, next) => {
 router.get('/', (req, res, next) => {
     const event = new EventsQueries(getDatabase());
     event.getAllEvents().then(events => {
-        res.status(200).json({ 'events:': events });
+        res.status(200).json({ events: events });
     }).catch(err => next(err));
 });
 
@@ -54,7 +57,7 @@ router.get('/', (req, res, next) => {
 router.get('/active', (req, res, next) => {
     const event = new EventsQueries(getDatabase());
     event.getActiveEvent().then(events => {
-        res.status(200).json({ 'events:': events });
+        res.status(200).json({ events: events });
     }).catch(err => next(err));
 });
 
@@ -63,7 +66,7 @@ router.get('/:eventID', (req, res, next) => {
     const eventType = req.params.eventID;
     const event = new EventsQueries(getDatabase());
     event.getEvent(eventType).then(events => {
-        res.status(200).json({ 'events:': events });
+        res.status(200).json({ events: events });
     }).catch(err => next(err));
 });
 
@@ -72,7 +75,7 @@ router.get('/:eventID/prices', (req, res, next) => {
     const eventID = req.params.eventID;
     const event = new EventsQueries(getDatabase());
     event.getEventPricesByEvent(eventID).then(prices => {
-        res.status(200).json({ 'events:': prices });
+        res.status(200).json({ events: prices });
     }).catch(err => next(err));
 });
 
@@ -82,7 +85,7 @@ router.get('/:eventID/:productID/prices', (req, res, next) => {
     const productID = req.params.productID;
     const event = new EventsQueries(getDatabase());
     event.getEventPricesByEventAndProduct(eventID, productID).then(prices => {
-        res.status(200).json({ 'events:': prices });
+        res.status(200).json({ events: prices });
     }).catch(err => next(err));
 });
 
@@ -141,7 +144,7 @@ router.post('/:eventID/delete', (req, res, next) => {
     const event = new EventsQueries(getDatabase());
     event.deleteEvent(eventID).then(result => {
         if (result.affectedRows === 1) {
-            res.status(200).json({ 'customers:': 'The customer has been deleted' });
+            res.status(200).json({ event: 'The event has been deleted' });
         } else {
             next(new EmptySQLResultError('No entry found for ' + eventID));
         }
@@ -155,7 +158,7 @@ router.post('/:eventID/prices/delete', (req, res, next) => {
     const event = new EventsQueries(getDatabase());
     event.deleteEventPrice(eventID, productID).then(result => {
         if (result.affectedRows === 1) {
-            res.status(200).json({ 'customers:': 'The customer has been deleted' });
+            res.status(200).json({ event: 'The event has been deleted' });
         } else {
             next(new EmptySQLResultError('No entry found for ' + eventID));
         }
