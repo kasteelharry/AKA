@@ -48,7 +48,6 @@ const dbSessionOptions = {
 };
 
 const sessionStore = new MySQLStore(dbSessionOptions);
-console.log(sessionStore);
 
 const secretKey: string = process.env.SESSION_SECRET === undefined ? 'THISISABACKUPSESSION' : process.env.SESSION_SECRET;
 app.use(session({
@@ -73,9 +72,6 @@ export type queryType = { id: number, query: string, parameters: (string | numbe
 let database: Database<queryType>;
 
 export default function getDatabase (test? : boolean) {
-    if (!env) {
-        return new MockDatabase();
-    }
     if (database === undefined) {
         database = new MySQLDatabase();
     }
@@ -91,19 +87,25 @@ app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
-app.use(cors())
+app.use(cors({
+    credentials: true,
+    origin: 'http://localhost:3000'
+}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.all('/api/*', (req, res, next) => {
+    if (!env) {
+        return next();
+    }
     const auth = new UserAuthentication(database);
     auth.authenticateUser(req.sessionID).then(val => {
         if (val) {
             next();
         } else {
-            return res.redirect('/');
+            return res.status(403).json({ login: 'please login' });
         }
     });
 });
