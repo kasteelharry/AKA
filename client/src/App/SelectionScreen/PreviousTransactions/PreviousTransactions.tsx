@@ -23,6 +23,7 @@ function PreviousTransactions(props: any) {
     const [showUpdate, setUpdate] = useState(false)
     const [showError, setError] = useState(false)
     const [historyLoaded, setHistoryLoaded] = useState(false);
+    const [previousLoaded, setPreviousLoaded] = useState(false);
     const [transactionToUpdate, setTransactionToUpdate] = useState<any>({})
 
     const { t } = useTranslation();
@@ -46,8 +47,12 @@ function PreviousTransactions(props: any) {
     }
 
     useEffect(() => {
+        console.log('running the effect');
+        
         if (!historyLoaded) {
             let eventID = localStorage.getItem('activeEvent');
+            console.log(eventID);
+            
             if (eventID === undefined || eventID === null) {
                 return;
             }
@@ -99,11 +104,13 @@ function PreviousTransactions(props: any) {
         // retrieveHistoricalData()
         // Obtains the keys of all the items in local storage.
         const keys = Object.keys(localStorage);
-
+        console.log(keys);
         keys.forEach(key => {
             // If the key is not a timestamp, ignore it.
             if (isValidDate(new Date(+key))) {
                 const stored = localStorage.getItem(key);
+                console.log(stored);
+                
                 if (stored !== null) {
                     // Convert the stored object from string to JSON.
                     const transaction = JSON.parse(stored)
@@ -132,9 +139,9 @@ function PreviousTransactions(props: any) {
     // Retrieves the previous transactions such that the table can be built.
     // If called from an useEffect hook, the hook will not fire when the component
     // is navigated to after initial component creation.
-    if (previous.length === 0 && Object.keys(localStorage).length > 1) {
+    if (previous.length === 0 && Object.keys(localStorage).length > 1 && !previousLoaded) {
         setHistory()
-        
+        setPreviousLoaded(true)
     }
 
     if (localStorage.getItem('customer') !== null) {
