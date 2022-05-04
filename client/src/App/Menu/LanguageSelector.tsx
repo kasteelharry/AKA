@@ -17,7 +17,7 @@ const languages = [
 ]
 
 function LanguageSelector() {
-    const icon = (<IconContext.Provider value={{ size:'1.5em', style: {verticalAlign: 'top'} }}>
+    const icon = (<IconContext.Provider value={{ size:'2em', style: {verticalAlign: 'top'} }}>
             <MdPublic />
     </IconContext.Provider>);
 
