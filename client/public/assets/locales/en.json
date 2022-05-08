@@ -39,7 +39,9 @@
   },
   "search": {
       "box": "Search members",
-      "history": "Order history"
+      "history": "Order history",
+      "event": "Save event",
+      "active": "Current event: "
   },
   "previous": {
       "name": "Customer name",
@@ -50,5 +52,13 @@
       "timestamp": "Time of sell",
       "update": "Update",
       "delete": "Delete"
-  }
+  },
+  "event": {
+    "title": "Create an event",
+    "name": "Event Name",
+    "flow": "Flowmeter amount",
+    "select": "Select Event type",
+    "button": "Create Event",
+    "select-active": "Select an active Event"
+}
 }
