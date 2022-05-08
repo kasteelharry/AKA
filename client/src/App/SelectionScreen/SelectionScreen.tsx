@@ -59,10 +59,10 @@ function SelectionScreen(props:any) {
     return (
         <Container className="selectionScreen">
                 <div className={history ? 'selection-container-history' : "selection-container"}>
-                    <SelectionSearchBar query={query} setQuery={setQuery} history={history} setHistory={setHistory} />
+                    <SelectionSearchBar query={query} setQuery={setQuery} history={history} setHistory={setHistory} activeEvent={props.activeEvent}/>
                     {!history && <CustomerSelection customers={customers} query={query} setQuery={setQuery}  />}
                     {history && <HistoryTransactions query={query} setQuery={setQuery} />}
-                    {!history && <PreviousTransactions query='' />}
+                    {!history && <PreviousTransactions query='' activeEvent={props.activeEvent} />}
                     {history}
                     
                 </div>

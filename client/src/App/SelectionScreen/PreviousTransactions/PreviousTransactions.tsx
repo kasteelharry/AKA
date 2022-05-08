@@ -13,7 +13,6 @@ import UpdateTransactionDialog from "./UpdateTransactionDialog";
 import CustomAlert from './CustomAlert';
 import makePostRequest from '../../../utils/PostRequests';
 import makeGetRequest from '../../../utils/GetRequests';
-import sanitize from 'sanitize-filename';
 
 import './PreviousTransactions.scss'
 
@@ -46,21 +45,26 @@ function PreviousTransactions(props: any) {
         }).catch(err => console.log(err));
     }
 
-    useEffect(() => {
-        console.log('running the effect');
-        
+    useEffect(() => {      
         if (!historyLoaded) {
-            let eventID = localStorage.getItem('activeEvent');
-            console.log(eventID);
+            console.log('loading history');
             
-            if (eventID === undefined || eventID === null) {
+            // let eventID = localStorage.getItem('activeEvent');
+            console.log('Passed active event is: ', props.activeEvent);
+            if (props.activeEvent === undefined) {
                 return;
             }
-            eventID = sanitize(eventID)
-            retrieveHistoricalData(parseInt(eventID, 10));
+            // if (props.activeEvent ==eventID === undefined || eventID === null) {
+            //     console.log('no event found');
+                
+            //     return;
+            // }
+            // eventID = sanitize(eventID)
+            // retrieveHistoricalData(parseInt(eventID, 10));
+            retrieveHistoricalData(props.activeEvent)
             setHistoryLoaded(true);
         }
-    }, [historyLoaded])
+    }, [historyLoaded]);
 
     /**
      * Retrieves all historical data from the database for a certain event.
@@ -104,13 +108,10 @@ function PreviousTransactions(props: any) {
         // retrieveHistoricalData()
         // Obtains the keys of all the items in local storage.
         const keys = Object.keys(localStorage);
-        console.log(keys);
         keys.forEach(key => {
             // If the key is not a timestamp, ignore it.
             if (isValidDate(new Date(+key))) {
                 const stored = localStorage.getItem(key);
-                console.log(stored);
-                
                 if (stored !== null) {
                     // Convert the stored object from string to JSON.
                     const transaction = JSON.parse(stored)
@@ -118,8 +119,7 @@ function PreviousTransactions(props: any) {
                     if (previous.indexOf(transaction) === -1) {
                         previous.push(transaction);
                     }
-                }
-
+                } 
             }
         })
         // Sort the array by the latest timestamp first such that the
@@ -160,8 +160,6 @@ function PreviousTransactions(props: any) {
 
     useEffect(() => {
         if (transactionToUpdate.amount === undefined) {
-            console.log(transactionToUpdate);
-            
             localStorage.removeItem(transactionToUpdate.timestamp)
                 const newPrev = previous.filter(transaction => transaction.timestamp !== transactionToUpdate.timestamp);
                 setPrevious(newPrev);
