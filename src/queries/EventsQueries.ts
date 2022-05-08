@@ -461,8 +461,10 @@ export default class EventsQueries {
      */
     saveEvent = (eventID: string, saved: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryOne = 'UPDATE ak_events e SET e.saved = ? WHERE e.id = ?;';
-            const queryTwo = 'UPDATE ak_events e SET e.saved = ? WHERE e.name = ?;';
+            const queryOne = 'UPDATE ak_events e SET e.saved = ?, ' +
+            'e.EndTime = CURRENT_TIMESTAMP WHERE e.id = ?;';
+            const queryTwo = 'UPDATE ak_events e SET e.saved = ?, ' +
+            'e.EndTime = CURRENT_TIMESTAMP WHERE e.name = ?;';
             const queryThree = 'SELECT * FROM ak_events e WHERE e.id = ?;';
             const queryFour = 'SELECT * FROM ak_events e WHERE e.name = ?';
             let queryToPerform = '';

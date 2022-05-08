@@ -109,14 +109,15 @@ router.post('/:eventID', (req, res, next) => {
     }).catch(err => next(err));
 });
 
-/* POST to save an event */
-router.post('/:eventID/save', (req, res, next) => {
-    const eventID = req.params.eventID;
+/* PUT to save an event */
+router.put('/save', (req, res, next) => {
+    const eventID = req.body.eventID;
     const saved = req.body.saved;
     const event = new EventsQueries(getDatabase());
     event.saveEvent(eventID, saved).then(result => {
         res.status(200).json(result);
-    }).catch(err => next(err));
+    }).catch(err =>
+        next(err));
 });
 
 /* POST to update the price for a product of an event  */
