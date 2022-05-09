@@ -37,7 +37,7 @@ function PreviousTransactions(props: any) {
         const body = {
             timestamp,
         };
-        makePostRequest('http://localhost:8080/api/sales/delete', body)
+        makePostRequest('/api/sales/delete', body)
         .then(data => {
                 localStorage.removeItem(timestamp);
                 const newPrev = previous.filter(transaction => transaction.timestamp !== timestamp);
@@ -71,7 +71,7 @@ function PreviousTransactions(props: any) {
      * @param eventID the id of the event to retrieve data from.
      */
     function retrieveHistoricalData(eventID:number) {
-        makeGetRequest('http://localhost:8080/api/sales/events/' + eventID)
+        makeGetRequest('/api/sales/events/' + eventID)
         .then(result => {
             const resultArray: any[] = result.sale;
             resultArray.forEach(sale => {
@@ -204,7 +204,7 @@ function PreviousTransactions(props: any) {
                             .map((transaction: any) =>
                                 <TableRow
                                     key={transaction.timestamp}
-                                    sx={{ fontSize:200, '&:last-child td, &:last-child th': { border: 0 } }}
+                                    sx={{ fontSize:20, '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell sx={{fontSize:20}} component="th" scope="row">
                                         {transaction.customerName}

@@ -42,7 +42,7 @@ function SelectionScreen(props:any) {
 
     
     useEffect(() => {
-        makeGetRequest("http://localhost:8080/api/customers")
+        makeGetRequest("/api/customers")
     .then(result => {
         if (result.customer === undefined || result.customer.length === 0) {
             return;

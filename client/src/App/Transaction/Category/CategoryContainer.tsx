@@ -26,7 +26,7 @@ function CategoryContainer(props: any) {
         if (catLoaded) {
             return;
         }
-        makeGetRequest('http://localhost:8080/api/category')
+        makeGetRequest('/api/category')
         .then(res => {
             setCategories(res.categories);
             setCatLoaded(true);

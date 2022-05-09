@@ -52,7 +52,7 @@ function UpdateTransactionDialog(props: any) {
                         amount: amount,
                         customerID: props.transaction.customerID
                     }
-        makePostRequest('http://localhost:8080/api/sales/update', body)
+        makePostRequest('/api/sales/update', body)
         .then(result => {
             props.transaction.amount = amount;
                 const newTransaction = {...props.transaction};

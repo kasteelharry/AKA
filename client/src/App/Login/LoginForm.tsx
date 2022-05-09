@@ -38,7 +38,7 @@ function LoginForm(props: any) {
     function handleSubmit(event: SyntheticEvent): void {
         event.preventDefault();
 
-        makePostRequest('http://localhost:8080/login', { email, password }).then(result => {
+        makePostRequest('/login', { email, password }).then(result => {
             props.setLogin(true);
             localStorage.setItem('loggedIn', 'true');
             navigate('/transaction');

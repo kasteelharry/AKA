@@ -26,7 +26,7 @@ function OverviewContainer(props: any) {
      */
     function sendTransaction(selected: any[], addNewProductsHook:Function) {
 
-        makePostRequest('http://localhost:8080/api/sales/customers', {
+        makePostRequest('/api/sales/customers', {
             customerID: props.customerID,
             eventID: props.activeEvent,
             products: selected,

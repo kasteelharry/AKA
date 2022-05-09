@@ -26,7 +26,7 @@ function ProductContainer(props: any) {
         if (prodLoaded) {
             return;
         }
-        makeGetRequest("http://localhost:8080/api/products").then(result => {
+        makeGetRequest("/api/products").then(result => {
             setProdLoaded(true);
             setProducts(result.products);
         }).catch(error => {

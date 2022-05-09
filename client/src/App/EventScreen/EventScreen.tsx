@@ -34,7 +34,7 @@ function EventScreen(props: any) {
     useEffect(() => {
         if (!requestLoaded) {
             setLoaded(true);
-            makeGetRequest('http://localhost:8080/api/events/active').then(result => {
+            makeGetRequest('/api/events/active').then(result => {
                 if (result.events !== undefined && result.events.length > 0) {
                     console.log(result.events);
                     
@@ -43,7 +43,7 @@ function EventScreen(props: any) {
                     return;
                 }
             });
-            makeGetRequest('http://localhost:8080/api/eventtypes').then(result => {
+            makeGetRequest('/api/eventtypes').then(result => {
                 setEventType(result.eventTypes);
             })
         }
@@ -60,7 +60,7 @@ function EventScreen(props: any) {
             eventID: selectedEventType,
             startTime: undefined,
         }
-        makePostRequest('http://localhost:8080/api/events', body).then(result => {
+        makePostRequest('/api/events', body).then(result => {
             console.log(result.event);
             
             props.setActiveEvent(parseInt(result.event));

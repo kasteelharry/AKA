@@ -15,7 +15,7 @@ function LoginPage(props: any) {
             return;
         }
         setCookie(true);
-        fetch('http://localhost:8080/', {credentials:'include'}).then(res => res.json()).catch(err => console.log(err));
+        fetch('/', {credentials:'include'}).then(res => res.json()).catch(err => console.log(err));
     }, [gotCookie, setCookie]);
 
     if (props.loggedIn) {

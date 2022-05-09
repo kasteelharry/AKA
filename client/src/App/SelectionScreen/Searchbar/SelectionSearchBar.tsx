@@ -34,7 +34,7 @@ function SelectionSearchBar(props: any) {
         if (eventNameLoaded) {
             return;
         } else {
-            makeGetRequest(('http://localhost:8080/api/events/' + props.activeEvent))
+            makeGetRequest(('/api/events/' + props.activeEvent))
                 .then(result => {
                     setEventName(result.events[0].Name);
                     setLoaded(true);
@@ -68,7 +68,7 @@ function SelectionSearchBar(props: any) {
             eventID: props.activeEvent,
             saved: 1
         }
-        makePutRequest('http://localhost:8080/api/events/save', body)
+        makePutRequest('/api/events/save', body)
             .then(result => {
                 // Delete the local storage saved data
                 clearHistory();
@@ -89,6 +89,7 @@ function SelectionSearchBar(props: any) {
             <TextField
                 id="outlined-basic"
                 label={t('search.box')}
+                size="medium"
                 variant="outlined"
                 onChange={
                     event => props.setQuery(event.target.value)

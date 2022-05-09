@@ -53,7 +53,7 @@ function MenuBar(props:any) {
         <Container maxWidth={false}>
           <Toolbar disableGutters>
             <Typography
-              variant="h5"
+              variant="h6"
               noWrap
               component="div"
               sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
@@ -61,9 +61,9 @@ function MenuBar(props:any) {
               {t('app_title')}
             </Typography>
   
-            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+            <Box sx={{ flexGrow: 0, display: { xs: 'flex', md: 'none' } }}>
               <IconButton
-                size="large"
+                size="medium"
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
@@ -98,7 +98,7 @@ function MenuBar(props:any) {
               </Menu>
             </Box>
             <Typography
-              variant="h5"
+              variant="h6"
               noWrap
               component="div"
               sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
@@ -113,7 +113,7 @@ function MenuBar(props:any) {
                       handleCloseNavMenu();
                       navigate(pagesPath[index]);
                       }}
-                  sx={{ fontSize:18, my: 2, color: 'white', display: 'block' }}
+                  sx={{ fontSize:15, my: 2, color: 'white', display: 'block' }}
                 >
                   {page}
                 </Button>
@@ -125,11 +125,11 @@ function MenuBar(props:any) {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar sx={{ fontSize:25, height: '60px', width: '60px' }}>SB</Avatar>
+                  <Avatar sx={{ fontSize:22.5, height: '50px', width: '50px' }}>SB</Avatar>
                 </IconButton>
               </Tooltip>
               <Menu
-                sx={{  mt: '45px' }}
+                sx={{  mt: '40px' }}
                 id="menu-appbar"
                 anchorEl={anchorElUser}
                 anchorOrigin={{

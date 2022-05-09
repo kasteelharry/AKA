@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react';
+import {  Routes, Route, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet'
 
@@ -38,7 +38,7 @@ function AppContainer() {
             firstUpdate.current = true;
         } else {
             if (!loggedIn) {
-                fetch('http://localhost:8080/logout', { credentials: 'include' })
+                fetch('/logout', { credentials: 'include' })
                     .then(response => response.json())
                     .then(data => console.log(data));
             }
@@ -82,7 +82,7 @@ function AppContainer() {
      */
     const SetLogout = () => {
         setLoginHook(false);
-        fetch('http://localhost:8080/logout', { credentials: 'include' })
+        fetch('/logout', { credentials: 'include' })
             .then(response => response.json())
             .then(data => console.log(data));
         localStorage.setItem('loggedIn', 'false');
@@ -148,7 +148,7 @@ function AppContainer() {
 export const SetLogout = () => {
     const navigate = useNavigate();
     localStorage.clear();
-    fetch('http://localhost:8080/logout', { credentials: 'include' })
+    fetch('/logout', { credentials: 'include' })
         .then(response => response.json())
         .then(data => console.log(data));
 

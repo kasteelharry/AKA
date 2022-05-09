@@ -94,7 +94,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 app.all('/api/*', (req, res, next) => {
     if (!env) {
@@ -111,8 +111,12 @@ app.all('/api/*', (req, res, next) => {
 });
 
 app.use('/', indexRouter);
+
 app.use('/login', loginRouter);
 app.use('/api', apiRouter);
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'))
+})
 // catch 404 and forward to error handler
 app.use((req: Request, res: Response, next) => {
     next(createError(404));
