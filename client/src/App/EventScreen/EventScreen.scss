@@ -61,8 +61,8 @@ margin-right: 1vw;
 
 .modal-header-div {
     position: relative;
-    // display: inline-block;
-    float: left;
+    display: inline-block;
+    width: 85%;
 
 }
 
@@ -75,15 +75,10 @@ margin-right: 1vw;
     :hover {
         cursor: pointer;
     }
-    position: absolute;
-    // display: inline-block;
+    position: relative;
+    display: inline-block;
     margin-top: -1vh;
-    top: auto;
-    left: 80%;
-    right:85.5%;
-    height: 3.5vh;
-    width: 3.5vh;
-    float:left;
+    width: 15%;
 }
 
 .Event-Select-Button {

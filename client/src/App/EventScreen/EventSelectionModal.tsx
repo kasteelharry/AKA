@@ -51,14 +51,14 @@ function EventSelectionModal(props: any) {
             contentLabel="Select Event Modal"
             ariaHideApp={false}>
             <Box className="modal-header-div">
-                {t('event.select-active')}
+                {/* {t('event.select-active')} */}
             </Box>
             <div className="modal-close-div" onClick={closeModal} >
                 <GrClose className='modal-close' />
             </div>
             <Box className="modal-body">
             <FormControl required>
-                    <FormLabel sx={{fontSize:25}} id="radio-buttons-events">{t("event.selectActive")}</FormLabel>
+                    <FormLabel sx={{fontSize:25}} id="radio-buttons-events">{t("event.select-active")}</FormLabel>
                     <RadioGroup
                     className="Event-Input-Type"
                     aria-labelledby="demo-radio-buttons-group-label"
