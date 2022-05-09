@@ -199,7 +199,7 @@ export default class SalesQueries {
         return new Promise((resolve, reject) => {
             const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'us.TotalPrice, us.UserID, c.Name, ' +
                 'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
                 'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
@@ -250,7 +250,7 @@ export default class SalesQueries {
         return new Promise((resolve, reject) => {
             const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'us.TotalPrice, us.UserID, c.Name, ' +
                 'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
                 'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
@@ -302,7 +302,7 @@ export default class SalesQueries {
         return new Promise((resolve, reject) => {
             const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'us.TotalPrice, us.UserID, c.Name, ' +
                 'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
                 'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
@@ -355,7 +355,7 @@ export default class SalesQueries {
         return new Promise((resolve, reject) => {
             const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'us.TotalPrice, us.UserID, c.Name, ' +
                 'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
                 'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
@@ -408,7 +408,7 @@ export default class SalesQueries {
         return new Promise((resolve, reject) => {
             const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'us.TotalPrice, us.UserID, c.Name, ' +
                 'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
                 'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
@@ -461,7 +461,7 @@ export default class SalesQueries {
         return new Promise((resolve, reject) => {
             const query = 'SELECT s.TimeSold, s.EventID, s.ProductID, p.Name as ProductName, ' +
                 'ps.price as UnitPrice, s.amount, ' +
-                '(ps.price * amount) as TotalPrice, us.UserID, c.Name, ' +
+                'us.TotalPrice, us.UserID, c.Name, ' +
                 'JSON_ARRAYAGG(JSON_OBJECT("categoryID",ca.id, "categoryName", ca.name)) ' +
                 'as category FROM ak_sales s ' +
                 'LEFT JOIN ak_products p ' +
