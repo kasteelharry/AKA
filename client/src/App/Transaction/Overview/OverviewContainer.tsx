@@ -42,13 +42,12 @@ function OverviewContainer(props: any) {
                     console.log(response);
                                         
                     product.unitPrice = response[0].UnitPrice;
-                    
+                    product.totalPrice = product.unitPrice * product.amount
                     product.customerID = props.customerID;
                     product.customerName = props.customerName;
                     // product.eventID = props.eventID;
                     product.eventID = props.activeEvent;
                     console.log(product);
-                    
                     localStorage.setItem(product.timestamp, JSON.stringify(product))
                     product.amount = 0;
                     product.customerID = undefined;

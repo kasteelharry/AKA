@@ -81,7 +81,7 @@ function PreviousTransactions(props: any) {
                         timestamp: ((new Date(sale.TimeSold)).getTime()),
                         eventID: sale.EventID,
                         customerName: sale.Name,
-                        unitPrice: sale.UnitPrice,
+                        totalPrice: sale.TotalPrice,
                         amount: sale.amount,
                         id: sale.productID,
                         category: sale.category,
@@ -213,7 +213,7 @@ function PreviousTransactions(props: any) {
                                     <TableCell sx={{fontSize:20}} align="right"> {transaction.category[0].categoryName}</TableCell>
                                     <TableCell sx={{fontSize:20}} align="right">{transaction.amount}</TableCell>
                                     <TableCell sx={{fontSize:20}} align="right">{
-                                        ((transaction.unitPrice * transaction.amount) / 100).toLocaleString("nl-nl", { style: "currency", currency: "EUR" })
+                                        ((transaction.totalPrice) / 100).toLocaleString("nl-nl", { style: "currency", currency: "EUR" })
                                     }</TableCell>
                                     <TableCell sx={{fontSize:20}} align="right">{
                                         (new Date(transaction.timestamp)).toLocaleString("nl-nl")
