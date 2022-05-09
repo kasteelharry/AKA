@@ -29,7 +29,8 @@
   "transaction": {
       "confirm": "Confirm",
       "update": "Update",
-      "delete": "Delete"
+      "delete": "Delete",
+      "cancel": "Cancel"
   },
   "menu": {
     "language": {
@@ -49,7 +50,7 @@
       "category": "Product category",
       "amount": "Amount",
       "price": "Total price",
-      "timestamp": "Time of sell",
+      "timestamp": "Time of sale",
       "update": "Update",
       "delete": "Delete"
   },

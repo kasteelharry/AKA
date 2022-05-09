@@ -29,7 +29,8 @@
     "transaction": {
         "confirm": "Bevestigen",
         "update": "Update",
-        "delete": "Verwijder"
+        "delete": "Verwijder",
+        "cancel": "Cancel"
     },
     "menu": {
         "language": {
