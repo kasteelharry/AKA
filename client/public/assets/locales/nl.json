@@ -52,7 +52,8 @@
         "price": "Totale prijs",
         "timestamp": "Tijd van verkoop",
         "update": "Update",
-        "delete": "Verwijderen"
+        "delete": "Verwijderen",
+        "update-product": "Update hoeveelheid van het product"
     },
     "event": {
         "title": "Event aanmaken",

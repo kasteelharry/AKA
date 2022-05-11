@@ -95,7 +95,7 @@ function UpdateTransactionDialog(props: any) {
         >
             <div>
                 <Box className="modal-header-div">
-                    {t('previous.updateProduct')}
+                    {t('previous.update-product')}
                 </Box>
                 <div className="modal-close-div" onClick={closeModal} >
                     <GrClose className='modal-close' />
@@ -112,6 +112,7 @@ function UpdateTransactionDialog(props: any) {
                         variant="filled"
                         InputProps={{ style: { fontSize: 25 } }}
                         defaultValue={amount}
+                        autoFocus
                         required
                         onChange={(e) => {
                             const newAmount = parseInt(e.target.value, 10);

@@ -52,7 +52,8 @@
       "price": "Total price",
       "timestamp": "Time of sale",
       "update": "Update",
-      "delete": "Delete"
+      "delete": "Delete",
+      "update-product": "Please update product amount"
   },
   "event": {
     "title": "Create an event",
