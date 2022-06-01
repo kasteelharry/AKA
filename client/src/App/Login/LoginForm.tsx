@@ -38,7 +38,7 @@ function LoginForm(props: any) {
     function handleSubmit(event: SyntheticEvent): void {
         event.preventDefault();
 
-        makePostRequest('/login', { email, password }).then(result => {
+        makePostRequest('/api/login', { email, password }).then(result => {
             props.setLogin(true);
             localStorage.setItem('loggedIn', 'true');
             navigate('/transaction');
@@ -58,14 +58,14 @@ function LoginForm(props: any) {
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>{t('login.email.title')}</Form.Label>
                     <Form.Control type="email" placeholder={t('login.email.placeholder')} autoFocus onChange={
-                        (e) => setEmail(e.target.value)
+                        (e: { target: { value: React.SetStateAction<string>; }; }) => setEmail(e.target.value)
                     } />
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="formBasicPassword">
                     <Form.Label>{t('login.password.title')}</Form.Label>
                     <Form.Control type="password" placeholder={t('login.password.placeholder')} onChange={
-                        (e) => setPassword(e.target.value)
+                        (e: { target: { value: React.SetStateAction<string>; }; }) => setPassword(e.target.value)
                     } />
                     <Link className="small" to="/login/forgotten">{t('login.forgot_password')}</Link>
                 </Form.Group>

@@ -7,6 +7,7 @@ import hotkeyRouter from './HotKeys';
 import flowstandRouter from './FlowStand';
 import categoryRouter from './Category';
 import salesRouter from './Sales';
+import loginRouter from '@dir/routes/Login';
 const router = express.Router();
 
 // Sets the routes of the api different type of endpoints.
@@ -18,4 +19,5 @@ router.use('/hotkeys', hotkeyRouter);
 router.use('/flowstand', flowstandRouter);
 router.use('/category', categoryRouter);
 router.use('/sales', salesRouter);
+router.use('/login', loginRouter);
 export default router;
