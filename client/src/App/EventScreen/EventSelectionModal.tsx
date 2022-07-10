@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { GrClose } from 'react-icons/gr'
 import { Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
+// Custom modal style
 const customStyles = {
     content: {
         top: '50%',
@@ -32,6 +34,7 @@ function EventSelectionModal(props: any) {
         
     }, [selectedEvent])
 
+    // Run when the modal closes.
     function closeModal() {
         setIsOpen(false);
     }
@@ -90,7 +93,7 @@ function EventSelectionModal(props: any) {
                     navigate('/selection')
                 }}
                 >
-                    {t("event.button")}
+                    {t("event.choose")}
                     </Button>
         </Modal>
     );

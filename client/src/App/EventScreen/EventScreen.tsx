@@ -34,7 +34,9 @@ function EventScreen(props: any) {
     useEffect(() => {
         if (!requestLoaded) {
             setLoaded(true);
+            // Get the active events from the back-end.
             makeGetRequest('/api/events/active').then(result => {
+                // If there are many active events then load the selection
                 if (result.events !== undefined && result.events.length > 0) {
                     console.log(result.events);
                     
@@ -50,27 +52,45 @@ function EventScreen(props: any) {
 
     }, [requestLoaded])
 
-    if (props.activeEvent > -1) {
-        // navigate('/selection')
-    }
-
+    /**
+     * Submits the event to the back-end and starting it in the database.
+     */
     function submitEvent() {
         const body = {
             name: eventName,
             eventID: selectedEventType,
             startTime: undefined,
         }
+        let eventID = 0;
+        // Make the request
         makePostRequest('/api/events', body).then(result => {
             console.log(result.event);
-            
-            props.setActiveEvent(parseInt(result.event));
+            eventID = parseInt(result.event);
+            props.setActiveEvent(eventID);
             localStorage.setItem('activeEvent', result.event);
             localStorage.setItem('flowStand', flowMeter.toString());
-
+            const flowBody = {
+                eventID:result.event,
+                start:flowMeter,
+                end:flowMeter
+            }
+            // After the event has been created, save the starting flow amount
+            makePostRequest('api/flowstand', flowBody)
+            .then(res => {
+                console.log(res);
+                navigate('/selection')
+                // TODO result handler
+            })
+            .catch(err => {
+                console.log(err);
+                
+                // TODO error handler
+            });
         //TODO put in an error handler. 
         }).catch(err => console.log(err)
         );
-        navigate('/selection')
+        
+        
     }
 
     return (
@@ -105,10 +125,11 @@ function EventScreen(props: any) {
                     InputLabelProps={{ style: { fontSize: 25 } }}
                 required
                     onChange={e => {
-
+                        // Convert the string input into a float
                         const newAmount = (+e.target.value).toFixed(1);
+                        // Convert the float into an integer and then to a decimal string.
                         const rounded = parseInt((parseFloat(newAmount) * 10).toFixed(1));
-                        
+                        // Save the amount
                         setFlowMeter(rounded);
                     }}
                     label={t("event.flow")}
