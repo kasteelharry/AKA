@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsSearch } from 'react-icons/bs';
 import Button from '@mui/material/Button';
@@ -6,12 +6,9 @@ import TextField from '@mui/material/TextField';
 
 
 import './SelectionSearchBar.scss';
-import { clearHistory } from '../../AppContainer';
-import { useNavigate } from 'react-router-dom';
-import makePutRequest from '../../../utils/PutRequest';
 import { Typography } from '@mui/material';
 import makeGetRequest from '../../../utils/GetRequests';
-import sanitize from 'sanitize-filename';
+import SaveEvent from './SaveEvent';
 
 
 /**
@@ -21,27 +18,38 @@ import sanitize from 'sanitize-filename';
  */
 function SelectionSearchBar(props: any) {
 
-    const navigate = useNavigate();
     const { t } = useTranslation();
     // textInput must be declared here so the ref can refer to it
     const textInput = useRef<HTMLInputElement>(null);
     const [eventName, setEventName] = useState('');
     const [eventNameLoaded, setLoaded] = useState(false);
+    const [saveModal, setSaveModal] = useState(false);
 
     useState(() => {
-        console.log(props.activeEvent);
-        
+        // Only run this once
         if (eventNameLoaded) {
             return;
         } else {
+            // Get the name of the event from the database.
             makeGetRequest(('/api/events/' + props.activeEvent))
                 .then(result => {
                     setEventName(result.events[0].Name);
+                    // Set the hook to ensure the request is just run once.
                     setLoaded(true);
                 })
                 .catch(err => console.log(err));
         }
     })
+
+    // Change the focus back to the search bar if the modal closes again.
+    useEffect(() => {
+        if (!saveModal) {
+            // Ensure that the text input does indeed exits
+            if (textInput.current !== null) {
+                textInput.current.focus();
+            }
+        }
+    }, [saveModal])
 
     /**
      * Ensures that the focus is returned to the input field.
@@ -51,35 +59,6 @@ function SelectionSearchBar(props: any) {
             textInput.current.focus();
         }
         props.setHistory(!props.history)
-    }
-
-    /**
-     * Saves the event in the database and redirects the user to the event selection screen.
-     */
-    function saveEvent() {
-        // Request flowmeter end amount
-        // TODO build dialog
-
-        // Save flow amount
-        // TODO after dialog has been build
-
-        // Save the event and make it inactive
-        const body = {
-            eventID: props.activeEvent,
-            saved: 1
-        }
-        makePutRequest('/api/events/save', body)
-            .then(result => {
-                // Delete the local storage saved data
-                clearHistory();
-                localStorage.removeItem('activeEvent');
-
-                // Redirect to event selection screen
-                navigate('/event')
-            }).catch(err => console.log(err)
-            )
-
-
     }
 
     return (
@@ -117,9 +96,10 @@ function SelectionSearchBar(props: any) {
                 disabled={false}
                 type={'button'}
                 className='saveEvent'
-                onClick={() => saveEvent()} >
+                onClick={() => setSaveModal(true)} >
                 {t('search.event')}
             </Button>
+            {saveModal && <SaveEvent saveModal={() => setSaveModal(false)} eventName={eventName} setEventName={setEventName} eventID={props.activeEvent}/>}
         </div>
 
     )
