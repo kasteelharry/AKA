@@ -81,7 +81,7 @@ export default class FlowStandQueries {
         return new Promise((resolve, reject) => {
             const queryA = 'SELECT f.EventID, e.name, f.StartCount, f.EndCount FROM ak_flowstand f ' +
                 'LEFT JOIN ak_events e ' +
-                'ON f.EventID = e.id' +
+                'ON f.EventID = e.id ' +
                 'WHERE f.EventID = ?';
             const queryB = 'SELECT f.EventID, e.name, f.StartCount, f.EndCount FROM ak_flowstand f ' +
                 'LEFT JOIN ak_events e ' +
@@ -125,18 +125,18 @@ export default class FlowStandQueries {
      */
     updateFlowStand = (eventID: string, start?: number, end?: number): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryA = "UPDATE ak_flowstand f SET '" +
+            const queryA = 'UPDATE ak_flowstand f SET ' +
                 'f.StartCount = COALESCE(?, f.StartCount), ' +
                 'f.EndCount = COALESCE(?, f.EndCount) ' +
                 'WHERE f.EventID = ?;';
-            const queryB = "UPDATE ak_flowstand f SET '" +
+            const queryB = 'UPDATE ak_flowstand f SET ' +
                 'f.StartCount = COALESCE(?, f.StartCount), ' +
                 'f.EndCount = COALESCE(?, f.EndCount) ' +
                 'WHERE f.EventID =  ' +
                 '(SELECT e.id FROM ak_events e WHERE e.name = ?);';
             const queryC = 'SELECT f.EventID, e.name, f.StartCount, f.EndCount FROM ak_flowstand f ' +
                 'LEFT JOIN ak_events e ' +
-                'ON f.EventID = e.id' +
+                'ON f.EventID = e.id ' +
                 'WHERE f.EventID = ?';
             const queryD = 'SELECT f.EventID, e.name, f.StartCount, f.EndCount FROM ak_flowstand f ' +
                 'LEFT JOIN ak_events e ' +
