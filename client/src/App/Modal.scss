@@ -1,0 +1,38 @@
+.modal {
+    left: '50%';
+    right: 'auto';
+    bottom: 'auto';
+    margin-right: '-50%';
+    transform: 'translate(-50%, -50%)';
+    z-index: 1000;
+}
+
+.modal-close-div {
+    position: relative;
+    padding-bottom: 2vh;
+    :hover {
+        cursor: pointer;
+    }
+}
+
+.modal-header-div {
+    position: relative;
+    display: inline-block;
+    width: 85%;
+
+}
+
+.modal-body {
+    position: relative;
+    margin-top: 0vh;
+}
+
+.modal-close {
+    :hover {
+        cursor: pointer;
+    }
+    position: relative;
+    display: inline-block;
+    margin-top: -1vh;
+    width: 15%;
+}
