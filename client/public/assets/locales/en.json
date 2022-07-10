@@ -59,8 +59,11 @@
     "title": "Create an event",
     "name": "Event Name",
     "flow": "Flowmeter amount",
+    "flow-old": "Start Flowmeter amount",
     "select": "Select Event type",
     "button": "Create Event",
-    "select-active": "Select an active Event"
+    "select-active": "Select an active Event",
+    "save": "Save this event",
+    "choose": "Select an active event"
 }
 }

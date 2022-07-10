@@ -59,8 +59,11 @@
         "title": "Event aanmaken",
         "name": "Event Naam",
         "flow": "Flowmeter stand",
+        "flow-old": "Start Flowmeter stand",
         "select": "Selecteer Event soort",
         "button": "Creëer Event",
-        "select-active": "Selecteer lopend event"
+        "select-active": "Selecteer lopend event",
+        "save": "Event opslaan",
+        "choose": "Kies een actief event"
     }
 }
