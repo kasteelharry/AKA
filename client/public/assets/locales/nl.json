@@ -1,0 +1,69 @@
+{
+    "login": {
+        "email": {
+            "title": "Emailadres",
+            "placeholder": "Vul hier je email in"
+        },
+        "submit": "Inloggen",
+        "password": {
+            "placeholder": "Vul hier je wachtwoord in",
+            "title": "Wachtwoord"
+        },
+        "title": "Welkom bij de $t(app_title)",
+        "forgot_password": "Wachtwoord vergeten?"
+    },
+    "app_title": "AKA V3.0",
+    "nav": {
+        "login": "Log in",
+        "register": "Registreren",
+        "transaction": "Transacties",
+        "dashboard": "Dashboard",
+        "statistics": "Statistieken"
+    },
+    "user": {
+        "profile": "Profile",
+        "account": "Account",
+        "dashboard": "Dashboard",
+        "logout": "Uitloggen"
+    },
+    "transaction": {
+        "confirm": "Bevestigen",
+        "update": "Update",
+        "delete": "Verwijder",
+        "cancel": "Cancel"
+    },
+    "menu": {
+        "language": {
+            "en": "Engels",
+            "nl": "Nederlands"
+        }
+    },
+    "search": {
+        "box": "Zoek leden",
+        "history": "Bestel geschiedenis",
+        "event": "Event opslaan",
+        "active": "Huidig Event"
+    },
+    "previous": {
+        "name": "Naam kroegbezoeker",
+        "product": "Product naam",
+        "category": "Product categorie",
+        "amount": "Hoeveelheid",
+        "price": "Totale prijs",
+        "timestamp": "Tijd van verkoop",
+        "update": "Update",
+        "delete": "Verwijderen",
+        "update-product": "Update hoeveelheid van het product"
+    },
+    "event": {
+        "title": "Event aanmaken",
+        "name": "Event Naam",
+        "flow": "Flowmeter stand",
+        "flow-old": "Start Flowmeter stand",
+        "select": "Selecteer Event soort",
+        "button": "Creëer Event",
+        "select-active": "Selecteer lopend event",
+        "save": "Event opslaan",
+        "choose": "Kies een actief event"
+    }
+}

@@ -1,9 +1,8 @@
-import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
-import { ItemAlreadyExistsError } from "@dir/exceptions/ItemAlreadyExistsError";
-import { queryType } from "@dir/app";
+import { EmptySQLResultError } from '@dir/exceptions/EmptySQLResultError';
+import { ItemAlreadyExistsError } from '@dir/exceptions/ItemAlreadyExistsError';
+import { queryType } from '@dir/app';
 export default class CustomerQueries {
-
-    constructor(private database: Database<queryType>) {
+    constructor (private database: Database<queryType>) {
         this.database = database;
     }
 
@@ -20,26 +19,25 @@ export default class CustomerQueries {
      *             in the database.
      * @returns - The Promise object containing the resolved result or the rejected failure.
      */
-    createNewCustomer = (name: string, birthDate: string | undefined, bank: string): Promise<any> => {
+    createNewCustomer = (id:string, name: string, birthDate: string | undefined, bank: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = 'INSERT INTO ak_customers (Name, BirthDate, Bankaccount) ' +
-                'VALUES (?, ?, ?);';
+            const query = 'INSERT INTO ak_customers (ID, Name, BirthDate, Bankaccount) ' +
+                'VALUES (?,?, ?, ?);';
 
             this.database.executeTransactions([
                 {
                     id: 1,
                     query,
-                    parameters: [name, birthDate, bank]
+                    parameters: [id, name, birthDate, bank]
                 }
             ]).then(
                 val => {
                     resolve(val[1].result.insertId);
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
-
 
     //
     // ------------------------- Retrieve statements -------------------------
@@ -52,7 +50,7 @@ export default class CustomerQueries {
      */
     getAllCustomers = (): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = "SELECT * FROM ak_customers";
+            const query = 'SELECT * FROM ak_customers';
 
             this.database.executeTransactions([
                 {
@@ -64,10 +62,10 @@ export default class CustomerQueries {
                 val => {
                     resolve(val[1].result);
                 }).catch(
-                    err => {
-                        reject(err);
-                    }
-                );
+                err => {
+                    reject(err);
+                }
+            );
         });
     }
 
@@ -79,16 +77,17 @@ export default class CustomerQueries {
      */
     getCustomerByID = (customerID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryOne = "SELECT * FROM ak_customers c WHERE c.id = ?";
-            const queryTwo = "SELECT * FROM ak_customers c WHERE c.name LIKE ?";
-            let query = "";
-            const numberID = parseInt(customerID, 10);
-            if (isNaN(numberID)) {
-                query = queryTwo;
-                customerID = '%' + customerID + '%';
-            } else {
-                query = queryOne;
-            }
+            const queryOne = 'SELECT * FROM ak_customers c WHERE c.id = ?';
+            const queryTwo = 'SELECT * FROM ak_customers c WHERE c.name LIKE ?';
+            let query = '';
+            // const numberID = parseInt(customerID, 10);
+            // if (isNaN(numberID)) {
+            //     query = queryTwo;
+            //     customerID = '%' + customerID + '%';
+            // } else {
+            //     query = queryOne;
+            // }
+            query = queryOne;
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -99,8 +98,8 @@ export default class CustomerQueries {
                 val => {
                     resolve(val[1].result);
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
 
@@ -116,29 +115,29 @@ export default class CustomerQueries {
      */
     updateCustomer = (customerID: string, params: Map<string, string | number | undefined>): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryA = "UPDATE ak_customers c SET " +
-                "c.name = COALESCE(?,c.name), " +
-                "c.birthdate = COALESCE(?,c.birthdate), " +
-                "c.bankaccount = COALESCE(?,c.bankaccount), " +
-                "c.active = COALESCE(?,c.active) " +
-                "WHERE c.id = ?;";
-            const queryB = "UPDATE ak_customers c SET " +
-            "c.name = COALESCE(?,c.name), " +
-            "c.birthdate = COALESCE(?,c.birthdate), " +
-            "c.bankaccount = COALESCE(?,c.bankaccount), " +
-            "c.active = COALESCE(?,c.active) " +
-            "WHERE c.name = ?;";
-            const queryC = "SELECT * FROM ak_customers c WHERE c.id = ?;";
-            const queryD = "SELECT * FROM ak_customers c WHERE c.name = ?;";
-            let queryOne = "";
-            let queryTwo = "";
-            const name = params.get("name") === undefined ? null : params.get("name");
+            const queryA = 'UPDATE ak_customers c SET ' +
+                'c.name = COALESCE(?,c.name), ' +
+                'c.birthdate = COALESCE(?,c.birthdate), ' +
+                'c.bankaccount = COALESCE(?,c.bankaccount), ' +
+                'c.active = COALESCE(?,c.active) ' +
+                'WHERE c.id = ?;';
+            const queryB = 'UPDATE ak_customers c SET ' +
+            'c.name = COALESCE(?,c.name), ' +
+            'c.birthdate = COALESCE(?,c.birthdate), ' +
+            'c.bankaccount = COALESCE(?,c.bankaccount), ' +
+            'c.active = COALESCE(?,c.active) ' +
+            'WHERE c.name = ?;';
+            const queryC = 'SELECT * FROM ak_customers c WHERE c.id = ?;';
+            const queryD = 'SELECT * FROM ak_customers c WHERE c.name = ?;';
+            let queryOne = '';
+            let queryTwo = '';
+            const name = params.get('name') === undefined ? null : params.get('name');
             const finalID = name != null ? name : customerID;
-            const birthday = params.get("birthday") === undefined ? null : params.get("birthday");
-            const bankaccount = params.get("bankaccount") === undefined ? null : params.get("bankaccount");
-            let active = params.get("active") === undefined ? null : params.get("active");
+            const birthday = params.get('birthday') === undefined ? null : params.get('birthday');
+            const bankaccount = params.get('bankaccount') === undefined ? null : params.get('bankaccount');
+            let active = params.get('active') === undefined ? null : params.get('active');
             if (active != null) {
-                active = (active === "true") ? 1 : 0;
+                active = (active === 'true') ? 1 : 0;
             }
             const numberID = parseInt(customerID, 10);
             if (isNaN(numberID)) {
@@ -170,10 +169,9 @@ export default class CustomerQueries {
                     } else {
                         reject(new EmptySQLResultError('Was unable to find a match for the id.'));
                     }
-
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
 
@@ -188,9 +186,9 @@ export default class CustomerQueries {
      */
     deleteCustomer = (customerID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryOne = "DELETE FROM ak_customers c WHERE c.id = ?;";
-            const queryTwo = "DELETE FROM ak_customers c WHERE c.name = ?";
-            let query = "";
+            const queryOne = 'DELETE FROM ak_customers c WHERE c.id = ?;';
+            const queryTwo = 'DELETE FROM ak_customers c WHERE c.name = ?';
+            let query = '';
             const numberID = parseInt(customerID, 10);
             if (isNaN(numberID)) {
                 query = queryTwo;
@@ -208,8 +206,8 @@ export default class CustomerQueries {
                 val => {
                     resolve(val[1].result);
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
 }

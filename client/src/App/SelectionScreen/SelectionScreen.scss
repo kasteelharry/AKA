@@ -1,0 +1,32 @@
+.selection-container {
+    position: absolute;
+    left:5vw;
+    margin-top: 1vh;
+    width: 90vw;
+    height:55vh;
+    // outline: auto;
+    z-index: 975;
+}
+
+.selection-container-history {
+    position: absolute;
+    left:5vw;
+    margin-top: 1vh;
+    width: 90vw;
+    height:80vh;
+    // outline: auto;
+    z-index: 975;
+}
+table, th, td {
+    // border: 1px solid;
+    font-size: larger;
+  }
+  
+
+
+.test-button {
+    position: absolute;
+    float:left;
+    width: 80%;
+    height: 80%;
+}

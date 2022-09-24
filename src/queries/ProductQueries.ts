@@ -1,14 +1,12 @@
 
-import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
-import { ItemAlreadyExistsError } from "@dir/exceptions/ItemAlreadyExistsError";
-import { queryType } from "@dir/app";
+import { EmptySQLResultError } from '@dir/exceptions/EmptySQLResultError';
+import { ItemAlreadyExistsError } from '@dir/exceptions/ItemAlreadyExistsError';
+import { queryType } from '@dir/app';
 
 export default class ProductQueries {
-
-    constructor(private database: Database<queryType>) {
+    constructor (private database: Database<queryType>) {
         this.database = database;
     }
-
 
     //
     // ------------------------- Create statements -------------------------
@@ -23,7 +21,7 @@ export default class ProductQueries {
      */
     createNewProduct = (product: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryToPerform = "INSERT INTO ak_products (Name) VALUES (?);";
+            const queryToPerform = 'INSERT INTO ak_products (Name) VALUES (?);';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -34,14 +32,14 @@ export default class ProductQueries {
                 val => {
                     resolve(val[1].result.insertId);
                 }).catch(
-                    err => {
-                        if (err.message.match("Duplicate entry")) {
-                            reject(new ItemAlreadyExistsError("Given product " + product + " already exists."));
-                        } else {
-                            reject(err);
-                        }
+                err => {
+                    if (err.message.match('Duplicate entry')) {
+                        reject(new ItemAlreadyExistsError('Given product ' + product + ' already exists.'));
+                    } else {
+                        reject(err);
                     }
-                );
+                }
+            );
         });
     }
 
@@ -55,15 +53,16 @@ export default class ProductQueries {
      */
     getAllProducts = (): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const query = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
-            +"LEFT JOIN ak_hotkeys hk "
-            +"ON p.id = hk.productID "
-            +"LEFT JOIN ak_productcategory pc "
-            +"ON pc.productID = p.id "
-            +"LEFT JOIN ak_category c "
-            +"ON c.id = pc.categoryID "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
+            const query = 'SELECT p.id, p.name, p.archived, hk.hotkey, ' +
+            'JSON_ARRAYAGG(JSON_OBJECT("categoryID",c.id, "categoryName", c.name)) ' +
+            'as category FROM ak_products p  ' +
+            'LEFT JOIN ak_hotkeys hk ' +
+            'ON p.id = hk.productID ' +
+            'LEFT JOIN ak_productcategory pc ' +
+            'ON pc.productID = p.id ' +
+            'LEFT JOIN ak_category c ' +
+            'ON c.id = pc.categoryID ' +
+            'GROUP BY p.id, p.name, p.archived, hk.hotkey';
             this.database.executeTransactions([
                 {
                     id: 1,
@@ -74,8 +73,8 @@ export default class ProductQueries {
                 val => {
                     resolve(val[1].result);
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
 
@@ -86,27 +85,28 @@ export default class ProductQueries {
      */
     getProductByID = (productID: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryOne = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
-            +"LEFT JOIN ak_hotkeys hk "
-            +"ON p.id = hk.productID "
-            +"LEFT JOIN ak_productcategory pc "
-            +"ON pc.productID = p.id "
-            +"LEFT JOIN ak_category c "
-            +"ON c.id = pc.categoryID "
-            +"WHERE p.id = ? "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey;";
-            const queryTwo = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
-            +"LEFT JOIN ak_hotkeys hk "
-            +"ON p.id = hk.productID "
-            +"LEFT JOIN ak_productcategory pc "
-            +"ON pc.productID = p.id "
-            +"LEFT JOIN ak_category c "
-            +"ON c.id = pc.categoryID "
-            +"WHERE p.name LIKE ? "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
-            let queryToPerform = "";
+            const queryOne = 'SELECT p.id, p.name, p.archived, hk.hotkey, ' +
+            'JSON_ARRAYAGG(JSON_OBJECT("categoryID",c.id, "categoryName", c.name)) ' +
+            'as category FROM ak_products p  ' +
+            'LEFT JOIN ak_hotkeys hk ' +
+            'ON p.id = hk.productID ' +
+            'LEFT JOIN ak_productcategory pc ' +
+            'ON pc.productID = p.id ' +
+            'LEFT JOIN ak_category c ' +
+            'ON c.id = pc.categoryID ' +
+            'WHERE p.id = ? ' +
+            'GROUP BY p.id, p.name, p.archived, hk.hotkey;';
+            const queryTwo = 'SELECT p.id, p.name, p.archived, hk.hotkey, ' +
+            'JSON_ARRAYAGG(c.name) as category FROM ak_products p ' +
+            'LEFT JOIN ak_hotkeys hk ' +
+            'ON p.id = hk.productID ' +
+            'LEFT JOIN ak_productcategory pc ' +
+            'ON pc.productID = p.id ' +
+            'LEFT JOIN ak_category c ' +
+            'ON c.id = pc.categoryID ' +
+            'WHERE p.name LIKE ? ' +
+            'GROUP BY p.id, p.name, p.archived, hk.hotkey';
+            let queryToPerform = '';
             const numberID = parseInt(productID, 10);
             if (isNaN(numberID)) {
                 queryToPerform = queryTwo;
@@ -126,11 +126,10 @@ export default class ProductQueries {
                 val => {
                     resolve(val[1].result);
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
-
 
     //
     // ------------------------- Update statements -------------------------
@@ -145,30 +144,30 @@ export default class ProductQueries {
      */
     updateProductNameByID = (productID: string, newName: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryOne = "UPDATE ak_products p SET p.name = ? WHERE p.id = ?;";
-            const queryTwo = "UPDATE ak_products p SET p.name = ? WHERE p.name = ?";
-            const queryThree = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
-            +"LEFT JOIN ak_hotkeys hk "
-            +"ON p.id = hk.productID "
-            +"LEFT JOIN ak_productcategory pc "
-            +"ON pc.productID = p.id "
-            +"LEFT JOIN ak_category c "
-            +"ON c.id = pc.categoryID "
-            +"WHERE p.id = ? "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey;";
-            const queryFour = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
-            +"LEFT JOIN ak_hotkeys hk "
-            +"ON p.id = hk.productID "
-            +"LEFT JOIN ak_productcategory pc "
-            +"ON pc.productID = p.id "
-            +"LEFT JOIN ak_category c "
-            +"ON c.id = pc.categoryID "
-            +"WHERE p.name LIKE ? "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
-            let queryToPerform = "";
-            let secondQuery = "";
+            const queryOne = 'UPDATE ak_products p SET p.name = ? WHERE p.id = ?;';
+            const queryTwo = 'UPDATE ak_products p SET p.name = ? WHERE p.name = ?';
+            const queryThree = 'SELECT p.id, p.name, p.archived, hk.hotkey, ' +
+            'JSON_ARRAYAGG(c.name) as category FROM ak_products p ' +
+            'LEFT JOIN ak_hotkeys hk ' +
+            'ON p.id = hk.productID ' +
+            'LEFT JOIN ak_productcategory pc ' +
+            'ON pc.productID = p.id ' +
+            'LEFT JOIN ak_category c ' +
+            'ON c.id = pc.categoryID ' +
+            'WHERE p.id = ? ' +
+            'GROUP BY p.id, p.name, p.archived, hk.hotkey;';
+            const queryFour = 'SELECT p.id, p.name, p.archived, hk.hotkey, ' +
+            'JSON_ARRAYAGG(c.name) as category FROM ak_products p ' +
+            'LEFT JOIN ak_hotkeys hk ' +
+            'ON p.id = hk.productID ' +
+            'LEFT JOIN ak_productcategory pc ' +
+            'ON pc.productID = p.id ' +
+            'LEFT JOIN ak_category c ' +
+            'ON c.id = pc.categoryID ' +
+            'WHERE p.name LIKE ? ' +
+            'GROUP BY p.id, p.name, p.archived, hk.hotkey';
+            let queryToPerform = '';
+            let secondQuery = '';
             const numberID = parseInt(productID, 10);
             let finalID = productID;
             if (isNaN(numberID)) {
@@ -201,8 +200,8 @@ export default class ProductQueries {
                         reject(new EmptySQLResultError('Was unable to find a match for the id.'));
                     }
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
 
@@ -216,31 +215,31 @@ export default class ProductQueries {
      */
     archiveProductByID = (productID: string, archive: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryOne = "UPDATE ak_products p SET p.archived = ? WHERE p.id = ?;";
-            const queryTwo = "UPDATE ak_products p SET p.archived = ? WHERE p.name = ?;";
-            const queryThree = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
-            +"LEFT JOIN ak_hotkeys hk "
-            +"ON p.id = hk.productID "
-            +"LEFT JOIN ak_productcategory pc "
-            +"ON pc.productID = p.id "
-            +"LEFT JOIN ak_category c "
-            +"ON c.id = pc.categoryID "
-            +"WHERE p.id = ? "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey;";
-            const queryFour = "SELECT p.id, p.name, p.archived, hk.hotkey, "
-            +"JSON_ARRAYAGG(c.name) as category FROM ak_products p "
-            +"LEFT JOIN ak_hotkeys hk "
-            +"ON p.id = hk.productID "
-            +"LEFT JOIN ak_productcategory pc "
-            +"ON pc.productID = p.id "
-            +"LEFT JOIN ak_category c "
-            +"ON c.id = pc.categoryID "
-            +"WHERE p.name LIKE ? "
-            +"GROUP BY p.id, p.name, p.archived, hk.hotkey";
-            let queryToPerform = "";
-            let secondQuery = "";
-            const archiveNum = (archive === "true") ? 1 : 0;
+            const queryOne = 'UPDATE ak_products p SET p.archived = ? WHERE p.id = ?;';
+            const queryTwo = 'UPDATE ak_products p SET p.archived = ? WHERE p.name = ?;';
+            const queryThree = 'SELECT p.id, p.name, p.archived, hk.hotkey, ' +
+            'JSON_ARRAYAGG(c.name) as category FROM ak_products p ' +
+            'LEFT JOIN ak_hotkeys hk ' +
+            'ON p.id = hk.productID ' +
+            'LEFT JOIN ak_productcategory pc ' +
+            'ON pc.productID = p.id ' +
+            'LEFT JOIN ak_category c ' +
+            'ON c.id = pc.categoryID ' +
+            'WHERE p.id = ? ' +
+            'GROUP BY p.id, p.name, p.archived, hk.hotkey;';
+            const queryFour = 'SELECT p.id, p.name, p.archived, hk.hotkey, ' +
+            'JSON_ARRAYAGG(c.name) as category FROM ak_products p ' +
+            'LEFT JOIN ak_hotkeys hk ' +
+            'ON p.id = hk.productID ' +
+            'LEFT JOIN ak_productcategory pc ' +
+            'ON pc.productID = p.id ' +
+            'LEFT JOIN ak_category c ' +
+            'ON c.id = pc.categoryID ' +
+            'WHERE p.name LIKE ? ' +
+            'GROUP BY p.id, p.name, p.archived, hk.hotkey';
+            let queryToPerform = '';
+            let secondQuery = '';
+            const archiveNum = (archive === 'true') ? 1 : 0;
             const numberID = parseInt(productID, 10);
             if (isNaN(numberID)) {
                 queryToPerform = queryTwo;
@@ -271,8 +270,8 @@ export default class ProductQueries {
                         reject(new EmptySQLResultError('Was unable to find a match for the id.'));
                     }
                 }).catch(
-                    err => reject(err)
-                );
+                err => reject(err)
+            );
         });
     }
 
@@ -287,9 +286,9 @@ export default class ProductQueries {
      */
     deleteProductNameByID = (productId: string): Promise<any> => {
         return new Promise((resolve, reject) => {
-            const queryOne = "DELETE FROM ak_products p WHERE p.id = ?;";
-            const queryTwo = "DELETE FROM ak_products p WHERE p.name LIKE ?";
-            let queryToPerform = "";
+            const queryOne = 'DELETE FROM ak_products p WHERE p.id = ?;';
+            const queryTwo = 'DELETE FROM ak_products p WHERE p.name LIKE ?';
+            let queryToPerform = '';
             const numberID = parseInt(productId, 10);
             if (isNaN(numberID)) {
                 queryToPerform = queryTwo;
@@ -307,9 +306,8 @@ export default class ProductQueries {
                 val => {
                     resolve(val[1].result);
                 }).catch(
-                    err => reject(err)
-                );
-
+                err => reject(err)
+            );
         });
     }
 }

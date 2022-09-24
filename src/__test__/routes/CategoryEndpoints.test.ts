@@ -1,10 +1,10 @@
-import * as app from "@dir/app";
-import { MockDatabase } from "@dir/model/MockDatabase";
-import supertest, { SuperTest, Test } from "supertest";
-import UserAuthentication from "@dir/util/UserAuthentication";
-jest.mock("@dir/model/MySQLDatabase");
-describe("Test Category Routing", () => {
-
+import * as app from '@dir/app';
+import { MockDatabase } from '@dir/model/MockDatabase';
+import supertest, { SuperTest, Test } from 'supertest';
+import UserAuthentication from '@dir/util/UserAuthentication';
+jest.mock('@dir/model/MySQLDatabase');
+describe('Test Category Routing', () => {
+    // eslint-disable-next-line no-unused-vars
     let mock: jest.SpyInstance;
     let request: SuperTest<Test>;
     let database:MockDatabase<app.queryType>;
@@ -33,58 +33,58 @@ describe("Test Category Routing", () => {
     // ------------------------- Create statements test -------------------------
     //
 
-    test("POST /", async () => {
-        const promise = await request.post("/api/Category/")
-        .send({
-            name: "Product Category"
-        });
+    test('POST /', async () => {
+        const promise = await request.post('/api/Category/')
+            .send({
+                name: 'Product Category'
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST / General Error", async () => {
+    test('POST / General Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/Category/")
-        .send({
-            name: "Product Category"
-        });
+        const promise = await request.post('/api/Category/')
+            .send({
+                name: 'Product Category'
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST / Duplicate Error", async () => {
+    test('POST / Duplicate Error', async () => {
         database.setDuplicateInsert(true);
-        const promise = await request.post("/api/Category/")
-        .send({
-            name: "Product Category"
-        });
+        const promise = await request.post('/api/Category/')
+            .send({
+                name: 'Product Category'
+            });
         expect(promise.statusCode).toBe(403);
     });
 
-    test("POST /products", async () => {
-        const promise = await request.post("/api/Category/products/")
-        .send({
-            category: "Product Category",
-            product: "Product"
-        });
+    test('POST /products', async () => {
+        const promise = await request.post('/api/Category/products/')
+            .send({
+                category: 'Product Category',
+                product: 'Product'
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /products General Error", async () => {
+    test('POST /products General Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/Category/products/")
-        .send({
-            category: "Product Category",
-            product: "Product"
-        });
+        const promise = await request.post('/api/Category/products/')
+            .send({
+                category: 'Product Category',
+                product: 'Product'
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST /products Duplicate Error", async () => {
+    test('POST /products Duplicate Error', async () => {
         database.setDuplicateInsert(true);
-        const promise = await request.post("/api/Category/products")
-        .send({
-            category: "Product Category",
-            product: "Product"
-        });
+        const promise = await request.post('/api/Category/products')
+            .send({
+                category: 'Product Category',
+                product: 'Product'
+            });
         expect(promise.statusCode).toBe(403);
     });
 
@@ -92,40 +92,39 @@ describe("Test Category Routing", () => {
     // ------------------------- Retrieve statements test -------------------------
     //
 
-    test("GET /", async () => {
-        const promise = await request.get("/api/Category/");
+    test('GET /', async () => {
+        const promise = await request.get('/api/Category/');
         expect(promise.statusCode).toBe(200);
     });
 
-    test("GET / Error", async () => {
+    test('GET / Error', async () => {
         expect.assertions(1);
         database.setDBState(false);
-        const promise = await request.get("/api/Category/");
+        const promise = await request.get('/api/Category/');
         expect(promise.statusCode).toBe(500);
     });
 
-    test("GET /products", async () => {
-        const promise = await request.get("/api/Category/products/");
+    test('GET /products', async () => {
+        const promise = await request.get('/api/Category/products/');
         expect(promise.statusCode).toBe(200);
     });
 
-    test("GET /products Error", async () => {
+    test('GET /products Error', async () => {
         expect.assertions(1);
         database.setDBState(false);
-        const promise = await request.get("/api/Category/products/");
+        const promise = await request.get('/api/Category/products/');
         expect(promise.statusCode).toBe(500);
     });
 
-
-    test("GET /:categoryID", async () => {
-        const promise = await request.get("/api/Category/1");
+    test('GET /:categoryID', async () => {
+        const promise = await request.get('/api/Category/1');
         expect(promise.statusCode).toBe(200);
     });
 
-    test("GET /:categoryID Error", async () => {
+    test('GET /:categoryID Error', async () => {
         expect.assertions(1);
         database.setDBState(false);
-        const promise = await request.get("/api/Category/1");
+        const promise = await request.get('/api/Category/1');
         expect(promise.statusCode).toBe(500);
     });
 
@@ -133,41 +132,41 @@ describe("Test Category Routing", () => {
     // ------------------------- Update statements test -------------------------
     //
 
-    test("POST /update", async () => {
-        const promise = await request.post("/api/Category/update/")
-        .send({
-            name: "joris",
-            categoryID: 1
-        });
+    test('POST /update', async () => {
+        const promise = await request.post('/api/Category/update/')
+            .send({
+                name: 'joris',
+                categoryID: 1
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /update Error", async () => {
+    test('POST /update Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/Category/update/")
-        .send({
-            name: "joris",
-            categoryID: 1
-        });
+        const promise = await request.post('/api/Category/update/')
+            .send({
+                name: 'joris',
+                categoryID: 1
+            });
         expect(promise.statusCode).toBe(500);
     });
 
-    test("POST /update/archive", async () => {
-        const promise = await request.post("/api/Category/update/archive/")
-        .send({
-            archive: "true",
-            categoryID: 1
-        });
+    test('POST /update/archive', async () => {
+        const promise = await request.post('/api/Category/update/archive/')
+            .send({
+                archive: 'true',
+                categoryID: 1
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("POST /update/archive Error", async () => {
+    test('POST /update/archive Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/Category/update/archive/")
-        .send({
-            archive: "true",
-            categoryID: 1
-        });
+        const promise = await request.post('/api/Category/update/archive/')
+            .send({
+                archive: 'true',
+                categoryID: 1
+            });
         expect(promise.statusCode).toBe(500);
     });
 
@@ -175,29 +174,29 @@ describe("Test Category Routing", () => {
     // ------------------------- Delete statements test -------------------------
     //
 
-    test("DELETE /delete", async () => {
-        const promise = await request.post("/api/Category/delete")
-        .send({
-            categoryID: 1
-        });
+    test('DELETE /delete', async () => {
+        const promise = await request.post('/api/Category/delete')
+            .send({
+                categoryID: 1
+            });
         expect(promise.statusCode).toBe(200);
     });
 
-    test("DELETE /delete Error Not Found", async () => {
+    test('DELETE /delete Error Not Found', async () => {
         database.setIndexToUse(2);
-        const promise = await request.post("/api/Category/delete")
-        .send({
-            categoryID: 1
-        });
+        const promise = await request.post('/api/Category/delete')
+            .send({
+                categoryID: 1
+            });
         expect(promise.statusCode).toBe(204);
     });
 
-    test("DELETE /delete Error", async () => {
+    test('DELETE /delete Error', async () => {
         database.setDBState(false);
-        const promise = await request.post("/api/Category/delete")
-        .send({
-            categoryID: 1
-        });
+        const promise = await request.post('/api/Category/delete')
+            .send({
+                categoryID: 1
+            });
         expect(promise.statusCode).toBe(500);
     });
 });

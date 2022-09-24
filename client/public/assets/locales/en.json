@@ -1,0 +1,69 @@
+{
+  "login": {
+    "email": {
+      "title": "Email address",
+      "placeholder": "Enter email"
+    },
+    "password": {
+      "title": "Password",
+      "placeholder": "Enter password"
+    },
+    "submit": "Log in",
+    "title": "Welcome to the $t(app_title)",
+    "forgot_password": "Forgot password?"
+  },
+  "app_title": "AKA V3.0",
+  "nav": {
+    "login": "Login",
+    "register": "Register",
+    "transaction": "Transactions",
+    "dashboard": "Dashboard",
+    "statistics": "Statistics"
+  },
+  "user": {
+      "profile": "Profile",
+      "account": "Account",
+      "dashboard":"Dashboard",
+      "logout": "Logout"
+  },
+  "transaction": {
+      "confirm": "Confirm",
+      "update": "Update",
+      "delete": "Delete",
+      "cancel": "Cancel"
+  },
+  "menu": {
+    "language": {
+      "en": "English",
+      "nl": "Dutch"
+    }
+  },
+  "search": {
+      "box": "Search members",
+      "history": "Order history",
+      "event": "Save event",
+      "active": "Current event: "
+  },
+  "previous": {
+      "name": "Customer name",
+      "product": "Product name",
+      "category": "Product category",
+      "amount": "Amount",
+      "price": "Total price",
+      "timestamp": "Time of sale",
+      "update": "Update",
+      "delete": "Delete",
+      "update-product": "Please update product amount"
+  },
+  "event": {
+    "title": "Create an event",
+    "name": "Event Name",
+    "flow": "Flowmeter amount",
+    "flow-old": "Start Flowmeter amount",
+    "select": "Select Event type",
+    "button": "Create Event",
+    "select-active": "Select an active Event",
+    "save": "Save this event",
+    "choose": "Select an active event"
+}
+}

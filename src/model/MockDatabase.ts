@@ -1,9 +1,8 @@
-import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
-import { EmptySQLResultError } from "@dir/exceptions/EmptySQLResultError";
-import { rejects } from "assert";
-import { convertStringToSQLDate } from "@dir/util/ConvertStringToSQLDate";
-
-
+/* eslint-disable no-case-declarations */
+/* eslint-disable no-loss-of-precision */
+import { GeneralServerError } from '@dir/exceptions/GeneralServerError';
+import { EmptySQLResultError } from '@dir/exceptions/EmptySQLResultError';
+import { convertStringToSQLDate } from '@dir/util/ConvertStringToSQLDate';
 
 const insertResult = {
     fieldCount: 0,
@@ -66,30 +65,30 @@ export class MockDatabase<T> implements Database<T> {
         ID: 1,
         Name: 'Joris',
         Email: 'joriskuiper2@gmail.com',
-        BirthDate: new Date("2001-01-26T00:00:00.000Z"),
+        BirthDate: new Date('2001-01-26T00:00:00.000Z'),
         PicturePath: null,
         Bankaccount: 'NL22INGB0123456789',
         Active: 1,
         expires: 1672441200,
         loginID: 112233445566778899,
         googleId: 112233445566778899,
-        session_id: "expiredSession",
+        session_id: 'expiredSession'
     },
     {
         ID: 2,
         Name: 'Bobby',
-        BirthDate: new Date("2001-01-26T00:00:00.000Z"),
+        BirthDate: new Date('2001-01-26T00:00:00.000Z'),
         PicturePath: null,
         Bankaccount: 'NL22INGB0123456789',
         Active: 1,
         loginID: undefined,
         googleId: undefined,
-        salt: "testSalt"
+        salt: 'testSalt'
     },
     {
         ID: 3,
         Name: 'Charlie',
-        BirthDate: new Date("2001-01-26T00:00:00.000Z"),
+        BirthDate: new Date('2001-01-26T00:00:00.000Z'),
         PicturePath: null,
         Bankaccount: 'NL22INGB0123456789',
         Active: 1,
@@ -97,15 +96,15 @@ export class MockDatabase<T> implements Database<T> {
         expires: 1670441,
         loginID: 112233445566778899,
         googleId: 112233445566778899,
-        session_id: "existentSession",
-        salt: "testSalt",
-        password: "testHash",
-        timestamp: convertStringToSQLDate("2000-12-12")
+        session_id: 'existentSession',
+        salt: 'testSalt',
+        password: 'testHash',
+        timestamp: convertStringToSQLDate('2000-12-12')
     },
     {
         ID: 3,
         Name: 'Amy',
-        BirthDate: new Date("2001-01-26T00:00:00.000Z"),
+        BirthDate: new Date('2001-01-26T00:00:00.000Z'),
         PicturePath: null,
         Bankaccount: 'NL22INGB0123456789',
         Active: 1,
@@ -118,88 +117,87 @@ export class MockDatabase<T> implements Database<T> {
     private indexToUse:number = 0;
     private failInsert: boolean = false;
 
-    setFailInsert(fail: boolean): void {
+    setFailInsert (fail: boolean): void {
         this.failInsert = fail;
     }
 
-    setDuplicateInsert(duplicate: boolean):void{
+    setDuplicateInsert (duplicate: boolean):void {
         this.duplicateInsert = duplicate;
     }
 
-    setDBState(state: boolean): void {
+    setDBState (state: boolean): void {
         this.dbState = state;
     }
 
-    setIndexToUse(index:number): void {
+    setIndexToUse (index:number): void {
         this.indexToUse = index;
     }
 
-    getDBState():boolean {
+    getDBState ():boolean {
         return this.dbState;
     }
 
-    getDuplicateInsert():boolean {
+    getDuplicateInsert ():boolean {
         return this.duplicateInsert;
     }
 
-    getFailInsert():boolean {
+    getFailInsert ():boolean {
         return this.failInsert;
     }
 
-    getIndexToUse():number {
+    getIndexToUse ():number {
         return this.indexToUse;
     }
 
-    executeTransactions(queries: any[]): Promise<{ [id: string]: any }> {
+    executeTransactions (queries: any[]): Promise<{ [id: string]: any }> {
         return new Promise((resolve, reject) => {
             if (!this.dbState) {
-                reject(new GeneralServerError("SQL Server is not able to be reached"));
+                reject(new GeneralServerError('SQL Server is not able to be reached'));
             }
             const res: { [id: string]: { result: any } } = {};
             for (const qry of queries) {
-
                 try {
-                    const param= qry.parameters;
-                    switch (qry.query.split(" ")[0]) {
-                        case "SELECT":
-                            if (param === undefined || param.length === 0) {
-                                res[qry.id] = this.getAllElements();
-                                break;
+                    const param = qry.parameters;
+                    switch (qry.query.split(' ')[0]) {
+                    case 'SELECT':
+                        if (param === undefined || param.length === 0) {
+                            res[qry.id] = this.getAllElements();
+                            break;
+                        }
+                        const id:string|number = param[0];
+                        let num;
+                        let bool = false;
+                        if (typeof id === 'number') {
+                            num = id;
+                        } else {
+                            num = parseInt(id, 10);
+                            if (id.match(':')) {
+                                bool = true;
                             }
-                            const id:string|number = param[0];
-                            let num;
-                            let bool = false;
-                            if (typeof id === "number") {
-                                num = id;
+                        }
+                        if (isNaN(num) || bool) {
+                            const ts = convertStringToSQLDate(id);
+                            if (ts !== undefined) {
+                                res[qry.id] = this.getElements(ts);
                             } else {
-                                num = parseInt(id, 10);
-                                if (id.match(":")) {
-                                    bool = true;
-                                }
+                                res[qry.id] = this.getElements(id);
                             }
-                            if (isNaN(num) || bool) {
-                                const ts = convertStringToSQLDate(id);
-                                if (ts !== undefined) {
-                                    res[qry.id] = this.getElements(ts);
-                                } else {
-                                    res[qry.id] = this.getElements(id);
-                                }
-                            } else {
-                                res[qry.id] = this.getElements(num);
-                            }
-                            break;
-                        case "INSERT":
-                            res[qry.id] = this.createElements(param);
-                            break;
-                        case "UPDATE":
-                            res[qry.id] = this.updateElements(param[param.length - 1], param);
-                            break;
-                        case "DELETE":
-                            res[qry.id] = this.deleteElements();
-                            break;
-                        default:
-                            reject(new GeneralServerError("SQL Query wasn't recognized."));
-                            break;
+                        } else {
+                            res[qry.id] = this.getElements(num);
+                        }
+                        break;
+                    case 'INSERT':
+                        res[qry.id] = this.createElements(param);
+                        break;
+                    case 'UPDATE':
+                        res[qry.id] = this.updateElements(param[param.length - 1], param);
+                        break;
+                    case 'DELETE':
+                        res[qry.id] = this.deleteElements();
+                        break;
+                    default:
+                        reject(new GeneralServerError("SQL Query wasn't recognized."));
+                        break;
                     }
                     if (qry.id === queries.length) {
                         resolve(res);
@@ -212,12 +210,12 @@ export class MockDatabase<T> implements Database<T> {
         });
     }
 
-    deleteElements() {
+    deleteElements () {
         if (this.indexToUse === 3) {
-            throw new EmptySQLResultError("Could not delete");
+            throw new EmptySQLResultError('Could not delete');
         } else if (this.indexToUse === 2) {
             return {
-                result: updateNotFound,
+                result: updateNotFound
             };
         }
         return {
@@ -225,58 +223,55 @@ export class MockDatabase<T> implements Database<T> {
         };
     }
 
-
-    updateElements(id: number, param: (string | number | null | undefined)[]): any {
-
+    updateElements (id: number, param: (string | number | null | undefined)[]): any {
         if (this.indexToUse === 1) {
             return {
-                result: updateFailedResult,
+                result: updateFailedResult
             };
         } else if (this.indexToUse === 2) {
             return {
-                result: updateNotFound,
+                result: updateNotFound
             };
         } else {
             return {
-            result: updateResult,
-        };
+                result: updateResult
+            };
         }
-
     }
 
-    createElements(param: string[]): any {
-        if (param === undefined || param.length === 0 ) {
+    createElements (param: string[]): any {
+        if (param === undefined || param.length === 0) {
             return {
-                result: insertFailedResult,
+                result: insertFailedResult
             };
         } else if (this.duplicateInsert) {
-            throw new GeneralServerError("Duplicate entry found for insert");
+            throw new GeneralServerError('Duplicate entry found for insert');
         } else if (this.failInsert === true) {
-            throw new GeneralServerError("Could not insert.");
+            throw new GeneralServerError('Could not insert.');
         }
         return {
-            result: insertResult,
+            result: insertResult
         };
     }
 
-    getAllElements(): any {
+    getAllElements (): any {
         return {
             result: this.itemList
         };
     }
 
-    getElements(index: number | string): any {
-        if (typeof index === 'string' ) {
-            const values = this.itemList.filter(e =>e.Name === index || e.Email === index || e.Bankaccount === index || e.session_id === index || e.timestamp === index);
+    getElements (index: number | string): any {
+        if (typeof index === 'string') {
+            const values = this.itemList.filter(e => e.Name === index || e.Email === index || e.Bankaccount === index || e.session_id === index || e.timestamp === index);
             return {
-                result:values,
+                result: values
             };
         }
         if (this.itemList.length <= index) {
-            throw new EmptySQLResultError("No results found.");
+            throw new EmptySQLResultError('No results found.');
         }
         return {
-            result: [this.itemList[this.indexToUse]],
+            result: [this.itemList[this.indexToUse]]
         };
     }
 }

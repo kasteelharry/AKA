@@ -1,0 +1,35 @@
+#category-container {
+    position: absolute;
+    left:2vw;
+    margin-top: 2vh;
+    width: 15vw;
+    height:85vh;
+    outline: auto;
+    // overflow-y: scroll;
+}
+
+#overview-container {
+    position: absolute;
+    left:83vw;
+    margin-top: 2vh;
+    width: 15vw;
+    height:85vh;
+    outline: auto;
+
+}
+
+#product-container {
+    position: absolute;
+    left:19vw;
+    margin-top: 2vh;
+    width: 62vw;
+    height:85vh;
+    outline: auto;
+    // background-color: aqua;
+    overflow-y: scroll;
+}
+
+.transaction {
+    position: absolute;
+}
+

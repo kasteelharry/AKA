@@ -1,5 +1,5 @@
 import express from 'express';
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs';
 import { EmailNotRegisteredError } from '@dir/exceptions/EmailNotRegisteredError';
 import { OAuth2Client } from 'google-auth-library';
 
@@ -12,31 +12,39 @@ const router = express.Router();
 router.get('/', (req, res, next) => {
     res.render('login');
 });
-/* POST login an user*/
+/* POST login an user */
 router.post('/', (req, res, next) => {
     const login = new LoginQueries(getDatabase());
     const authUser = new UserAuthentication(getDatabase());
     const email = req.body.email;
+    console.log(email);
     const session = req.sessionID;
     const password: string = req.body.password;
     if (password === undefined || email === undefined) {
-        return res.status(401).redirect("../");
+        return res.status(401).redirect('../');
     }
     try {
         login.retrieveHash(email).then(hash => {
             if (hash === undefined) {
-                next(new EmailNotRegisteredError("email " + email + " is not registered."));
+                next(new EmailNotRegisteredError('email ' + email + ' is not registered.'));
             } else {
                 bcrypt.compare(password, hash, (error2, result2) => {
                     if (result2) {
+                        console.log(result2);
                         authUser.registerSession(session, email).then(val => {
                             // TODO change this to redirect to the dashboard.
-                            res.status(200).json({ "login:": result2 });
+                            res.status(200).json({ login: result2 });
                         }).catch(failure => {
-                            next(failure);
+                            // next(failure);
+                            if (failure.message.includes('No match found')) {
+                                res.status(200).json({ login: result2 });
+                            } else {
+                                next(failure)
+                            }
+                            // res.status(200).json({ login: result2 });
                         });
                     } else {
-                        res.status(401).json({ "login:": result2 });
+                        res.status(401).json({ login: result2 });
                     }
                 });
             }
@@ -46,7 +54,7 @@ router.post('/', (req, res, next) => {
     }
 });
 
-/* POST register an user*/
+/* POST register an user */
 router.post('/register', (req, res, next) => {
     const authUser = new UserAuthentication(getDatabase());
     authUser.authenticateUser(req.sessionID).then(val => {
@@ -58,15 +66,14 @@ router.post('/register', (req, res, next) => {
                 bcrypt.hash(password, salt, (hashError, result1) => {
                     const hash = result1;
                     login.registerLogin(email, hash, salt).then(result => {
-                        res.status(200).json({ "registered:": result });
+                        res.status(200).json({ registered: result });
                     }).catch(error => next(error));
                 });
             }).catch(err => next(err));
         } else {
-            return res.render("login");
+            return res.render('login');
         }
     }).catch(errors => next(errors));
-
 });
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT);
@@ -84,15 +91,15 @@ router.post('/google', async (req, res, next) => {
         const authUser = new UserAuthentication(getDatabase());
         authUser.registerGoogleSession(session, uniqueId)
             .then(val => {
-                res.redirect("../products");
+                res.redirect('../products');
             }).catch(err => {
                 if (err === null) {
-                    res.redirect("../products");
+                    res.redirect('../products');
                 }
                 next(err);
             });
     } else {
-        res.render("login");
+        res.render('login');
     }
 });
 

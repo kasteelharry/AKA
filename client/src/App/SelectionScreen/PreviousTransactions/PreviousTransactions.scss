@@ -1,0 +1,20 @@
+.previous-transaction-div {
+    position: relative;
+    left:0vh;
+    margin-top: 1vh;
+    width: 100%;
+    height: 25vh;
+    // outline: 0px;
+    z-index: 1000;
+    overflow-y: scroll;
+}
+
+.previous-transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.button-table {
+    position: relative;
+    height: 6vh;
+    width: 6vw;
+}

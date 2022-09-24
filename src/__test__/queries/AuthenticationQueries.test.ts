@@ -1,11 +1,9 @@
-import { MockDatabase } from "@dir/model/MockDatabase";
-import { queryType } from "@dir/app";
-import AuthenticationQueries from "@dir/queries/AuthenticationQueries";
-import { GeneralServerError } from "@dir/exceptions/GeneralServerError";
+import { MockDatabase } from '@dir/model/MockDatabase';
+import { queryType } from '@dir/app';
+import AuthenticationQueries from '@dir/queries/AuthenticationQueries';
+import { GeneralServerError } from '@dir/exceptions/GeneralServerError';
 
-describe("AuthenticationQueriesTest", () => {
-
-
+describe('AuthenticationQueriesTest', () => {
     let auth: AuthenticationQueries;
     let db: MockDatabase<queryType>;
 
@@ -24,39 +22,37 @@ describe("AuthenticationQueriesTest", () => {
     // ------------------------- Create statements test -------------------------
     //
 
-
-
-    test("Authenticate existent user in Database", async () => {
-        const promise = auth.authenticateUserInDB(1, "session");
+    test('Authenticate existent user in Database', async () => {
+        const promise = auth.authenticateUserInDB(1, 'session');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Authenticate non-existent user in Database", async () => {
+    test('Authenticate non-existent user in Database', async () => {
         db.setFailInsert(true);
-        const promise = auth.authenticateUserInDB(1, "session");
+        const promise = auth.authenticateUserInDB(1, 'session');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
-    test("Authenticate duplicate user in Database", async () => {
+    test('Authenticate duplicate user in Database', async () => {
         db.setDuplicateInsert(true);
-        const promise = auth.authenticateUserInDB(1, "session");
+        const promise = auth.authenticateUserInDB(1, 'session');
         await expect(promise).resolves.toBeFalsy();
     });
 
-    test("Authenticate existent Google user in Database", async () => {
-        const promise = auth.authenticateGUserInDB("1", "session");
+    test('Authenticate existent Google user in Database', async () => {
+        const promise = auth.authenticateGUserInDB('1', 'session');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Authenticate non-existent Google user in Database", async () => {
+    test('Authenticate non-existent Google user in Database', async () => {
         db.setFailInsert(true);
-        const promise = auth.authenticateGUserInDB("1", "session");
+        const promise = auth.authenticateGUserInDB('1', 'session');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
-    test("Authenticate duplicate user Google in Database", async () => {
+    test('Authenticate duplicate user Google in Database', async () => {
         db.setDuplicateInsert(true);
-        const promise = auth.authenticateGUserInDB("1", "session");
+        const promise = auth.authenticateGUserInDB('1', 'session');
         await expect(promise).resolves.toBeFalsy();
     });
 
@@ -64,14 +60,14 @@ describe("AuthenticationQueriesTest", () => {
     // ------------------------- Retrieve statements test -------------------------
     //
 
-    test("Verify session in the database", async () => {
-        const promise = auth.verifyUserInDB("existentSession");
+    test('Verify session in the database', async () => {
+        const promise = auth.verifyUserInDB('existentSession');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Verify session in closed database", async () => {
+    test('Verify session in closed database', async () => {
         db.setDBState(false);
-        const promise = auth.verifyUserInDB("existentSession");
+        const promise = auth.verifyUserInDB('existentSession');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
@@ -83,26 +79,25 @@ describe("AuthenticationQueriesTest", () => {
     // ------------------------- Delete statements test -------------------------
     //
 
-    test("Logging out user", async () => {
-        const promise = auth.logOutUser("1");
+    test('Logging out user', async () => {
+        const promise = auth.logOutUser('1');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Logging out user in closed database", async () => {
+    test('Logging out user in closed database', async () => {
         db.setDBState(false);
-        const promise = auth.logOutUser("1");
+        const promise = auth.logOutUser('1');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
 
-    test("Logging out session", async () => {
-        const promise = auth.logOutSession("existentSession");
+    test('Logging out session', async () => {
+        const promise = auth.logOutSession('existentSession');
         await expect(promise).resolves.toBeDefined();
     });
 
-    test("Logging out session in closed database", async () => {
+    test('Logging out session in closed database', async () => {
         db.setDBState(false);
-        const promise = auth.logOutSession("existentSession");
+        const promise = auth.logOutSession('existentSession');
         await expect(promise).rejects.toBeInstanceOf(GeneralServerError);
     });
-
 });
