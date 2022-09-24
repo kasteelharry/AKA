@@ -80,7 +80,7 @@
         "eslint-plugin-promise": "^5.2.0",
         "eslint-plugin-react": "^7.28.0",
         "jest": "^27.4.5",
-        "nodemon": "^2.0.15",
+        "nodemon": "^2.0.20",
         "supertest": "^6.2.1",
         "ts-jest": "^27.1.2",
         "ts-node": "^8.10.2",
